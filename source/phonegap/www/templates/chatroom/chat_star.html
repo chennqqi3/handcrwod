@@ -1,0 +1,26 @@
+<ion-view view-title="スター付きメッセージ" id="messageView" cache-view="false">
+    <ion-content id="chat_star_view" has-bouncing="true" class="has-header"
+      delegate-handle="userMessageScroll" on-scroll-complete="onScrollComplete()">
+      
+        <div ng-repeat="message in messages" class="message-wrapper" ng-class="{'to-mine': isToMine(message)}" ng-if="message.star">
+
+            <div id="chat_star_{{message.cmsg_id}}">
+                <img ng-click="viewProfile(message)" class="profile-pic left" ng-src="{{message.avartar}}" onerror="onProfilePicError(this)"/>
+
+                <div class="chat-message left border-top" ng-class="{'me': session.user_id == message.user_id}">
+                    <div class="message-detail">
+                        <span ng-click="viewProfile(message)" class="bold" ng-if="message.show_avartar">{{message.user_name}}</span> 
+                        <span class="time"><i class="fa fa-circle text-danger {{message.read_class}}"></i><a href="javascript:;" class="star" ng-click="unstar(message)"><i class="fa fa-star text-warning" ng-show="message.star"></i></a> {{message.date_label}}</span>
+                    </div>
+
+                    <div class="message" ng-bind-html="message.content | chatize">
+                    </div>
+                </div>
+            </div>
+
+            <div class="cf"></div>
+
+        </div>
+    </ion-content>
+
+</ion-view>

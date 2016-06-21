@@ -1,0 +1,29 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+  <h4 class="modal-title" id="myModalLabel">チャットルームへの招待</h4>
+</div>
+<div class="modal-body">
+	<div class="search-bar input-group">
+		<input type="text" class="form-control" required data-ng-model="search_string" placeholder="メールアドレスやユーザー名を入力">
+		<div class="input-group-btn">
+			<button type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
+		</div>
+	</div>
+  	<ul class="dialog-list">
+		<li data-ng-repeat="user in users | filter:search_string track by user.user_id" data-ng-class="{'selected': user.user_id==selectedUser.user_id}">
+			<a href="javascript:;" ng-click="selectUser(user)">
+				<img alt="" ng-src="{{user.avartar}}" class="avartar avartar-primary img30_30">
+				<span tooltip-placement="right" tooltip="依頼金額累計：{{user.deliver_amount}}円" tooltip-append-to-body="true">{{user.user_name}} <small>({{user.email}})</small></span>
+			</a>
+		</li>
+		<li ng-show="(users|filter:search_string).length == 0">
+			ホームのメンバー以外にチャットルームを共有する場合は、以下の「ホームに招待して共有」を押下してください。
+		</li>
+	</ul>
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" ng-click="cancel()">閉じる</button>
+  <button type="button" class="btn btn-primary" ng-click="invite()" ng-disabled="!canInvite()">共有</button>
+  <button type="button" class="btn btn-primary" ng-click="invite_entrance()">ホームに招待して共有</button>
+</div>

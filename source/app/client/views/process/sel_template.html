@@ -1,0 +1,51 @@
+<!-- Mission panel -->
+<div id="panel-sel-template" class="panel panel-default panel-sel-template"
+	data-ng-controller="selTemplateCtrl">
+	<header class="panel-header">
+		<div class="pull-right">
+			<div class="btn-group">
+				<button type="button" class="btn btn-default btn-circle" ng-click="closePanel()"><i class="ln-icon-cross2"></i></button>
+			</div>
+		</div>
+		<h4>テンプレート</h4>
+	</header>
+	<!-- end panel-header -->
+	<div class="page">
+		<h4>プロセスをテンプレートへ保存</h4>
+		<form name="form_template_add" class="form-horizontal form-validation form-template-add" data-ng-submit="submitForm()" ng-controller="templateAddCtrl">
+			<div class="col-md-12">
+				<div class="form-group">
+					<input type="text" class="form-control" required ng-model="template.template_name" placeholder="テンプレート名を入力" auto-focus=true>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-block" data-ng-disabled="!canSubmit()"><i class="ln-icon-floppy-disk"></i> 保存</button>
+				</div>
+			</div>
+		</form>
+		<h4>テンプレート一覧</h4>
+		<ul class="list-group">
+			<li data-ng-repeat="template in templates" class="list-group-item" data-ng-class="{selected: template.template_id == selected_template_id}" ng-click="selectTemplate(template)">
+				<span class="view">
+					<span class="pull-right">
+						{{template.create_time | date_time_label}} 
+						<button type="button" class="btn btn-xs btn-inverse" ng-click="removeTemplate(template)"><i class="glyphicon glyphicon-trash"></i></button>
+					</span>
+					{{template.template_name}}
+				</span>
+			</li>
+		</ul>
+		<div ng-if="canEditTask()">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary btn-block" data-ng-disabled="!canImport()" ng-click="importConfirm()"><i class="ln-icon-pencil"></i> テンプレートからプロセスを生成</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end page -->
+</div>
+<!-- end Mission panel -->

@@ -1,0 +1,123 @@
+<ion-view view-title="{{title()}}" id="messageView" cache-view="false">
+    <ion-nav-buttons side="right">
+        <button menu-toggle="right" class="button button-icon icon ion-ios-more" ng-click="showOthers($event)"></button>
+    </ion-nav-buttons>
+    <div id="loader">
+        <div>
+            <div class="hc-loader">Loading...</div>
+        </div>
+    </div>
+    <ion-content id="chat_view" has-bouncing="true" class="has-header transparent" ng-class="{'hide-footer': !canChat()}"
+      delegate-handle="userMessageScroll" on-scroll-complete="onScrollComplete()">
+      
+        <div ng-repeat="message in messages" class="message-wrapper" ng-class="{'to-mine': isToMine(message), 'linked': message.cmsg_id==chat_id}" on-hold="onMessageHold($event, $index, message)">
+
+            <div id="chat_{{message.cmsg_id}}">
+                <img class="profile-pic left" ng-src="{{::message.avartar}}" onerror="onProfilePicError(this)" ng-if="message.show_avartar" ng-click="showUserProfile(message.avartar)"/>
+
+                <div class="chat-message left" ng-class="{'me': session.user_id == message.user_id, 'border-top': message.show_avartar, 'editing': message.editing}">
+                    <div class="sending" ng-if="message.cmsg_id < 0"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>
+                    <div class="message-detail">
+                        <span class="bold" ng-if="message.show_avartar" ng-click="showUserProfile(message.avartar)">{{::message.user_name}}</span> 
+                        <span class="time"><i class="fa fa-circle text-danger {{message.read_class}}"></i><a href="javascript:;" class="star" ng-click="star(message)"><i class="fa fa-star text-warning" ng-show="message.star"></i></a> {{message.date_label}}</span>
+                    </div>
+
+                    <div class="message" ng-bind-html="message.content | chatize">
+                    </div>
+                </div>
+            </div>
+
+            <div class="cf"></div>
+
+        </div>
+    </ion-content>
+
+    <div id="emoticon_gallery" style="visibility: hidden;">
+        <ul class="emoticonGallery clearfix">
+            <li ng-repeat="em in emoticons" class="emoticon {{em.class}}" title="{{em.title}} {{em.alt}}" alt={{e.alt}} ng-click="add_emoticon(em.alt)"></li>
+        </ul>         
+    </div>
+
+    <div id="to_users" style="visibility: hidden;">
+        <label class="search-bar item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" class="form-control" ng-model="search_user" maxlength="50" placeholder="検索...">
+        </label>
+        <ul class="user-list">
+            <li data-ng-repeat="member in cur_mission.members | filter:{user_name:search_user}" ng-click="to_message(member)">
+                <img ng-src="{{member.avartar}}" class="avartar img30_30">
+                {{member.user_name}}
+            </li>
+        </ul>
+    </div>
+
+    <div class="chat-send-files" id="file_bar">
+        <div class="chat-send-file" ng-repeat="file in files">
+            <div class="file-info">
+                {{file.name}}({{file.fileSize}}M)
+            </div>
+            <button class="button button-icon button-small icon ion-close-round pull-right" ng-click="onCancelUpload(file)"></button>
+            <div class="pbar">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped active" role="progressbar"
+                  aria-valuenow="{{file.progress}}" aria-valuemin="0" aria-valuemax="100" style="width:{{file.progress}}%">
+                    {{file.progress}}% 
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>   
+
+    <form id="input_bar" name="sendMessageForm" novalidate ng-show="canChat()">
+        <ion-footer-bar class="bar-stable item-input-inset message-footer" keyboard-attach>
+            <div class="footer-btn-wrap">
+                <button class="button button-icon icon icon-emoticon-smile footer-btn btn-emoticon">
+                </button>
+            </div>
+            <div class="footer-btn-wrap" ng-if="!show_more">
+                <button type="button" class="button button-icon icon-plus btn-to footer-btn" ng-click="showMore(true)"></button>
+            </div>
+            <div class="footer-btn-wrap" ng-show="show_more">
+                <button type="button" class="button button-icon btn-to footer-btn" ng-click="showTo()">TO</button>
+            </div>
+            <div class="footer-btn-wrap" ng-show="show_more">
+                <button class="button button-icon icon icon-paper-clip footer-btn" ng-file-select="onUploadFiles($files)">
+                </button>
+            </div>
+            <div class="footer-btn-wrap" ng-show="show_more && isAndroid">
+                <button class="button button-icon icon icon-camera footer-btn" ng-click="onCapture(false)">
+                </button>
+            </div>
+            <div class="footer-btn-wrap" ng-show="show_more && isAndroid">
+                <button class="button button-icon icon icon-camcorder footer-btn" ng-click="onCapture(true)">
+                </button>
+            </div>
+            <div class="footer-btn-wrap" ng-show="show_more">
+                <button type="button" class="button button-icon icon-close btn-to footer-btn" ng-click="showMore(false)"></button>
+            </div>
+            <label class="item-input-wrapper">
+                <textarea ng-model="cmsg.content" value="" placeholder="メッセージ" required minlength="1" maxlength="1500" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()"></textarea>
+            </label>
+            <div class="footer-btn-wrap">
+                <button class="button button-icon icon icon-paper-plane footer-btn" type="submit" ng-click="sendMessage()">
+                </button>
+            </div>
+        </ion-footer-bar>
+    </form>
+
+</ion-view>
+
+<script id="chatroom-menu.html" type="text/ng-template">
+    <ion-popover-view style="height:340px">
+        <ion-content>
+            <ion-list>
+                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".task({mission_id:mission_id})"><i class="icon fa fa-check-square-o"></i>タスク</ion-item>
+                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".process({mission_id:mission_id})"><i class="icon icon-share"></i>プロセス</ion-item>
+                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".attach({mission_id:mission_id})"><i class="icon icon-paper-clip"></i>添付ファイル</ion-item>
+                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".edit({mission_id:mission_id})"><i class="icon icon-settings"></i>設定</ion-item>
+                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".member({mission_id:mission_id})" ng-if="cur_mission.private_flag==1 && canEditMissionMember()"><i class="icon icon-users"></i>メンバー</ion-item>
+                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".star({mission_id:mission_id})"><i class="icon icon-star"></i>スター付き</ion-item>
+            </ion-list>
+        </ion-content>
+    </ion-popover-view>
+</script>

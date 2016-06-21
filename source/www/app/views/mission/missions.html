@@ -1,0 +1,66 @@
+<!-- Mission panel -->
+<div class="panel panel-default side-panel panel-mission shadow-right"
+	data-ng-controller="missionCtrl" data-ng-cloak>
+	<header class="panel-header with-icon-right">
+		<input type="text" class="form-control" required ng-model="search_string" placeholder="キーワードを入力">
+		<i class="fa fa-search"></i>
+	</header>
+	<!-- end panel-header -->
+	<div id="mission-add" class="mission-add-bar">
+		<form name="form_mission_add" class="form-horizontal form-validation" data-ng-submit="submitForm()" ng-controller="missonAddCtrl">
+			<div class="col-md-12">
+				<div class="form-group">
+					<span class="icon-left fa fa-plus"></span>
+					<input type="text" class="form-control" required ng-model="mission.mission_name" placeholder="チャットルーム名を入力">
+					<a href="javascript:;" ng-click="closePanel()"><span class="icon-right fa fa-times"></span></a>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="page page-missions">
+		<div class="clear"></div>
+		<ul mission-sortable class="list-group mission-sort">
+			<li data-ng-repeat="mission in missions | filter:searchFilter1 | orderBy:'sort0' track by mission.mission_id" class="list-group-item mission-item" data-ng-class="{selected: mission.mission_id == cur_mission.mission_id}" data-mission-id="{{mission.mission_id}}">
+				<span class="view">
+					<label ng-click="selectMission(mission)">
+						<span class="mission-name">{{mission.mission_name}}</span>
+						<span class="pull-right badge badge-danger" ng-show="mission.remainingTasks > 0">{{mission.remainingTasks}}</span>
+					</label>
+				</span>
+			</li>
+		</ul>
+		<ul class="list-group">
+			<li data-ng-repeat="mission in missions | filter:searchFilter2 track by mission.mission_id" class="list-group-item completed" data-ng-class="{selected: mission.mission_id == cur_mission.mission_id}">
+				<span class="view">
+					<label ng-click="selectMission(mission)">
+						{{mission.mission_name}}
+					</label>
+				</span>
+			</li>
+		</ul>
+		<div class="row complete-bar">
+			<div class="col-md-12 text-center">
+				<button type="button" class="btn btn-gap-v btn-inverse" ng-click="loadCompleted()">完了済み</button>
+			</div>
+		</div>
+	</div>
+	<!-- end page -->
+	<footer class="panel-footer">
+		<ul class="nav-left list-unstyled">
+			<li>
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="editMission()" data-ng-disabled="cur_mission==null" title="詳細"><i class="fa fa-cogs"></i></button>
+			</li>
+			<li>
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-file-select="importCSV($files)" title="CSV取込"><i class="fa fa-upload"></i></button>
+			</li>
+		</ul> 
+		<ul class="nav-right pull-right list-unstyled">
+			<li>
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="showMissionAdd()" title="追加"><i class="glyphicon glyphicon-plus"></i></button>
+			</li>
+		</ul>
+	</footer>
+	<!-- end panel-footer -->
+	<section data-ng-include=" 'views/mission/mission_edit.html' + ver "></section>
+</div>
+<!-- end Mission panel -->

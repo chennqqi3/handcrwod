@@ -1,0 +1,62 @@
+.panel-sel-performer {
+    position: absolute;
+    display: none;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    padding: 0;
+    margin: 0px;
+
+    .panel-header {
+        height: 84px;
+    }
+
+    .page {
+        position: absolute;
+        top: 0px;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: -blackberry-touch;
+        -moz-transition: none;
+        -webkit-transition: none;
+        -o-transition: none;
+        transition: none;
+        padding: 10px 0px;
+
+        // when init
+        .list-group-item {
+            padding: 10px 15px;
+            border-left: 0px;
+            border-right: 0px;
+
+            &.selected {
+                background: @brand-success;
+                color: white;
+                font-weight: bold;
+            }
+
+            div.skills {
+                padding-left: 30px;
+            }
+
+            .label-group {
+                padding-bottom: 0px;
+            }
+
+            .desc {
+                padding-left: 45px;
+                font-size: 12px;
+            }
+        }
+
+        .list-group-item:first-child {
+            border-top: 0px;
+        }
+    }
+}

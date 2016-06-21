@@ -1,0 +1,43 @@
+
+.view-containter {
+    position: relative;
+}
+
+#content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    left: @nav_width;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: -blackberry-touch;
+    background: white;
+    .transition(all .2s ease-in-out);
+}
+
+// for special page, like 404, sign in, sign up
+.body-special {
+    #content {
+        z-index: 2;
+        top: 0;
+        left: 0 !important;
+        background: url('../images/background/splash.jpg') no-repeat center center fixed; 
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+}
+// lock screen
+.body-lock {
+    #content {
+        background: url('../images/background/splash.jpg') no-repeat center center fixed; 
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+}

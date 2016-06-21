@@ -1,0 +1,32 @@
+<ion-modal-view>
+    <ion-header-bar class="bar bar-header bar-positive">
+        <h1 class="title">ホーム詳細情報</h1>
+        <div class="buttons">
+            <button class="button button-icon icon ion-ios-close-outline" ng-click="close()"></button>
+        </div>
+    </ion-header-bar>
+    <ion-content>
+        <div class="list">
+            <label class="item item-input">
+                <span class="input-label">ホーム名</span>
+                <input type="text" ng-model="home.home_name">
+            </label>
+            <div class="item item-input">
+                <span class="input-label">ロゴ</span>
+                <div class="logo-container-80">
+                    <span ng-if="home.logo_url == null">{{home.home_name | abbr}}</span>
+                    <img alt="" ng-src="{{home.logo_url}}" class="logo" ng-if="home.logo_url != null">
+                </div>
+                <div>
+                    <div class="button button-small button-assertive" ng-file-select="onUploadLogo($files)" style="margin-bottom: 10px;">アップロード</div>
+                    <br/>
+                    <button type="button" class="btn btn-sm btn-gap-v btn-default" ng-click="onRemoveLogo($files)">削除</button>
+                </div>
+            </div>
+            <label class="item item-input item-floating-label">
+                <span class="input-label">ホーム概要</span>
+                <textarea placeholder="概要を入力してください。" ng-model="home.summary" rows=10></textarea>
+            </label>
+        </div>
+    </ion-content>
+</ion-modal-view>

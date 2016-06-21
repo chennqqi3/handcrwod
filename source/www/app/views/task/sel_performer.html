@@ -1,0 +1,32 @@
+<!-- Select performer panel -->
+<div id="panel-sel-performer" class="panel panel-sel-performer" data-ng-controller="selPerformerCtrl">
+	<header class="panel-header">
+        <div class="pull-right">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-circle" ng-click="closePanel()"><i class="ln-icon-cross2"></i></button>
+            </div>
+        </div>
+        <h4>ユーザー選択</h4>
+        <div class="input-group">
+    		<input type="text" class="form-control" required ng-model="search_string" placeholder="キーワードを入力">
+            <div class="input-group-btn">
+    			<button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+    		</div>
+        </div>
+	</header>
+	<!-- end panel-header -->
+	<div class="page" data-slim-scroll>
+		<ul class="list-group">
+			<li class="list-group-item" data-ng-repeat="user in users | filter:search_string">
+				<a href="javascript:;" ng-click="selectPerformer(user)">
+					<img alt="" ng-src="{{user.avartar}}" class="avartar avartar-primary img30_30">
+					<span tooltip-placement="right" tooltip="依頼金額累計：{{user.deliver_amount}}円" tooltip-append-to-body="true">{{user.user_name}}</span>
+				</a>
+				<div class="pull-right">
+                    <div ng-show="user.type!=1" class="desc"><span ng-show="user.ongoing_tasks>0">進行中:{{user.ongoing_tasks}}件 </span>{{user.skills}}</div>
+				</div>
+			</li>
+        </ul>
+	</div>
+</div>
+<!-- End Select performer panel -->

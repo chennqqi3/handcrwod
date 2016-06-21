@@ -1,0 +1,37 @@
+<div class="panel panel-default panel-chat-star" data-ng-controller="chatStarCtrl">  
+    <header class="title-bar">
+        <div class="title-wrapper">
+            <h2>スター付きメッセージ</h2>
+        </div>
+    </header>
+    <div id="chat_view" class="page chat-container" scroll-top="prev()" scroll-bottom="next()">
+        <div ng-repeat="message in messages | filter:{star:true} track by message.cmsg_id" class="message-wrapper" ng-class="{'to-mine': isToMine(message)}">
+            <div id="chat_{{message.cmsg_id}}">
+                <img class="avartar avartar-sm left" ng-src="{{message.avartar}}"/>
+
+                <div class="chat-message left border-top" ng-class="{'me': session.user_id == message.user_id}">
+                    <div class="message-detail">
+                        <span ng-click="viewProfile(message)" class="user-name">
+                            {{message.user_name}}
+                        </span> 
+                        <span class="time">{{message.mission_name}} {{message.date_label}}</span>
+                    </div>
+
+                    <div class="message" ng-bind-html="message.content | chatize" autolinker>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="button-group">
+                <li>
+                    <button type="button" class="btn btn-default btn-xs btn-circle" title="このメッセージへ移動" ng-click="goMessage(message)"><i class="fa fa-fw fa-share"></i></button>
+                </li>
+                <li>
+                    <button type="button" class="btn btn-default btn-xs btn-circle" title="スターを外す" ng-click="unstar(message)"><i class="fa fa-fw fa-star-o"></i></button>
+                </li>
+            </ul>
+
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

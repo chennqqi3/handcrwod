@@ -1,0 +1,147 @@
+<div class="panel-edit-mission">
+	<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+        
+        <h4 class="modal-title">チャットルーム情報</h4>
+	</div>
+    <div class="modal-body">
+		<ul class="list-group">
+			<li class="list-group-item">
+				<div class="row form-group">
+					<label class="col-sm-2">タイトル</label>
+					<form class="col-sm-10" data-ng-submit="changeMissionName(mission)">
+						<input type="text" class="edit form-control" data-ng-trim="false" ng-model="mission.mission_name" data-ng-blur="changeMissionName(mission)" ng-show="canEdit()">
+					</form>
+					<span class="col-sm-10 col-detail" ng-show="!canEdit()">{{mission.mission_name}}</span>
+				</div>
+			</li>
+			<li class="list-group-item" ng-show="canEdit()">
+				<div class="row form-group">
+					<div class="col-sm-10 col-sm-offset-2">
+                		<dd class="radio-group">
+		                    <label class="ui-radio">
+		                        <input class="required" required type="radio" name="private_flag" ng-model="mission.private_flag" value="0" ng-change="changeMissionPrivateFlag(mission)"><span>全メンバー用</span>
+		                    </label>
+		                    <label class="ui-radio">
+		                        <input class="required" required type="radio" name="private_flag" ng-model="mission.private_flag" value="1" ng-change="changeMissionPrivateFlag(mission)"><span>特定メンバー用</span>
+		                    </label>
+		                </dd>
+					</div>
+				</div>
+			</li>
+			<li class="list-group-item" ng-show="mission.complete_flag">
+				<div class="row form-group">
+					<label class="col-sm-2">完了日時</label>
+					<div class="col-sm-10 col-detail">{{ mission.complete_time | date_time_label }}</div>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="row form-group">
+					<label class="col-sm-2">概要</label>
+					<div class="col-sm-10 summary-item" ng-show="!editSummaryMode">
+						<a href="javascript:;" id="summary" ng-model="mission.summary" class="edit-popup edit-block edit-popup-empty" ng-click="editSummary(mission)" data-ng-show="(mission.summary==null || mission.summary=='' ) && canEdit()">概要の入力</a>
+						<div class="edit-popup clickable" ng-bind-html="mission.summary | noHTML | htmlfy" data-ng-show="mission.summary!=null && mission.summary!=''" ng-click="editSummary(mission)"></div>
+					</div>
+					<form name="form_summary" class="col-sm-10 form-validation comment-form" data-ng-submit="submitSaveSummary(mission)" ng-show="editSummaryMode">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<textarea class="form-control" ng-model="mission.summary" placeholder="概要を入力してください。" rows=10 auto-focus="editSummaryMode == true"></textarea>
+								</div>
+							</div>
+						</div>
+						<div class="divider"></div>
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<button type="submit" class="edit-popup edit-block edit-popup-empty"><i class="ln-icon-floppy-disk"></i> 保存</button>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<button type="button" class="edit-popup edit-block edit-popup-empty" ng-click="exitEditSummary()"><i class="ln-icon-cross2"></i> 取消</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="row form-group">
+					<label class="col-sm-2">合計金額</label>
+					<div class="col-sm-4 col-detail">{{ mission.total_budget | number: 0 }}円</div>
+					<label class="col-sm-2">合計工数</label>
+					<div class="col-sm-4 col-detail">{{ mission.total_hours | hours_label}}</div>
+				</div>
+			</li>
+			<li class="list-group-item" ng-show="canEdit()">
+				<div class="row form-group" ng-show="canBackImage()">
+					<label class="col-sm-2">背景画像</label>
+					<div class="col-sm-5">
+						<a href="javascript:;" class="edit-popup edit-block edit-popup-empty" ng-file-select="onUploadBackImage($files, 0)" ng-show="mission.job_back==null"><i class="fa fa-image"></i> ルーム画面</a>
+						<a href="javascript:;" class="edit-popup edit-block edit-popup-empty" ng-click="onSettingBackImage(0)" ng-show="mission.job_back!=null"><i class="fa fa-image"></i> ルーム画面</a>
+					</div>
+					<div class="col-sm-5">
+						<a href="javascript:;" class="edit-popup edit-block edit-popup-empty" ng-file-select="onUploadBackImage($files, 1)" ng-show="mission.prc_back==null"><i class="fa fa-image"></i> プロセス画面</a>
+						<a href="javascript:;" class="edit-popup edit-block edit-popup-empty" ng-click="onSettingBackImage(1)" ng-show="mission.prc_back!=null"><i class="fa fa-image"></i> プロセス画面</a>
+					</div>
+				</div>
+				<div class="row" ng-show="!canBackImage()">
+					<div class="col-sm-12">
+						<div class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> 現在のユーザープランでは背景画像を設定できません。</div>
+					</div>
+				</div>
+			</li>
+			<li class="list-group-item" ng-show="canEdit()">
+				<div class="row form-group" ng-show="canRepeat()">
+					<label class="col-sm-2">繰り返し</label>
+					<div class="col-sm-4">
+		                <select class="form-control" ng-model="mission.repeat_type" ng-change="setRepeat()" ng-options="t.id as t.text for t in g_repeat_types"></select>
+					</div>
+					<label class="col-sm-6" ng-show="mission.repeat_type==2">
+						月曜日～金曜日
+					</label>
+					<div class="col-sm-6" ng-show="mission.repeat_type==3">
+		                <select class="form-control" ng-model="mission.repeat_weekday" ng-change="setRepeat()" ng-options="t.id as t.text for t in g_week_days"></select>
+					</div>
+					<div class="col-sm-4" ng-show="mission.repeat_type==4">
+						<span class="label-right">日</span>
+		                <input type="number" class="form-control text-right" min="1" max="31" ng-model="mission.repeat_monthday" ng-change="setRepeat()"></input>
+					</div>
+					<div class="col-sm-3" ng-show="mission.repeat_type==5">
+						<span class="label-right">月</span>
+		                <input type="number" class="form-control text-right" min="1" max="12" ng-model="mission.repeat_month" ng-change="setRepeat()"></input>
+					</div>
+					<div class="col-sm-3" ng-show="mission.repeat_type==5">
+						<span class="label-right">日</span>
+		                <input type="number" class="form-control text-right" min="1" max="31" ng-model="mission.repeat_monthday" ng-change="setRepeat()"></input>
+					</div>
+				</div>
+				<div class="row" ng-show="!canRepeat()">
+					<div class="col-sm-12">
+						<div class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i> 現在のユーザープランでは繰り返し設定を利用することができません。</div>
+					</div>
+				</div>
+			</li>
+			<li class="list-group-item">
+				<div class="row form-group">
+					<label class="col-sm-2">通知</label>
+					<div class="col-sm-10">
+						<dd class="radio-group">
+		                    <label class="ui-radio">
+		                        <input class="required" required type="radio" name="push_flag" ng-model="mission.push_flag" value="0" ng-change="changeMissionAlertFlag(mission)"><span>OFF</span>
+		                    </label>
+		                    <label class="ui-radio">
+		                        <input class="required" required type="radio" name="push_flag" ng-model="mission.push_flag" value="1" ng-change="changeMissionAlertFlag(mission)"><span>ON</span>
+		                    </label>
+		                </dd>
+		            </div>
+				</div>
+			</li>
+		</ul>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="cancel()">閉じる</button>
+    </div>
+</div>
+<!-- end Share mission panel -->

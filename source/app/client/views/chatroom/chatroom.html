@@ -1,0 +1,185 @@
+<div class="chat-main" data-ng-controller="chatroomCtrl" ng-class="{'show-side-panel': show_tasks || show_process || show_attach}">
+	<header class="title-bar">
+        <ul class="button-group-left" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">
+            <li dropdown>
+                <button type="button" class="btn btn-default btn-circle" dropdown-toggle><i class="icon-list"></i></button>
+                <ul class="dropdown-menu" aria-labelledby="simple-dropdown">
+                    <li>
+                        <a href ng-click="editMission()"><i class="icon-info"></i> チャットルーム情報</a>
+                    </li>
+                    <li ng-show="cur_mission.private_flag!=0 && canEditMissionMember()">
+                        <a href ng-click="inviteMission()"><i class="icon-user-follow"></i> ルームの共有</a>
+                    </li>
+                    <li ng-show="canComplete()">
+                        <a href ng-click="completeMissionConfirm()"><i class="icon-flag"></i> アーカイブする</a>
+                    </li>
+                    <li ng-show="canUncomplete()">
+                        <a href ng-click="uncompleteMissionConfirm()"><i class="icon-flag"></i> アーカイブしない</a>
+                    </li>
+                    <li ng-show="canRemove()">
+                        <a href ng-click="removeMissionConfirm()"><i class="icon-trash"></i> 削除</a>
+                    </li>
+                    <li ng-show="canBreak()">
+                        <a href ng-click="breakMissionConfirm()"><i class="icon-logout"></i> 退室</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        
+		<div class="title-wrapper">
+            <h2>{{cur_mission.mission_name}}</h2>
+            <span class="badge badge-danger" ng-if="cur_mission.end_date != null">期限:{{cur_mission.end_date | date_label}}</span> 
+            <span class="badge badge-primary" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">メンバー:{{cur_mission.members.length}}人</span> 
+		</div>
+
+		<ul class="button-group-right">
+            <li ng-show="cur_mission.private_flag==1">
+                <span data-ng-repeat="member in cur_mission.members | limitTo:5">
+                    <img ng-src="{{member.avartar}}" class="avartar clickable img30_30" title="{{member.user_name}}" ng-click="showUserProfile(member.user_id)">
+                </span>
+            </li>
+            <li ng-show="cur_mission.private_flag==1">
+                <button type="button" class="btn btn-default btn-circle" title="メンバーの招待と削除" ng-click="memberMission()"><i class="icon-people"></i></button>
+            </li>
+			<li>
+				<button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_process, 'btn-default': !show_process}" title="プロセス" ng-click="showProcess()"><i class="ln-icon-site-map"></i></button>
+			</li>
+			<li>
+				<button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_attach, 'btn-default': !show_attach}" title="ファイル" ng-click="showFiles()"><i class="icon-paper-clip"></i></button>
+			</li>
+            <li>
+                <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_star, 'btn-default': !show_star}" title="スター付き" ng-click="showStar()"><i class="icon-star"></i></button>
+            </li>
+		</ul>
+	</header>
+    <div class="chat-panel">
+        <div id="loader">
+            <div>
+                <div class="hc-loader">Loading...</div>
+            </div>
+        </div>
+    	<div id="chat_view" class="chat-view page chat-container transparent" scroll-top="prev()" scroll-bottom="next()" scroll="onScroll()">
+    		<div ng-repeat="message in messages track by message.cmsg_id" class="message-wrapper" ng-class="{'to-mine': isToMine(message), 'linked': message.cmsg_id==chat_id}">
+                <div id="chat_{{message.cmsg_id}}">
+                    <img class="avartar clickable left" ng-src="{{::message.avartar}}" ng-if="message.show_avartar" ng-click="showUserProfile(message.user_id)"/>
+
+                    <div class="chat-message left" ng-class="{'me': session.user_id == message.user_id, 'border-top': message.show_avartar, 'editing': message.editing}">
+                        <div class="sending" ng-if="message.cmsg_id < 0"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>
+                        <div class="message-detail">
+                            <span ng-click="viewProfile(message)" class="user-name" ng-if="message.show_avartar">{{::message.user_name}}</span> 
+                            <span class="time">{{::message.date_label}}</span>
+                            <a href="javascript:;" class="star" ng-class="{'show-hover': !message.star}" ng-click="star(message)" title="スター付き"><i class="fa text-warning" ng-class="{'fa-star': message.star, 'fa-star-o':!message.star}"></i></a>
+                            <span class="unread-mark"><i class="fa fa-circle text-danger {{message.read_class}}"></i></span>
+                        </div>
+                        <div class="message" ng-bind-html="message.content | chatize">
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="button-group" ng-class="{'editing': message.editing}" ng-if="message.cmsg_id>0">
+                    <li ng-if="canEditTask()">
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="タスク新規登録" ng-click="addTask(message)"><i class="ln-icon-check-square"></i></button>
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="リンク" ng-click="link(message)"><i class="icon-link"></i></button>
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="引用" ng-click="quote(message)"><i class="ln-icon-quote-open"></i></button>
+                    </li>
+                    <li ng-if="session.user_id == message.user_id">
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="編集" ng-click="edit(message)"><i class="icon-pencil"></i></button>
+                    </li>
+                    <li ng-if="session.user_id == message.user_id">
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="削除" ng-click="remove(message)"><i class="icon-trash"></i></button>
+                    </li>
+                </ul>
+
+                <div class="clear"></div>
+            </div>
+            <div id="scroll_bottom"></div>
+    	</div>
+        <div class="chat-send-files" id="file_bar">
+            <div class="chat-send-file" ng-repeat="file in files">
+                <div class="file-info">
+                    {{file.name}}({{file.fileSize}}M)
+                </div>
+                <span class="pull-right">
+                    {{file.progress}}% 
+                    <button class="btn btn-xs btn-default btn-circle" ng-click="onCancelUpload(file)"><i class="icon-close"></i></button>                    
+                </span>
+                <div class="pbar">            
+                    <progressbar class="progressbar-sm progress-striped active" value="file.progress"></progressbar>
+                </div>                
+            </div>
+        </div>
+        <form id="input_bar" class="bar bar-footer item-input-inset" novalidate ng-show="canChat()">
+            <div class="footer-btn-wrap">
+                <button class="btn btn-default btn-circle btn-smile"><i class="icon-emotsmile"></i></button>
+            </div>
+            <div class="footer-btn-wrap">
+                <button class="btn btn-default btn-circle btn-file" multiple ng-file-select="onUploadFiles($files)"><i class="icon-paper-clip"></i></button>
+            </div>
+            <div class="footer-btn-wrap" ng-show="cur_mission.private_flag==0 || cur_mission.private_flag==1">
+                <button class="btn btn-default btn-circle btn-to" >TO</button>
+            </div>
+            <label class="item-input-wrapper">
+                <textarea ng-model="cmsg.content" value="" placeholder="メッセージを入力してください。(SHIFT + ENTERで送信)" required minlength="1" maxlength="1500" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()"></textarea>
+            </label>
+            <div class="footer-btn-wrap">
+                <button class="btn btn-default btn-circle" type="submit" ng-disabled="!cmsg.content || cmsg.content === ''" ng-click="sendMessage()">
+                    <i class="ln-icon-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="right-panel">
+        <section data-ng-include=" 'views/task/tasks.html' + ver " ng-if="show_tasks"></section>
+        <section data-ng-include=" 'views/process/process.html' + ver " ng-if="show_process"></section>
+        <section data-ng-include=" 'views/mission/mission_attach.html' + ver " ng-show="show_attach"></section>
+        <section data-ng-include=" 'views/chatroom/chat_star.html' + ver " ng-if="show_star"></section>
+    </div>
+
+    <div class="resize-handle-h"><i class="fa fa-bars fa-rotate-90"></i></div>
+
+    <div id="emoticon_gallery" class="popover fade top in">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <ul id="_emoticonGallery" class="emoticonGallery clearfix">
+                <li ng-repeat="em in emoticons" class="emoticon {{em.class}}" title="{{em.title}} {{em.alt}}" alt={{e.alt}} ng-click="add_emoticon(em.alt)"></li>
+            </ul>
+        </h3>
+    </div>
+    <div id="file_drop" class="popover top">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <div class="drop-box">このエリアにドロップしてください<br/>（複数ファイル送信可能）</div>
+        </h3>
+    </div>
+    <div id="to_users" class="popover fade top in">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <input type="text" class="search-input form-control" required ng-model="search_user" maxlength="50" placeholder="検索...">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                    </div>
+                </div>
+            </div>
+            <ul class="user-list">
+                <li data-ng-repeat="member in cur_mission.members | filter:{user_name:search_user}" ng-click="to_message(member)">
+                    <img ng-src="{{member.avartar}}" class="avartar img30_30">
+                    {{member.user_name}}
+                </li>
+            </ul>
+        </h3>
+    </div>
+    <div id="selection_menu" class="popover fade bottom in">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <button type="button" class="btn btn-default btn-sm" ng-click="quote()"><i class="fa fa-fw fa-quote-left"></i>　引用</button>
+            <button type="button" class="btn btn-default btn-sm" ng-click="addTask()" ng-if="canEditTask()"><i class="icon-fa fa fa-check-square-o"></i>　タスク登録</button>
+        </h3>
+    </div>
+</div>

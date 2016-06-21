@@ -1,0 +1,34 @@
+<ion-modal-view>
+    <ion-header-bar class="bar bar-header bar-positive">
+        <div class="buttons">
+            <button class="button button-icon icon ion-ios-search" ng-click="open_search_skill()"></button>
+        </div>
+        <h1 class="title">スキル選択</h1>
+        <div class="buttons">
+            <button class="button button-icon icon ion-ios-close-outline" ng-click="close_skill()"></button>
+        </div>
+    </ion-header-bar>
+    <ion-header class="bar bar-header item-input-inset" ng-show="show_search_skill">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" ng-model="search_skill.text" placeholder="検索...">
+        </label>
+        <button class="button button-clear" ng-click="close_search_skill()">キャンセル</button>
+    </ion-header>
+    <ion-content>
+        <ion-list>
+            <ion-item data-ng-repeat="skill in all_skills | filter:search_skill.text | filter:{selected:true}" class="item item-checkbox">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="skill.selected">
+                </label>
+                {{skill.skill_name}}
+            </ion-item>
+            <ion-item data-ng-repeat="skill in all_skills | filter:search_skill.text | filter:{selected:false}" class="item item-checkbox">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="skill.selected">
+                </label>
+                {{skill.skill_name}}
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-modal-view>

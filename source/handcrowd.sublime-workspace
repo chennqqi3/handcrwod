@@ -1,0 +1,2233 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"inl",
+				"inline-block"
+			],
+			[
+				"font",
+				"font-size"
+			],
+			[
+				"mess",
+				"messages"
+			],
+			[
+				"un",
+				"undefined"
+			],
+			[
+				"me",
+				"messages"
+			],
+			[
+				"cache",
+				"cache_messages"
+			],
+			[
+				"miss",
+				"mission_id"
+			],
+			[
+				"g",
+				"g_messages"
+			],
+			[
+				"ta",
+				"target"
+			],
+			[
+				"mission",
+				"mission_id"
+			],
+			[
+				"eidt",
+				"ediatable"
+			],
+			[
+				"ms",
+				"msgkey"
+			],
+			[
+				"msg",
+				"msgkey"
+			],
+			[
+				"cmsg",
+				"cmsg_id"
+			],
+			[
+				"file",
+				"file_name"
+			],
+			[
+				"sync",
+				"syncServer"
+			],
+			[
+				"user",
+				"useragent"
+			],
+			[
+				"len",
+				"length"
+			],
+			[
+				"c",
+				"callback"
+			],
+			[
+				"cm",
+				"cmsg"
+			],
+			[
+				"cmg",
+				"cmsg_id"
+			],
+			[
+				"activa",
+				"activate_key"
+			],
+			[
+				"ERR",
+				"ERR_OK"
+			],
+			[
+				"call",
+				"callback"
+			],
+			[
+				"time",
+				"timeout	setTimeout function"
+			],
+			[
+				"view",
+				"viewHeight"
+			],
+			[
+				"app",
+				"apply"
+			],
+			[
+				"pr",
+				"progress"
+			],
+			[
+				"mis",
+				"mission_id"
+			],
+			[
+				"upload",
+				"upload_file"
+			],
+			[
+				"uplo",
+				"upload_file"
+			],
+			[
+				"home_",
+				"home_id"
+			],
+			[
+				"home",
+				"home_name"
+			],
+			[
+				"cms",
+				"cmsgs"
+			],
+			[
+				"next",
+				"next_id"
+			],
+			[
+				"unrea",
+				"unreads"
+			],
+			[
+				"unread",
+				"unread"
+			],
+			[
+				"t_mi",
+				"t_mission_member"
+			],
+			[
+				"date",
+				"dateutil"
+			],
+			[
+				"pin",
+				"pinned"
+			],
+			[
+				"oncall",
+				"oncall_type"
+			],
+			[
+				"shif",
+				"shiftStorage"
+			],
+			[
+				"oncal",
+				"oncall_type"
+			],
+			[
+				"shop",
+				"shop_id"
+			],
+			[
+				"sh",
+				"shop_shift"
+			],
+			[
+				"faci",
+				"facility_name"
+			],
+			[
+				"onc",
+				"oncall_pgroup"
+			],
+			[
+				"pgr",
+				"pgroups"
+			],
+			[
+				"wor",
+				"work_type"
+			],
+			[
+				"duti",
+				"dutytimes"
+			],
+			[
+				"duty",
+				"dutytimes"
+			],
+			[
+				"holi",
+				"holiday_date"
+			],
+			[
+				"hol",
+				"holiday_date"
+			],
+			[
+				"para",
+				"params"
+			],
+			[
+				"user_ty",
+				"user_type_name"
+			],
+			[
+				"holida",
+				"holiday_flag"
+			],
+			[
+				"to_d",
+				"to_date"
+			],
+			[
+				"to_",
+				"to_days"
+			],
+			[
+				"uhol",
+				"uholiday"
+			],
+			[
+				"uholi",
+				"uholidays"
+			],
+			[
+				"par",
+				"parseInt"
+			],
+			[
+				"day",
+				"dayofweek"
+			],
+			[
+				"ro",
+				"routeParams"
+			],
+			[
+				"uholida",
+				"uholidays"
+			],
+			[
+				"uholiday",
+				"uholiday_apply"
+			],
+			[
+				"uho",
+				"uholiday"
+			],
+			[
+				"sho",
+				"shop_id"
+			],
+			[
+				"work",
+				"worktimes"
+			],
+			[
+				"dut",
+				"dutytime"
+			],
+			[
+				"du",
+				"dutytime"
+			],
+			[
+				"back",
+				"background"
+			],
+			[
+				"mar",
+				"margin-right"
+			],
+			[
+				"date_",
+				"date_info"
+			],
+			[
+				"date_in",
+				"date_infos"
+			],
+			[
+				"padd",
+				"padding-right"
+			],
+			[
+				"fon",
+				"font-size"
+			],
+			[
+				"pad",
+				"padding-top"
+			],
+			[
+				"paddin",
+				"padding-top"
+			],
+			[
+				"mem",
+				"member"
+			],
+			[
+				"Err",
+				"ERR_OK"
+			],
+			[
+				"dep",
+				"depart"
+			],
+			[
+				"semi",
+				"seminar_company"
+			],
+			[
+				"semin",
+				"seminar_company"
+			],
+			[
+				"comp",
+				"company_id"
+			],
+			[
+				"depar",
+				"depart"
+			],
+			[
+				"compa",
+				"company"
+			],
+			[
+				"param",
+				"param_names"
+			],
+			[
+				"intro",
+				"intro_mail_time"
+			],
+			[
+				"sem",
+				"seminar_company"
+			],
+			[
+				"depa",
+				"depart"
+			],
+			[
+				"boss",
+				"boss_name"
+			],
+			[
+				"compan",
+				"company_id"
+			],
+			[
+				"de",
+				"departs"
+			],
+			[
+				"d",
+				"departs"
+			],
+			[
+				"Content",
+				"Content-type"
+			],
+			[
+				"t_s",
+				"t_seminar"
+			],
+			[
+				"member",
+				"member_ids"
+			],
+			[
+				"ERR_NOT",
+				"ERR_NOTFOUND_SEMINAR"
+			],
+			[
+				"sort",
+				"sort_field"
+			],
+			[
+				"searc",
+				"search_string"
+			],
+			[
+				"search",
+				"search_company_id"
+			],
+			[
+				"str_repa",
+				"str_replace"
+			],
+			[
+				"leg",
+				"legendTemplate"
+			],
+			[
+				"_pa",
+				"_page_id"
+			],
+			[
+				"Semi",
+				"seminar_id"
+			],
+			[
+				"ans",
+				"answers"
+			],
+			[
+				"result",
+				"result_id"
+			],
+			[
+				"err_",
+				"err_code"
+			],
+			[
+				"member_n",
+				"member_name_en"
+			],
+			[
+				"com",
+				"company"
+			],
+			[
+				"que",
+				"question"
+			],
+			[
+				"qvar",
+				"qvar_name"
+			],
+			[
+				"ques",
+				"questions"
+			],
+			[
+				"ass",
+				"assessment"
+			],
+			[
+				"del",
+				"del_flag"
+			],
+			[
+				"member_se",
+				"member_second_name_en"
+			],
+			[
+				"member_second_n",
+				"member_second_name_en"
+			],
+			[
+				"qv",
+				"qvar_name"
+			],
+			[
+				"seminar",
+				"seminar_id"
+			],
+			[
+				"company",
+				"company_id"
+			],
+			[
+				"assess",
+				"assessment_id"
+			],
+			[
+				"asses",
+				"assessmentStorage"
+			],
+			[
+				"face",
+				"facebook"
+			],
+			[
+				"perfor",
+				"performer_id"
+			],
+			[
+				"pass",
+				"password"
+			],
+			[
+				"faceb",
+				"facebook_id"
+			],
+			[
+				"sig",
+				"signup_url"
+			],
+			[
+				"crea",
+				"creator_id"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "app/client/views/account/signup.html",
+			"settings":
+			{
+				"buffer_size": 2271,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "app/client/scripts/account/signup.coffee",
+			"settings":
+			{
+				"buffer_size": 2419,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "phonegap/www/js/storage/chat.js",
+			"settings":
+			{
+				"buffer_size": 19799,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "app/client/scripts/chatroom/chatroom.coffee",
+			"settings":
+			{
+				"buffer_size": 54777,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "phonegap/www/js/app.js",
+			"settings":
+			{
+				"buffer_size": 16493,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "app/client/scripts/storage/chat.coffee",
+			"settings":
+			{
+				"buffer_size": 14263,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "app/client/styles-less/common.less",
+			"settings":
+			{
+				"buffer_size": 22223,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "app/client/styles-less/chat.less",
+			"settings":
+			{
+				"buffer_size": 14814,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "phonegap/www/css/style.css",
+			"settings":
+			{
+				"buffer_size": 22200,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "phonegap/www/templates/chatroom/chatroom.html",
+			"settings":
+			{
+				"buffer_size": 7243,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "phonegap/config.xml",
+			"settings":
+			{
+				"buffer_size": 4968,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "www/back/include/utility.php",
+			"settings":
+			{
+				"buffer_size": 37459,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "phonegap/www/js/chatroom/chatroom.js",
+			"settings":
+			{
+				"buffer_size": 58381,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "app/client/views/chatroom/chatroom.html",
+			"settings":
+			{
+				"buffer_size": 11245,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "app/client/scripts/app.coffee",
+			"settings":
+			{
+				"buffer_size": 12096,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 334.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"conver",
+				"Convert Case: Upper Case"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 416.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/F/Projects/HandCrowd_201411/rep/source/app/client",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/bower_components",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/bower_components/momentjs",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/js",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/js/momentjs",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/account",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/shared",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/storage",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/task",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/account",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/api",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/plugins",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/plugins/WebSocket",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/plugins/WebSocket/Application",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/sql",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap"
+	],
+	"file_history":
+	[
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/chatroom/chatroom.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/chatroom/chatroom.js",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/chatroom/chatroom.html",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/mission/mission_edit.html",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/styles-less/bootstrap-less/variables.less",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/config.js",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/cserver.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/home/bot.html",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/account/signin.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/shared/auth.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/js/config.js",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/utility.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/js/ng-websocket/ng-websocket.js",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/mission.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/plugins/WebSocket/Connection.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/installController.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/api/missionController.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/consts.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/commonController.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/shared/chat.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/bower_components/moment-timezone/builds/moment-timezone-with-data-2010-2020.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/chatroom/chatroom.html",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/account/settings.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/config.inc",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/storage/mission.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/storage/task.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/plugins/WebSocket/Server.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/.htaccess",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/api/taskController.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/settings.html",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/api/userController.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/task/process.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/plugins/WebSocket/Socket.php",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/shared/chat.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/res/xml/config.xml",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/plugins/ios.json",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/config.xml",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/plugins/android.json",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/app.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/AndroidManifest.xml",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/mission/mission_edit.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/config_dev.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/config_release.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/mission/mission_edit.html",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/mission_member.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/mission/mission_edit.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/db/model.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/include/plugins/WebSocket/Application/Application.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/storage/chat.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/shared/api.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/cmsg.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/styles-less/common.less",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/index.html",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/app.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/resource/cserver/cserver.sh",
+		"/F/Projects/HandCrowd_201411/rep/source/app/bower.json",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/storage/chat.js",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/bower_components/ng-websocket/ng-websocket.js",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/account/signin.html",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/account/forgotpwd.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/shared/consts.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/account/resetpwd.html",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/account/resetpwd.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/patch.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/home.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/resource/lang/ja_jp.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/nav.html",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/api/homeController.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/api/chatController.php",
+		"/F/Projects/Veecle_201505/rep/trunk/source/www/back/config.inc",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/sysconfig.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/resource/cserver/cserver",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/storage/user.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/_code.scss",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/controller/batchController.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/push_msg.php",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/shared/auth.js",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/push_token.php",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/pserver.php",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/shared/storage.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/shared/consts.js",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/resource/cserver/pserver.sh",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/ios/www/js/chatroom/chatroom.js",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/resource/service/handcrowd",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/tab-settings.html",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/resource/service/handcrowd.sh",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/resource/cserver/install_cserver.sh",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/account/signin.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/css/style.css",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/nav.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/shared/directives.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/build/intermediates/assets/debug/www/templates/account/signup.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/account/signup.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/storage/storage.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/storage/user.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/home/home_menu.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/plugins/com.phonegap.plugins.PushPlugin/src/android/com/plugin/gcm/PushPlugin.java",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/src/com/plugin/gcm/GCMIntentService.java",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/build/intermediates/assets/debug/www/cordova.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/plugins/com.phonegap.plugins.PushPlugin/src/android/com/plugin/gcm/CordovaGCMBroadcastReceiver.java",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/plugins/com.phonegap.plugins.PushPlugin/src/android/com/plugin/gcm/GCMIntentService.java",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/build/intermediates/res/debug/xml/config.xml",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/src/com/plugin/gcm/CordovaGCMBroadcastReceiver.java",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/src/com/plugin/gcm/PushPlugin.java",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/bower_components/ng-websocket/ng-websocket.js",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/mission/mission_attach.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/plugins/com.phonegap.plugins.PushPlugin/src/amazon/PushPlugin.java",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/home/home_menu.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/tab-chats.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/chatroom/chats.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/member/member_list.js",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/home/home_add.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/mission/mission_member_add_mail.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/mission/mission_member.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/mission/mission_member.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/mission/mission_member_add.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/templates/member/member_add.html",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/mission/mission_member_add.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/plugins/cordova-plugin-x-toast/plugin.xml",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/account/signup.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/build/intermediates/assets/debug/www/js/mission/mission_member.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/android/assets/www/js/shared/auth.js",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/js/shared/api.js",
+		"/F/Projects/HandCrowd_201411/rep/source/www/back/model/user.php",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/www/index.html",
+		"/F/Projects/HandCrowd_201411/rep/source/phonegap/platforms/ios/HandCrowd/HandCrowd-Info.plist",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/scripts/account/activate.coffee",
+		"/F/Projects/HandCrowd_201411/rep/source/app/client/views/account/signup.html"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\app\\client,F:\\Projects\\HandCrowd_201411\\rep\\source\\phonegap\\www,F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\app\\client,F:\\Projects\\HandCrowd_201411\\rep\\source\\phonegap,F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\app\\client;,F:\\Projects\\HandCrowd_201411\\rep\\source\\phonegap,F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back",
+			"F:\\Projects\\Kirari_Kintai_201511\\rep\\source\\app\\client,F:\\Projects\\Kirari_Kintai_201511\\rep\\source\\www\\back",
+			"F:\\Projects\\Kirari_Kintai_201511\\rep\\source\\app\\client;F:\\Projects\\Kirari_Kintai_201511\\rep\\source\\www\\back",
+			"F:\\Projects\\Kirari_Kintai_201511\\rep\\source\\app\\client",
+			"F:\\Projects\\Kaigaiseikatsu_201511\\rep\\source\\app\\",
+			"F:\\Projects\\Kaigaiseikatsu_201511\\rep\\source\\app\\public",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\inner,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\api,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\front,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\global",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\inner,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\api,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\front",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\inner,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\api",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\inner",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\inner",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\api",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\inner",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\global,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\inner",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back,F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\inner",
+			"F:\\Projects\\Assesment_201503\\assessment\\trunk\\source\\www\\back",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back,*.php,*.css,F:\\Projects\\HandCrowd_201411\\rep\\source\\app\\client,*.coffee,*.css,*.html,*.less",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back,*.php,*.css,*.js,F:\\Projects\\HandCrowd_201411\\rep\\source\\app\\client,*.coffee,*.css,*.html,*.less",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back,*.php,*.css,*.js,F:\\Projects\\HandCrowd_201411\\rep\\source\\app\\client,*.coffee,*.css,*.html",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back,*.php,*.css,*.js,F:\\Projects\\HandCrowd_201411\\rep\\source\\app,*.coffee,*.css,*.html",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back,*.php,*.css,*.js,F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\app,*.coffee,*.css,*.html",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back,*.php,*.css,*.js;F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\app,*.coffee,*.css,*.html",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back,*.php,*.css,*.js",
+			"F:\\Projects\\HandCrowd_201411\\rep\\source\\app\\client,*.less,*.css,*.coffee,*.html,F:\\Projects\\HandCrowd_201411\\rep\\source\\www\\back,*.php,*.css,*.js",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.less,*.css,*.coffee,*.html,F:\\Projects\\HandCrowd\\rep\\source\\www\\back,*.php,*.css,*.js",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.less,*.css,*.coffee,*.html,F:\\Projects\\HandCrowd\\rep\\source\\www\\back",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.less,*.css,*.coffee,*.html,F:\\Projects\\HandCrowd\\rep\\source\\www\\backd",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.less,*.css,*.coffee,*.html,F:\\Projects\\HandCrowd\\rep\\source\\www\\back",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.less,*.css,*.coffee,*.html",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.less,*.css,*.coffee",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.less,*.css",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.less",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.html",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client,*.coffee",
+			"F:\\Projects\\HandCrowd\\rep\\source\\app\\client"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"切れました",
+			"が切れました",
+			"chat-message",
+			"save_cache_messages_to_storage",
+			"$rootScope.g_messages",
+			"g_messages",
+			"console.log(",
+			"localStorage.getItem",
+			"cache_messages",
+			"load_messages",
+			"getStorage",
+			"set_message",
+			"$scope.mission_id",
+			"set_message",
+			"$scope.cmsg",
+			"init_cmsg",
+			"set_message",
+			"load_messages",
+			"\n                            chatStorage.cache_messages($scope.mission_id, messages)",
+			"$scope.mission_id",
+			"cache_messages",
+			"$scope.sync",
+			"load_messages",
+			"$scope.messages",
+			"clear_cmsg",
+			"$scope.sync()",
+			"set_message",
+			"sync",
+			"\")\n",
+			"set_message",
+			"$scope.messages",
+			"messages",
+			"scrolltobottom",
+			"set_message",
+			"loaded_messages",
+			"#loader",
+			"loader",
+			"$('#loader')",
+			"$scope.sync",
+			"$scope.chat_id",
+			"init_cmsg",
+			"g_messages",
+			"upload_attach",
+			"ffmpeg",
+			"upload",
+			"google_auth_url",
+			".chat_view",
+			"removeClientOnError",
+			"refreshBackImage",
+			"refresh_back_image",
+			"refreshBackImage",
+			"chat_view",
+			"refresh_back_image",
+			"$scope.refreshBackImage()",
+			"chat_view",
+			"page-task",
+			"refreshBackImage",
+			"TIME_ZONE",
+			"Shanghai",
+			"Asia",
+			"time_zones",
+			"ENTRANCE_EMAIL",
+			"ng-options",
+			"PLAN",
+			"unset",
+			"_clients",
+			"get_clients_by_user_id",
+			"'Disconnected'",
+			"Disconnected",
+			"handle",
+			"readBuffer",
+			"send(",
+			"$open",
+			"reconnectInterval",
+			"reconnect",
+			"websocket",
+			"removeClientOnError",
+			"getClientApplication",
+			"removeClientOnError",
+			"onDisconnect",
+			"getClientApplication",
+			"Connection.php",
+			"onConnect",
+			"FileTransfer",
+			"File",
+			"Already registered toke",
+			"to_users",
+			"save(",
+			"push_flag",
+			"canEditMission",
+			"out_key",
+			"$message",
+			"'ok",
+			"out_key",
+			"is_empty",
+			"query(",
+			"onConnect",
+			"onDisconnect",
+			"getApplication",
+			"application",
+			"cmsg.temp_cmsg_id != null",
+			"getClientApplication\n",
+			"set_message",
+			"$api",
+			"temp_cmsg_id",
+			"send",
+			"onDisconnect",
+			"removeClientOnError",
+			"getClientApplication",
+			"_users",
+			"get_clients_by_user_id",
+			"fread",
+			"log",
+			"removeClientOnError",
+			"send(",
+			"$message",
+			"$on",
+			"send(",
+			"buffer",
+			"msgkey",
+			"buffer",
+			"return $this.socket.$",
+			"$timeout",
+			"ok",
+			"$this.socket.$emit",
+			"buffer",
+			"messageQueue",
+			"push"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"g_messages",
+			"out_key",
+			"out_queue",
+			"$this.",
+			"$this.emit",
+			"	",
+			"$home_id",
+			"1.123",
+			"push_flag",
+			"1.123",
+			"curl",
+			"ln-icon-floppy-disk",
+			"ln-icon-cross2",
+			".@{linear-icon-prefix}",
+			"@linear-icon-prefix",
+			"Linearicons",
+			"linear-",
+			"#selection_menu",
+			".selection_menu",
+			"worktime",
+			"uholiday",
+			"begin_time",
+			"uholiday.",
+			"uholidays",
+			"_uholidays",
+			"$uholiday",
+			"holiday_date",
+			"holiday",
+			"'d_month'",
+			"dutytime",
+			"勤怠管理システム",
+			"",
+			"1.4.0",
+			"dirty_",
+			"text-primary",
+			"jpdate",
+			"t_worktime",
+			"きらり薬局出退勤システム",
+			"xs-min",
+			"digital",
+			"p",
+			"<?php if",
+			"<?php print",
+			"<?xml",
+			"<?php",
+			"<?php ",
+			"./menu.inc",
+			"FOLDER",
+			"1.0.10",
+			"showError",
+			"1.0.9",
+			"1.0.5",
+			"1.0.4",
+			"?v=1.0.2\" type=\"text/javascript\"></script>",
+			"static::",
+			"ハーモナー",
+			".js?\" + CONFIG.VER",
+			"\"js/controllers",
+			".html?\" + CONFIG.VER,",
+			"?\" + CONFIG.VER",
+			"\"js/controllers/",
+			"$params->sort_field",
+			"%",
+			"$$",
+			"",
+			"#e5e5e5",
+			"departs",
+			"ではありません。",
+			"class=\"text-danger\"",
+			"",
+			")",
+			"(",
+			"pie-chart",
+			"tooltipTemplate",
+			"cs_no_stats",
+			"oasis_stats",
+			"$sum += ",
+			"ent6_stats",
+			"ent1_stats",
+			"age_stats",
+			"gender_stats",
+			"",
+			"TimesNewRomanPS-ItalicMT",
+			"プロファイル",
+			"事前アセスメント",
+			"最高管理者",
+			"form.",
+			"SVG_PATH",
+			"jpmonthpicker",
+			"jpdaypicker",
+			"jpdatepicker",
+			"><i class=\"fa fa-times fa-fw\"></i> 閉じる<",
+			"><i class=\"fa fa-times fa-fw\"></i> 取消<",
+			"><i class=\"fa fa-floppy-o fa-fw\"></i> 保存<",
+			"><i class=\"fa fa-pencil fa-fw\"></i> 編集<",
+			"><i class=\"fa fa-trash-o fa-fw\"></i> 削除<",
+			"table-editable",
+			"search_string",
+			"class=\"btn btn-circle grey-cascade\" ng-click=\"remove()\"",
+			"\"btn btn-circle default\"",
+			"btn btn-circle btn-primary",
+			"search_string",
+			"管理者",
+			"スーパー管理者",
+			"開催日",
+			"担当者",
+			"BEGIN",
+			"user_form.",
+			"answers-block",
+			"guide-block",
+			"userinfo-block",
+			"\"Open Sans\", Helvetica, 'Hiragino Kaku Gothic Pro', Meiryo, Arial, Verdana, sans-serif",
+			"",
+			"会員",
+			"member",
+			"members",
+			"member",
+			"members",
+			"member",
+			"members",
+			"member",
+			"$brand-primary",
+			"$input-bg",
+			"$input-border",
+			"main-content",
+			"portlet main-port light",
+			"front",
+			"\"Open Sans\", 'Hiragino Kaku Gothic Pro', Meiryo, Arial, Verdana, sans-serif"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "app/client/views/account/signup.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2271,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								975,
+								975
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "app/client/scripts/account/signup.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2419,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								865,
+								731
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 9,
+			"sheets":
+			[
+				{
+					"buffer": 2,
+					"file": "phonegap/www/js/storage/chat.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19799,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5723,
+								5723
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2763.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "app/client/scripts/chatroom/chatroom.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 54777,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2040,
+								1684
+							]
+						],
+						"settings":
+						{
+							"history_list_is_closing": true,
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 42.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "phonegap/www/js/app.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16493,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3328,
+								3328
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1335.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "app/client/scripts/storage/chat.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14263,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7643,
+								7643
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2413.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "app/client/styles-less/common.less",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 22223,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								512,
+								514
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "app/client/styles-less/chat.less",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14814,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6292,
+								6292
+							]
+						],
+						"settings":
+						{
+							"history_list_is_closing": true,
+							"syntax": "Packages/CSS/CSS.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3511.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "phonegap/www/css/style.css",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 22200,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6884,
+								6884
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5787.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "phonegap/www/templates/chatroom/chatroom.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7243,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1952,
+								1952
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 126.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "phonegap/config.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4968,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								368,
+								368
+							]
+						],
+						"settings":
+						{
+							"history_list_is_closing": true,
+							"syntax": "Packages/XML/XML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "www/back/include/utility.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 37459,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1635,
+								1635
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "phonegap/www/js/chatroom/chatroom.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 58381,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								48399,
+								48408
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 16161.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "app/client/views/chatroom/chatroom.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11245,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5174,
+								5174
+							]
+						],
+						"settings":
+						{
+							"history_list_is_closing": true,
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 672.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "app/client/scripts/app.coffee",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12096,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3011,
+								3020
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1391.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 30.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.476528958984,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 100.0
+	},
+	"pinned_build_system": "",
+	"project": "handcrowd.sublime-project",
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"signup.co",
+				"client\\scripts\\account\\signup.coffee"
+			],
+			[
+				"signup",
+				"client\\views\\account\\signup.html"
+			],
+			[
+				"util",
+				"back\\include\\utility.php"
+			],
+			[
+				"mission_de",
+				"client\\views\\mission\\mission_edit.html"
+			],
+			[
+				"confi",
+				"phonegap\\config.xml"
+			],
+			[
+				"chatroom.",
+				"phonegap\\www\\templates\\chatroom\\chatroom.html"
+			],
+			[
+				"varia",
+				"client\\styles-less\\bootstrap-less\\variables.less"
+			],
+			[
+				"style.css",
+				"phonegap\\www\\css\\style.css"
+			],
+			[
+				"chat.l",
+				"client\\styles-less\\chat.less"
+			],
+			[
+				"commo",
+				"client\\styles-less\\common.less"
+			],
+			[
+				"chat.cof",
+				"client\\scripts\\storage\\chat.coffee"
+			],
+			[
+				"chatroom.cof",
+				"client\\scripts\\chatroom\\chatroom.coffee"
+			],
+			[
+				"chatroom.html",
+				"client\\views\\chatroom\\chatroom.html"
+			],
+			[
+				"config.js",
+				"phonegap\\www\\js\\config.js"
+			],
+			[
+				"chatroom.js",
+				"phonegap\\www\\js\\chatroom\\chatroom.js"
+			],
+			[
+				"chat.js",
+				"phonegap\\www\\js\\storage\\chat.js"
+			],
+			[
+				"chatroo",
+				"client\\views\\chatroom\\chatroom.html"
+			],
+			[
+				"app.co",
+				"client\\scripts\\app.coffee"
+			],
+			[
+				"chat.coff",
+				"client\\scripts\\storage\\chat.coffee"
+			],
+			[
+				"chatr",
+				"client\\scripts\\chatroom\\chatroom.coffee"
+			],
+			[
+				"missioncon",
+				"back\\controller\\api\\missionController.php"
+			],
+			[
+				"installcon",
+				"back\\controller\\installController.php"
+			],
+			[
+				"settings.co",
+				"client\\scripts\\account\\settings.coffee"
+			],
+			[
+				"chatroom.co",
+				"client\\scripts\\chatroom\\chatroom.coffee"
+			],
+			[
+				"process.cof",
+				"client\\scripts\\task\\process.coffee"
+			],
+			[
+				"chatroom",
+				"client\\scripts\\chatroom\\chatroom.coffee"
+			],
+			[
+				"usercon",
+				"back\\controller\\api\\userController.php"
+			],
+			[
+				"consts.",
+				"back\\include\\consts.php"
+			],
+			[
+				"taskcon",
+				"back\\controller\\api\\taskController.php"
+			],
+			[
+				"mission.cof",
+				"client\\scripts\\storage\\mission.coffee"
+			],
+			[
+				".ht",
+				"back\\.htaccess"
+			],
+			[
+				"commoncon",
+				"back\\controller\\commonController.php"
+			],
+			[
+				"const.php",
+				"back\\include\\consts.php"
+			],
+			[
+				"cserver.php",
+				"back\\cserver.php"
+			],
+			[
+				"socket.ph",
+				"back\\include\\plugins\\WebSocket\\Socket.php"
+			],
+			[
+				"ng-we",
+				"client\\js\\ng-websocket\\ng-websocket.js"
+			],
+			[
+				"cserver",
+				"back\\cserver.php"
+			],
+			[
+				"server.php",
+				"back\\include\\plugins\\WebSocket\\Server.php"
+			],
+			[
+				"connection.php",
+				"back\\include\\plugins\\WebSocket\\Connection.php"
+			],
+			[
+				"config.xml",
+				"phonegap\\platforms\\android\\res\\xml\\config.xml"
+			],
+			[
+				"app.js",
+				"phonegap\\www\\js\\app.js"
+			],
+			[
+				"config_rel",
+				"phonegap\\www\\js\\config_release.js"
+			],
+			[
+				"config_de",
+				"phonegap\\www\\js\\config_dev.js"
+			],
+			[
+				"mission_member",
+				"back\\model\\mission_member.php"
+			],
+			[
+				"mission_edi",
+				"client\\scripts\\mission\\mission_edit.coffee"
+			],
+			[
+				"mission_edit.js",
+				"phonegap\\www\\js\\mission\\mission_edit.js"
+			],
+			[
+				"mission_edit",
+				"client\\views\\mission\\mission_edit.html"
+			],
+			[
+				"chatroomhtml",
+				"phonegap\\www\\templates\\chatroom\\chatroom.html"
+			],
+			[
+				"mission_ed",
+				"client\\views\\mission\\mission_edit.html"
+			],
+			[
+				"uti",
+				"back\\include\\utility.php"
+			],
+			[
+				"model.php",
+				"back\\include\\db\\model.php"
+			],
+			[
+				"application",
+				"back\\include\\plugins\\WebSocket\\Application\\Application.php"
+			],
+			[
+				"api.cof",
+				"client\\scripts\\shared\\api.coffee"
+			],
+			[
+				"applica",
+				"back\\include\\plugins\\WebSocket\\Application\\Application.php"
+			],
+			[
+				"socket",
+				"back\\include\\plugins\\WebSocket\\Socket.php"
+			],
+			[
+				"connect",
+				"back\\include\\plugins\\WebSocket\\Connection.php"
+			],
+			[
+				"chat.co",
+				"client\\scripts\\shared\\chat.coffee"
+			],
+			[
+				"cmsg.php",
+				"back\\model\\cmsg.php"
+			],
+			[
+				"inde",
+				"client\\index.html"
+			],
+			[
+				"server.",
+				"back\\include\\plugins\\WebSocket\\Server.php"
+			],
+			[
+				"connec",
+				"back\\include\\plugins\\WebSocket\\Connection.php"
+			],
+			[
+				"cserver.sh",
+				"back\\resource\\cserver\\cserver.sh"
+			],
+			[
+				"socket.",
+				"back\\include\\plugins\\WebSocket\\Socket.php"
+			],
+			[
+				"config.inc",
+				"back\\config.inc"
+			],
+			[
+				"resetpwd",
+				"client\\scripts\\account\\resetpwd.coffee"
+			],
+			[
+				"signin.h",
+				"client\\views\\account\\signin.html"
+			],
+			[
+				"cser",
+				"back\\cserver.php"
+			],
+			[
+				"cserv",
+				"back\\cserver.php"
+			],
+			[
+				"home.php",
+				"back\\model\\home.php"
+			],
+			[
+				"connectio",
+				"back\\include\\plugins\\WebSocket\\Connection.php"
+			],
+			[
+				"patch.",
+				"back\\model\\patch.php"
+			],
+			[
+				"consts",
+				"back\\include\\consts.php"
+			],
+			[
+				"consts.co",
+				"client\\scripts\\shared\\consts.coffee"
+			],
+			[
+				"scoket.php",
+				"back\\include\\plugins\\WebSocket\\Socket.php"
+			],
+			[
+				"cserver.p",
+				"back\\cserver.php"
+			],
+			[
+				"ja_jp",
+				"back/resource/lang/ja_jp.php"
+			],
+			[
+				"consts.cof",
+				"client/scripts/shared/consts.coffee"
+			],
+			[
+				"chatcont",
+				"back/controller/api/chatController.php"
+			],
+			[
+				"mission.php",
+				"back/model/mission.php"
+			],
+			[
+				"settings.html",
+				"client/views/settings.html"
+			],
+			[
+				"homecon",
+				"back/controller/api/homeController.php"
+			],
+			[
+				"const",
+				"back/include/consts.php"
+			],
+			[
+				"cmsg",
+				"back/model/cmsg.php"
+			],
+			[
+				"missioncono",
+				"back/controller/api/missionController.php"
+			],
+			[
+				"sysconfig",
+				"back/model/sysconfig.php"
+			],
+			[
+				"htac",
+				"back/.htaccess"
+			],
+			[
+				"cserver.",
+				"back/cserver.php"
+			],
+			[
+				"config.i",
+				"back/config.inc"
+			],
+			[
+				"socket.php",
+				"back/include/plugins/WebSocket/Socket.php"
+			],
+			[
+				"index.html",
+				"client/index.html"
+			],
+			[
+				"config_re",
+				"phonegap/www/js/config_release.js"
+			],
+			[
+				".hta",
+				"back/.htaccess"
+			],
+			[
+				"chatcon",
+				"back/controller/api/chatController.php"
+			],
+			[
+				"api.co",
+				"client/scripts/shared/api.coffee"
+			],
+			[
+				"user.coff",
+				"client/scripts/storage/user.coffee"
+			],
+			[
+				"auth.co",
+				"client/scripts/shared/auth.coffee"
+			],
+			[
+				"auth.js",
+				"phonegap/www/js/shared/auth.js"
+			],
+			[
+				"config.in",
+				"back/config.inc"
+			],
+			[
+				"push_ms",
+				"back/model/push_msg.php"
+			],
+			[
+				"patch.php",
+				"back/model/patch.php"
+			],
+			[
+				"pserver",
+				"back/pserver.php"
+			],
+			[
+				"push_token",
+				"back/model/push_token.php"
+			],
+			[
+				"stor",
+				"client/scripts/shared/storage.coffee"
+			],
+			[
+				"signin.js",
+				"phonegap/www/js/account/signin.js"
+			],
+			[
+				"pserver.sh",
+				"back/resource/cserver/pserver.sh"
+			],
+			[
+				"pserver.php",
+				"back/pserver.php"
+			],
+			[
+				"setting.html",
+				"phonegap/www/templates/tab-settings.html"
+			],
+			[
+				"direc",
+				"phonegap/www/js/shared/directives.js"
+			],
+			[
+				"nav.coff",
+				"client/scripts/nav.coffee"
+			],
+			[
+				"nav.html",
+				"client/views/nav.html"
+			],
+			[
+				"config.",
+				"phonegap/config.xml"
+			],
+			[
+				"storage",
+				"phonegap/www/js/storage/storage.js"
+			],
+			[
+				"singup.html",
+				"phonegap/platforms/android/build/intermediates/assets/debug/www/templates/account/signup.html"
+			],
+			[
+				"push_token.php",
+				"back/model/push_token.php"
+			],
+			[
+				"usercont",
+				"back/controller/api/userController.php"
+			],
+			[
+				"cordova.js",
+				"phonegap/platforms/android/build/intermediates/assets/debug/www/cordova.js"
+			],
+			[
+				"mission_attach.cof",
+				"client/scripts/mission/mission_attach.coffee"
+			],
+			[
+				"confg.xml",
+				"phonegap/config.xml"
+			],
+			[
+				"chatroom.coff",
+				"client/scripts/chatroom/chatroom.coffee"
+			],
+			[
+				"pushp",
+				"phonegap/plugins/com.phonegap.plugins.PushPlugin/src/amazon/PushPlugin.java"
+			],
+			[
+				"confg.js",
+				"client/js/config.js"
+			],
+			[
+				"tab-chats",
+				"phonegap/www/templates/tab-chats.html"
+			],
+			[
+				"home_add",
+				"client/scripts/home/home_add.coffee"
+			],
+			[
+				"home_me",
+				"phonegap/www/templates/home/home_menu.html"
+			],
+			[
+				"storage.js",
+				"phonegap/www/js/storage/storage.js"
+			],
+			[
+				"member_list",
+				"phonegap/www/js/member/member_list.js"
+			],
+			[
+				"app.",
+				"phonegap/www/js/app.js"
+			],
+			[
+				"chats.",
+				"phonegap/www/templates/tab-chats.html"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 267.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

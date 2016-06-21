@@ -1,0 +1,136 @@
+<ion-view view-title="タスク詳細" cache-view="false" class="edit-task">
+    <ion-nav-buttons side="right">
+        <button menu-toggle="right" class="button button-icon icon" ng-class="{'ion-ios-star': task.priority, 'ion-ios-star-outline': !task.priority}" ng-click="checkPriority()"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <label class="item item-input">
+            <span class="input-label">タスク名</span>
+            <input type="text" ng-model="task.task_name" ng-readonly="!canEditTask()">
+        </label>
+        <label class="item item-input range range-positive">
+            <span class="input-label">進捗率 ({{task.progress}}%)</span>
+            <input type="range" name="volume" min="0" max="100" ng-model="task.progress" ng-readonly="!canProgress()">
+        </label>
+        <label class="item item-input item-floating-label">
+            <span class="input-label">概要</span>
+            <textarea placeholder="概要を入力してください。" ng-model="task.summary" rows=10 ng-readonly="!canEditTask()"></textarea>
+        </label>
+        <label class="item item-input">
+            <span class="input-label">チャットルーム</span>
+            <p>{{task.mission_name}}</p>
+        </label>
+        <label class="item item-input item-input-right-label">
+            <span class="input-label">スキル</span>
+            <p class="skills"><span ng-repeat="skill_name in task.skills">{{skill_name}}</span></p>
+            <button class="button button-clear button-large button-positive" ng-click="open_skill()" ng-if="canEditTask()"><i class="icon-graduation"></i></button>
+        </label>
+        <label class="item item-input item-input-right-label">
+            <span class="input-label">担当者</span>
+            <p>{{ task.performer_name }}</p>
+            <button class="button button-clear button-large button-positive" ng-click="open_performer()" ng-if="canEditTask()"><i class="icon-user"></i></button>
+        </label>
+        <span class="item item-input">
+            <span class="input-label">レベル</span>
+            <rating ng-model="task.level" max="max_level" readonly="!canEditTask()"></rating>
+        </span>
+        <label class="item item-input item-input-right-label">
+            <span class="input-label">開始日付</span>
+            <p>{{task.plan_start_date | date_label}}</p>
+            <ionic-datepicker input-obj="dpStartDate" ng-if="enable_start_date && canEditTask()">
+                <button class="button button-clear button-large button-positive"><i class="icon-calendar"></i></button>
+            </ionic-datepicker>
+        </label>
+        <label class="item item-input item-input-right-label" ng-show="task.plan_start_date != null">
+            <span class="input-label">開始時間</span>
+            <p>{{task.plan_start_time | time_label}}</p>
+            <ionic-timepicker input-obj="tpStartDate" ng-if="canEditTask()">
+                <button class="button button-clear button-large button-positive"><i class="icon-clock"></i>
+                </button>
+            </ionic-timepicker>
+        </label>
+        <label class="item item-input item-input-right-label">
+            <span class="input-label">終了日付</span>
+            <p>{{task.plan_end_date | date_label}}</p>
+            <ionic-datepicker input-obj="dpEndDate" ng-if="enable_end_date && canEditTask()">
+                <button class="button button-clear button-large button-positive"><i class="icon-calendar"></i></button>
+            </ionic-datepicker>
+        </label>
+        <label class="item item-input item-input-right-label" ng-show="task.plan_end_date != null">
+            <span class="input-label">終了時間</span>
+            <p>{{task.plan_end_time | time_label}}</p>
+            <ionic-timepicker input-obj="tpEndDate" ng-if="canEditTask()">
+                <button class="button button-clear button-large button-positive"><i class="icon-clock"></i>
+                </button>
+            </ionic-timepicker>
+        </label>
+        <label class="item item-input item-input-right-label">
+            <span class="input-label">工数</span>
+            <input type="text" class="text-right" ng-model="task.plan_hours" ng-readonly="!canEditTask()">
+            <span class="item-note">時間</span>
+        </label>
+        <label class="item item-input item-input-right-label">
+            <span class="input-label">予算</span>
+            <input type="number" class="text-right" ng-model="task.plan_budget" ng-readonly="!canEditTask()">
+            <span class="item-note">円</span>
+        </label>
+    </ion-content>
+</ion-view>
+<script id="ionic-datepicker-popup.html" type="text/ng-template">
+    <div class="ionic-datepicker">
+        <div class="selected_date_full">{{selectedDateFull | date:"yyyy/MM/dd"}}</div>
+        <div class="row no_padding">
+            <div class="col col-10 left_arrow" ng-click="prevMonth()" ng-class="{'pointer_events_none':(enableDatesFrom.isSet && enableDatesFrom.epoch > currentMonthFirstDayEpoch)}">
+                <button class="button-clear" ng-class="{'color_blue':((enableDatesFrom.isSet && enableDatesFrom.epoch < currentMonthFirstDayEpoch) || (!enableDatesFrom.isSet))}">
+                    <i class="icon ion-chevron-left"></i>
+                </button>
+            </div>
+            <div class="col col-80 drop_down no_padding">
+                <div class="row select_section">
+                    <div class="col col-50 year_dropdown">
+                        <div class="list">
+                            <label class="item item-input item-select">
+                                <select ng-model="currentYear" ng-change="yearChanged(currentYear)" class="year_select">
+                                    <option value="{{year}}" ng-repeat="year in yearsList" ng-selected="year == currentYearSelected">
+                                        {{year}}
+                                    </option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col col-50 month_dropdown">
+                        <div class="list">
+                            <label class="item item-input item-select">
+                                <select ng-model="currentMonth" ng-change="monthChanged(currentMonth)" class="month_select">
+                                    <option value="{{month}}" ng-repeat="month in monthsList" ng-selected="month == currentMonthSelected">
+                                        {{month}}
+                                    </option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-10 right_arrow" ng-click="nextMonth()" ng-class="{'pointer_events_none':(enableDatesTo.isSet && enableDatesTo.epoch < currentMonthLastDayEpoch)}">
+                <button class="button-clear" ng-class="{'color_blue':((enableDatesTo.isSet && enableDatesTo.epoch > currentMonthLastDayEpoch) || (!enableDatesTo.isSet))}">
+                    <i class="icon ion-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        <div class="calendar_grid">
+            <div class="row">
+                <div class="col" ng-repeat="weekName in weekNames track by $index" style="font-weight: bold"> {{ weekName }}</div>
+            </div>
+            <div style="height: 180px;">
+                <div class="row" ng-repeat="row in rows track by $index" style="text-align: center;">
+                    <div class="col no_padding" ng-repeat="col in cols track by $index" ng-class="{'date_col': (dayList[$parent.$index * numColumns + $index].day != undefined), 'date_selected': (dayList[$parent.$index * numColumns + $index].dateString === selctedDateStringCopy && dayList[$parent.$index * numColumns + $index].day != undefined) , 'today' : (dayList[$parent.$index * numColumns + $index].date == today.date && dayList[$parent.$index * numColumns + $index].month == today.month && dayList[$parent.$index * numColumns + $index].year == today.year)}">
+                        <div class="date_cell" ng-click="dateSelected(dayList[$parent.$index * numColumns + $index])" ng-class="{'pointer_events_none':(disabledDates.indexOf(dayList[$parent.$index * numColumns + $index].epochLocal) > -1) || (enableDatesFrom.isSet && enableDatesFrom.epoch > dayList[$parent.$index * numColumns + $index].epochLocal) || (enableDatesTo.isSet && enableDatesTo.epoch < dayList[$parent.$index * numColumns + $index].epochLocal)}">
+                            {{ dayList[$parent.$index * numColumns + $index].date }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="error_msg padding-horizontal" ng-show="date_selection.submitted === true && date_selection.selected === false">{{errorMsgLabel}}
+        </div>
+    </div>
+</script>

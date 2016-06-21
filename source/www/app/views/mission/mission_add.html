@@ -1,0 +1,29 @@
+<form name="form_mission_add" class="form-horizontal form-validation">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+        <h4 class="modal-title" id="myModalLabel">チャットルーム新規登録</h4>
+    </div>
+    <div class="modal-body">
+        <p>チャットルームを新規作成します。</p>
+        <div class="form-group">
+            <div class="col-md-12">
+                <dd class="radio-group">
+                    <label class="ui-radio">
+                        <input class="required" required type="radio" name="private_flag" ng-model="mission.private_flag" value="0"><span>全メンバー用</span>
+                    </label>
+                    <label class="ui-radio">
+                        <input class="required" required type="radio" name="private_flag" ng-model="mission.private_flag" value="1"><span>特定メンバー用</span>
+                    </label>
+                </dd>
+            </div>
+            <div class="col-md-12">
+                <input type="text" class="form-control" required ng-model="mission.mission_name" placeholder="ルーム名を入力してください。" auto-focus="true">
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
+        <button type="submit" class="btn btn-primary" ng-click="ok()" ng-disabled="!canSubmit()">保存</button>
+    </div>
+</form>

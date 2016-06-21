@@ -1,0 +1,203 @@
+<!-- Edit panel -->
+<div id="panel-task-edit" class="panel panel-default panel-task-edit" ng-controller="taskeditCtrl">
+	<header class="panel-header">
+		<span class="check-priority" ng-show="editTaskNameMode != true">
+			<label class="check-star check-star-primary" title="スター付き"><input type="checkbox" checked ng-model="task.priority" ng-change="checkPriority(task)"><i></i></label>
+		</span>
+		<div class="title-wrapper">
+			<form ng-submit="changeTaskName(task)">
+				<input type="text"
+					class="edit form-control"
+					ng-trim="false"
+					ng-model="task.task_name"
+					ng-blur="changeTaskName(task)"
+					ng-readonly="!canEditTask()"
+	                data-task-focus="editTaskNameMode == true">
+			</form>
+		</div>
+	</header>
+	<!-- end panel-header -->
+	<ul class="list-group task-detail">
+		<li class="list-group-item">
+			<div class="row">
+				<div class="col-sm-12 list-group-item-col edit-range">
+					<i class="fa icon-bar-chart" title="進捗率"></i>
+					<span><input type="range" ng-model="task.progress" min="0" max="100" ng-readonly="!canProgress()" ng-mouseup="changeProgress(task)"></span>
+					<label>{{task.progress}}%</label>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item" ng-show="!editSummaryMode">
+			<div class="row">
+				<div class="col-sm-12 list-group-item-col">
+					<i class="fa icon-book-open" title="概要"></i> <a href="javascript:;" id="summary" ng-model="task.summary" class="edit-popup edit-popup-empty" ng-click="editSummary(task)" ng-show="task.summary==null || task.summary==''" ng-class="{'default-cursor': !canEditTask()}">概要</a>
+					<a href="javascript:;" class="edit-popup" ng-class="{'default-cursor': !canEditTask()}" ng-bind-html="task.summary | noHTML | htmlfy" ng-show="task.summary!=null" ng-click="editSummary(task)"></a>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item" ng-show="editSummaryMode">
+			<form name="form_summary" class="form-validation comment-form" ng-submit="submitSaveSummary(task)">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<textarea class="form-control" ng-model="task.summary" placeholder="概要を入力してください。" rows=10 data-task-summary-focus="editSummaryMode == true"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<button type="submit" class="edit-popup edit-block edit-popup-empty"><i class="ln-icon-floppy-disk"></i> 保存</button>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<button type="button" class="edit-popup edit-block edit-popup-empty" ng-click="exitEditSummary()"><i class="ln-icon-cross2"></i> 取消</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</li>
+		<li class="list-group-item">
+			<div class="row">
+				<div class="col-sm-12 list-group-item-col">
+					<i class="fa icon-bubbles" title="チャットルーム"></i> <span class="edit-popup">{{ task.mission_name }}</span>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item">
+			<div class="row">
+				<div class="col-sm-12 list-group-item-col">
+					<i class="fa icon-graduation" title="スキル"></i>
+					<div class="skills" sel-skill ng-model="task.skills" ng-change="changeSkills(task)"><a href="javascript:;" class="edit-popup edit-popup-empty" ng-show="task.skills.length==0" ng-class="{'default-cursor': !canEditTask()}"> スキル</a><a href="javascript:;" class="edit-popup" ng-repeat="skill_name in task.skills" ng-class="{'default-cursor': !canEditTask()}">{{skill_name}}</a>
+					</div>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item">
+			<div class="row">
+				<div class="col-sm-6 list-group-item-col">
+					<i class="fa icon-user" title="担当者"></i>
+					<a sel-performer href="javascript:;" class="edit-popup" ng-model="task.performer_id" data-task-id="task.task_id" data-mission-id="task.mission_id" data-avartar="task.avartar" data-performer-name="task.performer_name" ng-class="{ 'edit-popup-empty': task.performer_id==null, 'default-cursor': !canEditTask()}" ng-change="changePerformer(task)">  {{ task.performer_id == null ? '担当者' : task.performer_name }}</a>
+				</div>
+				<div class="col-sm-6">
+					<i class="fa icon-flag" title="レベル"></i> 
+                    <rating class="ui-rating size-h5"
+                            ng-model="task.level"
+                            max="max_level"
+                            readonly="level_readonly"
+							ng-change="changeLevel(task)"
+                            state-on="'fa fa-heart'"
+                            state-off="'fa fa-heart-o'" ng-class="{ 'default-cursor': !canEditTask()}"></rating>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item">
+			<div class="row">
+				<div class="col-sm-6 list-group-item-col">
+					<i class="fa icon-calendar" title="開始"></i>
+					<a sel-date href="javascript:;" id="plan_start_date" ng-model="task.plan_start_date" data-end-date="task.plan_end_date" data-time-model="task.plan_start_time" class="edit-popup" ng-class="{ 'edit-popup-empty': task.plan_start_date==null, 'default-cursor': !canEditTask()}"> {{ task.plan_start_date == null ? '開始' : ( task.plan_start_time == null ? (task.plan_start_date | date_label) : (task.plan_start_time | date_time_label )) }}</a>
+				</div>
+				<div class="col-sm-6 list-group-item-col">
+					<i class="fa icon-calendar" title="期限"></i> 
+					<a sel-date href="javascript:;" id="plan_end_date"  ng-model="task.plan_end_date" data-start-date="task.plan_start_date" data-time-model="task.plan_end_time" class="edit-popup" ng-class="{ 'edit-popup-empty': task.plan_end_date==null, 'default-cursor': !canEditTask()}">{{ task.plan_end_date == null ? '期限' : ( task.plan_end_time == null ? (task.plan_end_date | date_label) : (task.plan_end_time | date_time_label )) }}</a>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item">
+			<div class="row">
+				<div class="col-sm-6 list-group-item-col">
+					<i class="fa icon-clock" title="工数"></i> 
+					<a sel-hours href="javascript:;" id="plan_hours" ng-model="task.plan_hours" class="edit-popup" ng-class="{ 'edit-popup-empty': task.plan_hours==null, 'default-cursor': !canEditTask()}" ng-change="changePlanHours(task)">{{ task.plan_hours == null ? '工数' : (task.plan_hours | times_label)}}</a>
+				</div>
+				<div class="col-sm-6 list-group-item-col">
+					<i class="fa icon-wallet" title="予算"></i> 
+					<a sel-budget href="javascript:;" id="plan_budget" ng-model="task.plan_budget" class="edit-popup" ng-class="{ 'edit-popup-empty': task.plan_budget==null, 'default-cursor': !canEditTask()}" ng-change="changeBudget(task)">{{ task.plan_budget == null ? '予算' : ((task.plan_budget | number: 0) + ' 円')}}</a>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item">
+				<div class="row">
+					<div class="col-sm-12 summary-item">
+						<div class="form-group">
+							<a href="javascript:;" class="edit-popup edit-block edit-popup-empty" ng-click="onUploadAttach()"><i class="icon-paper-clip"></i> ファイル添付</a>
+						</div>
+					</div>
+				</div>
+		</li>
+		<!--
+		<li class="list-group-item">
+			<form name="form_comment_add" class="form-validation comment-form" ng-submit="submitAddComment(task)">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<textarea class="form-control" required ng-model="comment" placeholder="コメントを入力してください。" rows=3></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<button type="submit" class="edit-popup edit-block edit-popup-empty" ng-disabled="!canAddComment()"><i class="icon-bubble"></i> コメントの追加</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</li>
+		-->
+		<li class="list-group-item">
+			<div class="row comments">
+				<div class="col-sm-12 comment" ng-repeat="comment in task.comments">
+					<div class="commentor" href="javascript:;">
+						<img alt="" ng-src="{{comment.avartar}}" class="avartar img30_30">
+					</div>
+					<div class="comment-body">
+						<div class="pull-right date-time-label">
+							{{comment.create_time | date_time_label}}<br/><button type="button" class="btn btn-xs btn-inverse" ng-click="removeComment(comment.task_comment_id)"><i class="glyphicon glyphicon-trash"></i></button>
+						</div>
+						<h4>{{comment.user_name}}</h4>
+						<p ng-show="comment.comment_type==0" ng-bind-html="comment.content | noHTML | htmlfy"></p>
+						<a ng-show="comment.comment_type==2" href="{{comment.attach_url}}" target="_blank"><i class="fa fa-paperclip"></i> {{comment.file_name}}</a> <span ng-show="comment.comment_type==2">({{comment.file_size}}MB)</span>
+					</div>
+				</div>
+				<!--
+				<div class="col-sm-12 comment">
+					<div class="commentor" href="javascript:;">
+						<img alt="" ng-src="{{task.creator_avartar}}" class="avartar img30_30">
+					</div>
+					<div class="comment-body">
+						<div class="pull-right date-time-label">
+							{{task.create_time | date_time_label}}
+						</div>
+						<h4>{{task.user_name}}</h4>
+						<p>新規作成</p>
+					</div>
+				</div>
+				-->
+			</div>
+		</li>
+	</ul>
+	<footer class="panel-footer">
+		<ul class="nav-left list-unstyled">
+			<li ng-show="!editmode">
+				<div class="btn-group">
+					<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="removeTask(task)" title="削除" ng-show="canEditTask()"><i class="icon-trash"></i></button>
+					<a ng-href="{{print_url}}{{task.task_id}}" target="_blank" type="button" class="btn btn-gap-v btn-white-primary" title="プリント" ng-show="false"><i class="icon-printer"></i></a>
+					<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="reqEntrance(task)" title="外部へ見積依頼"><i class="icon-people"></i></button>
+				</div>
+			</li>
+		</ul> 
+		<ul class="nav-right pull-right list-unstyled">
+			<li>
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="closePanel()"><i class="fa fa-fw fa-chevron-right"></i></button>
+			</li>
+		</ul>
+	</footer>
+	<section ng-include=" 'views/task/sel_mission.html' + ver "></section>
+	<section ng-include=" 'views/task/sel_skill.html' + ver "></section>
+	<section ng-include=" 'views/task/sel_date.html' + ver "></section>
+	<section ng-include=" 'views/task/sel_hours.html' + ver "></section>
+	<section ng-include=" 'views/task/sel_budget.html' + ver "></section>
+	<section ng-include=" 'views/task/sel_performer.html' + ver "></section>
+</div>
+<!-- end Edit panel -->

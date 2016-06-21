@@ -1,0 +1,18 @@
+<ion-view view-title="通知">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon" ng-click="toggleMenu()"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <ion-list>
+            <ion-item data-ng-repeat="alert in alerts" class="item item-icon-left item-icon-right">
+                <i class="icon icon-info"></i>
+                <h2>{{alert.msg}}</h2>
+
+                <div class="text-right">
+                    <button type="button" class="btn btn-sm btn-warning" ng-click="accept(alert, 1)" ng-disabled="posting">承認</button>
+                    <button type="button" class="btn btn-sm" ng-click="accept(alert, 0)" ng-disabled="posting">キャンセル</button>
+                </div>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

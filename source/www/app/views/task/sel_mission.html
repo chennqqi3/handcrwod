@@ -1,0 +1,30 @@
+<!-- Mission panel -->
+<div id="panel-sel-mission" class="panel panel-default panel-sel-mission"
+	data-ng-controller="selMissionCtrl">
+	<header class="panel-header">
+		<input type="text" class="form-control" required ng-model="search_string" placeholder="キーワードを入力">
+		<div class="icons-right">
+			<button type="button" class="btn"><i class="fa fa-search"></i></button>
+			<button type="button" class="btn" ng-click="closePanel()"><i class="fa fa-chevron-down"></i></button>
+		</div>
+	</header>
+	<!-- end panel-header -->
+	<div class="page">
+		<ul class="list-group">
+			<li data-ng-repeat="mission in missions | filter:search_string" class="list-group-item" data-ng-class="{selected: mission.mission_id == selected_mission_id}">
+				<span class="view">
+					<label ng-click="selectMission(mission)">
+						{{mission.mission_name}}
+					</label>
+				</span>
+			</li>
+			<li class="list-group-item" data-ng-class="{selected: selected_mission_id == null}">
+				<span class="view">
+					<label ng-click="selectMission(null)">[受信箱]</label>
+				</span>
+			</li>
+		</ul>
+	</div>
+	<!-- end page -->
+</div>
+<!-- end Mission panel -->

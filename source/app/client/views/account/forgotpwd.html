@@ -1,0 +1,35 @@
+<div class="page-forgot">
+    <div class="main-body">
+        <div class="container">
+			<div class="form-container">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="text-center">
+							<h1><img src="images/logo.png"/> パスワードリセット</h1>
+							<p>登録済みのメールアドレスを入力すると、パスワードをリセットするためのメールが送信されます。</p>
+						</div>
+
+						<form name="form_forgotpwd" class="form-horizontal form-validation" data-ng-submit="submitForm()" data-ng-controller="forgotpwdCtrl">
+							<div class="form-group form-group-large">
+								<span class="icon-left glyphicon glyphicon-envelope"></span>
+								<input type="email" class="form-control" required ng-model="user.email" placeholder="メールアドレス">
+							</div>
+							<div class="form-group">
+								<div class="alert alert-danger" data-ng-show="showMessage">{{message}}</div>
+							</div>
+							<div class="form-group">
+								<button type="submit" class="btn btn-primary btn-lg btn-block" data-ng-disabled="!canSubmit()">送信</button>
+							</div>
+						</form>
+
+						<section>
+							<p class="text-center">アカウントを持っていますか？ <a href="#/signin" >ログイン</a></p>
+						</section>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+
+</div>

@@ -1,0 +1,156 @@
+<!doctype html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+        <title>ハンドクラウド</title>
+        <meta name="description" content="ハンドクラウド(HandCrowd）は、仕事を分解しフローにすることで個人やチームの業務改善をサポートするクラウド型ToDoリスト">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" href="favicon.png">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+        <!-- needs images, font... therefore can not be part of ui.css -->
+        <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+        <!-- end needs images -->
+
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="apple-touch-icon" href="images/webapp.png">
+        <link rel="apple-touch-icon-precompsed" href="images/webapp.png">
+        <link rel="apple-touch-startup-image" href="images/webapp.png">
+
+    </head>
+    <body data-ng-app="app" id="app" data-custom-background>
+        <!--[if lt IE 9]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div data-ng-controller="AppCtrl">
+            <aside data-ng-include=" 'views/nav_home.html' + ver " id="nav-home-container" data-ng-hide="isSpecificPage()" data-ng-cloak class="no-print"></aside>
+            <aside data-ng-include=" 'views/nav.html' + ver " id="nav-container" data-ng-hide="isSpecificPage()" data-ng-cloak class="no-print"></aside>
+
+            <div class="view-container">
+                <section data-ng-view id="content"></section>
+            </div>
+        </div>
+
+        <div class="good_job"><img src="images/good_job.png"></div>
+        <div class="mission_complete"><img src="images/mission_complete.png"></div>
+
+        <div class="error-bar" ng-cloak>
+            <div class="error-connection" ng-class="{'show': error_disconnected}"><i class="fa fa-warning"></i> サーバーに接続できません。</div>
+        </div>
+
+        <!-- build:js scripts/vendor.js -->
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/angular/angular.min.js"></script>
+        <script src="bower_components/angular-route/angular-route.min.js"></script>
+        <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+        <script src="bower_components/underscore/underscore-min.js"></script>
+        <script src="bower_components/sjcl/sjcl.js"></script>
+        <!-- endbuild -->
+
+        <!-- build:js scripts/ui.js -->
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+        <script src="bower_components/jquery-spinner/dist/jquery.spinner.min.js"></script>
+        <script src="bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js"></script>
+        <script src="bower_components/toastr/toastr.min.js"></script>
+        <script src="bower_components/bootstrap-file-input/bootstrap.file-input.js"></script>
+        <script src="bower_components/jquery.slimscroll/jquery.slimscroll.min.js"></script>
+        <script src="bower_components/holderjs/holder.js"></script>
+        <script src="bower_components/jquery.ui/ui/jquery.ui.core.js"></script>
+        <script src="bower_components/jquery.ui/ui/jquery.ui.widget.js"></script>
+        <script src="bower_components/jquery.ui/ui/jquery.ui.mouse.js"></script>
+        <script src="bower_components/jquery.ui/ui/jquery.ui.effect.js"></script>
+        <script src="bower_components/jquery.ui/ui/jquery.ui.effect-slide.js"></script>
+        <script src="bower_components/jquery.ui/ui/jquery.ui.draggable.js"></script>
+        <script src="bower_components/jquery.ui/ui/jquery.ui.droppable.js"></script>
+        <script src="bower_components/jquery.ui/ui/jquery.ui.sortable.js"></script>
+        <script src="bower_components/momentjs/min/moment.min.js"></script>
+        <script src="bower_components/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>
+        <script src="js/momentjs/ja.js"></script>
+        <script src="js/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+        <script src="js/jquery-mobile/jquery.mobile.custom.min.js"></script>
+        <script src="bower_components/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+        <script src="bower_components/bootstrap-datepicker/js/locales/bootstrap-datepicker.ja.js"></script>
+        <script src="bower_components/ng-file-upload/angular-file-upload-shim.js"></script>
+        <script src="bower_components/ng-file-upload/angular-file-upload.js"></script>
+        <script src="bower_components/jquery-number/jquery.number.min.js"></script>
+        <script src="bower_components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+        <script src="js/dropzone/dropzone.min.js"></script>
+        <script src="js/ng-websocket/ng-websocket.js"></script>
+        <script src="bower_components/angular-scroll/angular-scroll.min.js"></script>
+        <!-- endbuild -->
+
+        <!-- build:js scripts/config.js -->
+        <script src="js/config.js"></script>
+        <!-- endbuild -->
+
+        <!-- build:js({.tmp,client}) scripts/app.js -->
+        <script src="scripts/shared/api.js"></script>
+        <script src="scripts/shared/dateutil.js"></script>
+        <script src="scripts/shared/storage.js"></script>
+        <script src="scripts/shared/filters.js"></script>
+        <script src="scripts/shared/auth.js"></script>
+        <script src="scripts/shared/dialogs.js"></script>
+        <script src="scripts/shared/chat.js"></script>
+        <script src="scripts/shared/consts.js"></script>
+
+        <script src="scripts/storage/home.js"></script>
+        <script src="scripts/storage/mission.js"></script>
+        <script src="scripts/storage/task.js"></script>
+        <script src="scripts/storage/chat.js"></script>
+        <script src="scripts/storage/user.js"></script>
+
+        <script src="scripts/app.js"></script>
+        <script src="scripts/nav.js"></script>
+        <script src="scripts/main.js"></script>
+        <script src="scripts/shared/directives.js"></script>
+        <script src="scripts/shared/localize.js"></script>
+        <script src="scripts/shared/logger.js"></script>
+		
+        <script src="scripts/sel_mission.js"></script>
+        <script src="scripts/sel_date.js"></script>
+        <script src="scripts/sel_skill.js"></script>
+        <script src="scripts/sel_performer.js"></script>
+        <script src="scripts/sel_hours.js"></script>
+        <script src="scripts/sel_budget.js"></script>
+        <script src="scripts/sel_template.js"></script>
+
+        <script src="scripts/account/signin.js"></script>
+        <script src="scripts/account/signup.js"></script>
+        <script src="scripts/account/signup_facebook.js"></script>
+        <script src="scripts/account/signup_google.js"></script>
+        <script src="scripts/account/signout.js"></script>
+        <script src="scripts/account/activate.js"></script>
+        <script src="scripts/account/forgotpwd.js"></script>
+        <script src="scripts/account/resetpwd.js"></script>
+        <script src="scripts/account/settings.js"></script>
+
+        <script src="scripts/home/home.js"></script>
+        <script src="scripts/home/home_add.js"></script>
+        <script src="scripts/home/home_open.js"></script>
+        <script src="scripts/home/home_invite.js"></script>
+        <script src="scripts/home/home_edit.js"></script>
+        <script src="scripts/home/bot.js"></script>
+  
+        <script src="scripts/mission/mission_add.js"></script>
+        <script src="scripts/mission/mission_open.js"></script>
+        <script src="scripts/mission/mission_edit.js"></script>
+        <script src="scripts/mission/mission_member.js"></script>
+        <script src="scripts/mission/mission_member_add.js"></script>
+        <script src="scripts/mission/mission_invite.js"></script>
+        <script src="scripts/mission/mission_attach.js"></script>
+
+        <script src="scripts/task/task_list.js"></script>
+        <script src="scripts/task/task_edit.js"></script>
+        <script src="scripts/task/task_star.js"></script>
+        <script src="scripts/task/process.js"></script>
+
+        <script src="scripts/chatroom/chatroom.js"></script>
+        <script src="scripts/chatroom/chat_star.js"></script>
+        <script src="scripts/chatroom/chat_search.js"></script>                
+        <!-- endbuild -->
+    </body>
+</html>

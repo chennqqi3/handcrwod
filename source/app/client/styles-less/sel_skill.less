@@ -1,0 +1,63 @@
+.panel-sel-skill {
+    position: absolute;
+    display: none;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    padding: 0;
+    margin: 0px;
+
+    .panel-header {
+        height: 84px;
+    }
+
+    .page {
+        position: absolute;
+        top: 0px;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: -blackberry-touch;
+        -moz-transition: none;
+        -webkit-transition: none;
+        -o-transition: none;
+        transition: none;
+        padding: 10px 0px;
+
+        // when init
+        .list-group-item {
+            padding: 10px 15px;
+            border-left: 0px;
+            border-right: 0px;
+
+            &.selected {
+                background: lighten(@brand-primary, 5%);
+                color: white;
+                font-weight: bold;
+            }
+
+            .view {
+                position: relative;
+                padding: 0;
+
+                label {
+                    line-height: 20px;
+                    margin: 0;
+                    width: 100%;
+                    padding: 0px;
+                    cursor: pointer;
+                    font-weight: normal;
+                }
+            }
+        }
+
+        .list-group-item:first-child {
+            border-top: 0px;
+        }
+    }
+}

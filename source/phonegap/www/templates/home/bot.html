@@ -1,0 +1,11 @@
+<ion-view view-title="アシスタント" id="messageView" cache-view="false">
+    <ion-content id="bot_view">
+        <ion-item data-ng-repeat="task in bot_tasks0 = (bot_tasks | filter:customFilter)" class="item">
+            <img alt="" ng-src="{{task.avartar}}" class="avartar img30_30" title="{{task.performer_name}}">
+            <p>
+                <a ui-sref="tab.chatroom({mission_id:task.mission_id})" class="text-primary">{{task.mission_name}}</a> / <i class="fa fa-check-square-o"></i> <span class="text-primary">{{task.task_name}}</span><span ng-if="task.task_end_expire">の期限<span class="label label-danger">{{task.plan_end_date|date_label}}</span>が切れました。</span><span ng-if="!task.task_end_expire && task.task_start_expire">の開始日<span class="label label-warning">{{task.plan_start_date|date_label}}</span>が切れました。</span>    
+            </p>
+        </ion-item>
+    </ion-content>
+
+</ion-view>

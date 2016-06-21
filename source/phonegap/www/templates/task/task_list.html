@@ -1,0 +1,51 @@
+<ion-view view-title="タスク">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon" ng-if="mission_id==null"></button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button menu-toggle="right" class="button button-icon icon ion-ios-plus-empty" ng-click="add()" ng-if="canEditTask() && mission_id!=undefined"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <ion-list class="list-task">
+            <ion-item data-ng-repeat="task in tasks | filter:searchFilter1 | orderBy:'sort0' track by task.task_id" class="item item-task">  
+                <div class="progress" ng-model="task.progress" ng-style="{width: (task.progress == 100 ? 0 : task.progress) + '%'}"></div> 
+                <div class="complete-handle">
+                    <img ng-show="!canComplete(task)" ng-src="{{task.avartar}}" class="avatar">
+                    <label ng-show="canComplete(task)" class="checkbox" ng-model="task"><input type="checkbox" checked ng-model="task.complete_flag" data-ng-change="completed(task)"><i></i></label>
+                </div>
+                <span class="item-note" data-ng-class="{ 'warning':is_past(task) }"><span ng-if="mission_id==null" class="mission-name">{{task.mission_name}}</span>{{ task.plan_end_time == null ? (task.plan_end_date | date_label) : (task.plan_end_time | date_time_label ) }}</span>
+                <h2 ui-sref=".edit({task_id:task.task_id})">{{task.task_name}}</h2>
+
+                <ion-option-button class="button-assertive" ng-click="remove(task)" ng-if="canEditTask()">
+                    <i class="icon ion-ios-trash-outline"></i>
+                </ion-option-button>
+            </ion-item>
+            <ion-item data-ng-repeat="task in tasks | filter:searchFilter2 | orderBy:'proclevel' track by task.task_id" class="item item-task">  
+                <div class="progress" ng-model="task.progress" ng-style="{width: (task.progress == 100 ? 0 : task.progress) + '%'}"></div> 
+                <div class="complete-handle">
+                    <img ng-show="!canComplete(task)" ng-src="{{task.avartar}}" class="avatar">
+                    <label ng-show="canComplete(task)" class="checkbox" ng-model="task"><input type="checkbox" checked ng-model="task.complete_flag" data-ng-change="completed(task)"><i></i></label>
+                </div>
+                <span class="item-note" data-ng-class="{ 'warning':is_past(task) }"><span ng-if="mission_id==null" class="mission-name">{{task.mission_name}}</span>{{ task.plan_end_time == null ? (task.plan_end_date | date_label) : (task.plan_end_time | date_time_label ) }}</span>
+                <h2 ui-sref=".edit({task_id:task.task_id})">{{task.task_name}}</h2>
+
+                <ion-option-button class="button-assertive" ng-click="remove(task)" ng-if="canEditTask()">
+                    <i class="icon ion-ios-trash-outline"></i>
+                </ion-option-button>
+            </ion-item>
+            <ion-item data-ng-repeat="task in tasks | filter:searchFilter3 track by task.task_id" class="item item-task">  
+                <div class="progress" ng-model="task.progress" ng-style="{width: (task.progress == 100 ? 0 : task.progress) + '%'}"></div> 
+                <div class="complete-handle">
+                    <img ng-show="!canComplete(task)" ng-src="{{task.avartar}}" class="avatar">
+                    <label ng-show="canComplete(task)" class="checkbox" ng-model="task"><input type="checkbox" checked ng-model="task.complete_flag" data-ng-change="completed(task)"><i></i></label>
+                </div>
+                <span class="item-note" data-ng-class="{ 'warning':is_past(task) }"><span ng-if="mission_id==null" class="mission-name">{{task.mission_name}}</span>{{ task.plan_end_time == null ? (task.plan_end_date | date_label) : (task.plan_end_time | date_time_label ) }}</span>
+                <h2 ui-sref=".edit({task_id:task.task_id})">{{task.task_name}}</h2>
+
+                <ion-option-button class="button-assertive" ng-click="remove(task)" ng-if="canEditTask()">
+                    <i class="icon ion-ios-trash-outline"></i>
+                </ion-option-button>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,47 @@
+<div class="page-signup">
+    <div class="main-body">
+        <div class="container">
+			<div class="form-container">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="text-center">
+								<h1><img src="images/logo.png"/> パスワードリセット</h1>
+								<p class="text-small">新しいパスワードを入力してください。</p>
+							</div>
+
+							<form name="form_resetpwd" class="form-horizontal form-validation" data-ng-submit="submitForm()" data-ng-controller="resetpwdCtrl">
+								<div class="form-group">
+									<div class="input-group input-group-lg">
+										<span class="input-group-addon">
+											<span class="glyphicon glyphicon-lock"></span>
+										</span>
+										<input type="password" class="form-control" required ng-model="user.password" placeholder="パスワード">
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="input-group input-group-lg">
+										<span class="input-group-addon">
+											<span class="glyphicon glyphicon-lock"></span>
+										</span>
+										<input type="password" class="form-control" required ng-model="user.password_retyped" placeholder="パスワード再入力" data-equals="{{user.password}}">
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="alert alert-danger" data-ng-show="showMessage">{{message}}</div>
+								</div>
+								<div class="form-group">
+									<button type="submit" class="btn btn-primary btn-lg btn-block" data-ng-disabled="!canSubmit()">リセット</button>
+								</div>
+		 
+							</form>
+						</section>
+
+						<section>
+							<p class="text-center">パスワードリセットを取消し<a href="#/signin" >ログイン</a>します。</p>
+						</section>
+					</div>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>

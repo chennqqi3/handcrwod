@@ -1,0 +1,81 @@
+<div id="nav-wrapper" data-ng-controller="NavCtrl">
+    <ul id="nav" class="nav-bar"
+        data-slim-scroll>
+		<li class="header"><img src="images/logo_banner_white.svg"></li>
+        <li ng-class="{'active': nav_id=='home' }">
+            <a ng-href="#/home"><i class="icon-home"></i><span>{{cur_home.home_name | home_label}}</span></a>
+        </li>
+        <li class="hc-bot" ng-class="{'active': nav_id=='chatroom_' + bot_mission.mission_id }">
+            <a href="#/chats/{{bot_mission.mission_id}}">
+                <div class="info">
+                    <span class="badge badge-danger" ng-show="bot_mission.unreads > 0">{{bot_mission.unreads}}</span>
+                </div>
+                <i class="icon-emotsmile"></i><span>アシスタント</span>
+            </a>
+        </li>
+        <li ng-if="cur_home != null">
+            <a href="javascript:;" title="全メンバー用新規作成" ng-click="addMission()" class="right-button" ng-show="cur_home.priv == HPRIV.HMANAGER"><i class="icon-plus"></i></a>
+            <a href="javascript:;" ng-click="toggleGroup(0)"><i class="icon-bubbles"></i><span>ルーム</span></a>
+            <ul class="list-mission">
+                <li data-ng-repeat="mission in missions0 = (missions | filter:roomFilter | filter:{mission_name:search_string} | orderBy:'order') track by mission.mission_id" class="list-item" ng-class="{'active': nav_id=='chatroom_' + mission.mission_id }" data-mission-id="{{mission.mission_id}}" ng-show="search_string !='' && search_string != null || groups[0] || mission.visible">
+                    <div class="info">
+                        <i class="badge badge-danger" ng-show="mission.unreads > 0">{{mission.unreads}}</i>
+                        <a href="javascript:;" ng-class="{'btn-pin': mission.pinned!=1}" ng-click="pinMission(mission)"><i class="icon-pin"></i></a>
+                    </div>
+                    <a ng-href="#/chats/{{mission.mission_id}}" title="{{::mission.mission_name}}"><i class="fa fa-lock" ng-if="mission.private_flag==1"></i> {{mission.mission_name}}</a>
+                </li>
+                <li ng-show="missions1.length > (missions1 | filter:visibleFilter).length || missions0.length > (missions0 | filter:visibleFilter).length">
+                    <a href="javascript:;" ng-click="toggleGroup(0)" class="more-link"><span ng-show="!groups[0]"><i class="fa fa-chevron-down"></i> すべて開く</span><span ng-show="groups[0]"><i class="fa fa-chevron-up"></i> 最新だけを表示...</span></a>
+                </li>
+            </ul>
+        </li>
+        <li ng-if="cur_home != null">
+            <a href="javascript:;" title="メンバーを招待" ng-click="inviteMember()" class="right-button" ng-if="cur_home.priv == HPRIV.HMANAGER"><i class="icon-plus"></i> </a>
+            <a href="javascript:;" ng-click="toggleGroup(2)"><i class="icon-people"></i><span>メンバー</span></a>
+            <ul class="list-team-member">
+                <li data-ng-repeat="mission in missions2 = (missions | filter:memberFilter | filter:{mission_name:search_string} | orderBy:'order') track by mission.user_id" class="list-item" ng-class="{'active': nav_id=='chatroom_' + mission.mission_id }" data-mission-id="{{mission.mission_id}}" ng-show="search_string !='' && search_string != null || groups[2] || mission.visible">
+                    <img alt="" ng-src="{{mission.avartar}}" class="avartar">
+                    <div class="info">
+                        <i class="badge badge-danger" ng-show="mission.unreads > 0">{{mission.unreads}}</i>
+                        <a href="javascript:;" ng-class="{'btn-pin': mission.pinned!=1}" ng-click="pinMission(mission)"><i class="icon-pin"></i></a>
+                    </div>
+                    <a href="javascript:;" ng-click="open_member(mission)" title="{{::mission.mission_name}}">{{mission.mission_name}}</a>
+                </li>
+                <li ng-show="missions2.length > (missions2 | filter:visibleFilter).length">
+                    <a href="javascript:;" ng-click="toggleGroup(2)" class="more-link"><span ng-show="!groups[2]"><i class="fa fa-chevron-down"></i> すべて開く</span><span ng-show="groups[2]"><i class="fa fa-chevron-up"></i> 最新だけを表示...</span></a>
+                </li>
+            </ul>
+        </li>
+        <li class="dummy"></li>
+    </ul>
+    <ul class="nav-bar footer">
+        <li class="my-avartar" ng-class="{'active': nav_id=='settings'}">
+            <div class="info">
+                <a href="javascript:;" ng-show="alerts.length > 0" ng-click="showAlerts()" class="alert">
+                    <i class="icon icon-info"></i>
+                    <span class="badge badge-danger">{{alerts.length}}</span>
+                </a>
+            </div>
+            <a href="#/settings">
+                <img alt="" ng-src="{{session.avartar}}" class="avartar">
+                <span>{{session.user_name}} <small>さんのプロフィール</small></span> 
+            </a>
+        </li>
+        <li class="settings" ng-class="{'active': nav_id=='task_star' }">
+            <a href="#/task/star"> <i class="fa fa-star-o"></i><span>スター付きタスク</span> </a>
+        </li>
+        <li>
+            <a href="javascript:;" ng-click="selectLogout()"> <i class="icon-logout"></i><span>ログアウト</span> </a>
+        </li>
+        <li class="search-wrapper">
+            <form id="search_bar" ng-submit="search()" novalidate>
+                <div class="input-group">
+                    <input type="text" class="search-input form-control" required ng-model="search_string" maxlength="50" placeholder="検索..." enter-submit="search()" esc="exitSearch()">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="search()"><i class="icon-magnifier"></i></button>
+                    </div>
+                </div>
+            </form>
+        </li>
+    </ul>
+</div>

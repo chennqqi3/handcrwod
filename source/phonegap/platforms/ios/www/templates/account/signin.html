@@ -1,0 +1,34 @@
+<ion-view view-title="ログイン" hide-nav-bar="true" class="login-page">
+    <ion-content>
+        <div class="login-container">
+            <div class="text-center logo-banner">
+                <img src="img/logo_banner.svg">
+            </div>
+            <form name="form_signin" class="list">
+                <label class="item item-input">
+                    <span class="input-label">メール</span>
+                    <input type="email" name="email" required ng-model="user.email">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">パスワード</span>
+                    <input type="password" name="password" required ng-model="user.password">
+                </label>
+                <div class="item alert-danger" data-ng-show="showExpireError">有償プランの期限が切れました。<a href="http://reflux.jp/handcrowd/#contact" target="_blank">こちらから</a>お支払いただくかサポートセンターへご連絡ください。</div>
+                <div class="item alert-danger" data-ng-show="showSigninError">メールアドレスまたはパスワードが正しくありません。</div>
+                <label class="item item-button">
+                    <button type="submit" class="button button-block button-positive" data-ng-disabled="!canSubmit(form_signin)" ng-click="submitForm()">
+                        ログイン
+                    </button>
+                </label>
+            </form>
+            <div class="padding">
+                <p class="text-center">
+                    <a href="#/signup" class="text-white">アカウントを新規登録する</a>
+                </p>
+                <p class="text-center">
+                    <a href="#" class="text-white" onclick="window.open('https://www.handcrowd.com/app/#/forgotpwd', '_system')">パスワードをリセットする</a>
+                </p>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,26 @@
+<ion-modal-view>
+    <ion-header-bar class="bar bar-header bar-positive">
+        <div class="buttons">
+            <button class="button button-icon icon ion-ios-search" ng-click="open_search_performer()"></button>
+        </div>
+        <h1 class="title">担当者選択</h1>
+        <div class="buttons">
+            <button class="button button-icon icon ion-ios-close-outline" ng-click="close_performer()"></button>
+        </div>
+    </ion-header-bar>
+    <ion-header class="bar bar-header item-input-inset" ng-show="show_search_performer">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" ng-model="search_performer.text" placeholder="検索...">
+        </label>
+        <button class="button button-clear" ng-click="close_search_performer()">キャンセル</button>
+    </ion-header>
+    <ion-content>
+        <ion-list>
+            <ion-item data-ng-repeat="user in users | filter:search_performer.text" class="item item-avatar item-icon-right" ng-click="select_performer(user)">
+                <img ng-src="{{user.avartar}}" class="avatar">
+                <h2>{{user.user_name}}</h2>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-modal-view>

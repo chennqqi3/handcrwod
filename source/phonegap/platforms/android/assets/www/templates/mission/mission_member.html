@@ -1,0 +1,25 @@
+<ion-view view-title="メンバー">
+    <ion-header class="bar bar-header item-input-inset" ng-show="show_search_member">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" ng-model="search_home.text" placeholder="検索...">
+        </label>
+        <button class="button button-clear" ng-click="close_search_member()">キャンセル</button>
+    </ion-header>
+    <ion-nav-buttons side="right">
+        <button menu-toggle="right" class="button button-icon icon ion-ios-search" ng-click="open_search_member()"></button>
+        <button menu-toggle="right" class="button button-icon icon ion-ios-personadd-outline" ui-sref=".add" ng-if="canEditMissionMember()"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <ion-list>
+            <ion-item data-ng-repeat="member in members | filter:search_home.text" class="item item-avatar item-icon-right">
+                <img ng-src="{{member.avartar}}" class="avatar">
+                <h2>{{member.user_name}}</h2>
+
+                <ion-option-button class="button-assertive" ng-click="removeMember(member)" ng-if="canEditMissionMember()">
+                    <i class="icon ion-ios-trash-outline"></i>
+                </ion-option-button>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

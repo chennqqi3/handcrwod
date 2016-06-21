@@ -1,0 +1,105 @@
+<div class="panel panel-default panel-task" data-ng-controller="taskCtrl">	
+	<header class="title-bar">
+		<div class="title-wrapper">
+			<h2>タスク</h2>
+		</div>
+		<ul class="button-group-right">
+			<li>
+				<button id="btnAddTask" type="button" class="btn btn-default btn-circle" ng-click="addTask()" ng-show="canEditTask()"><i class="ln-icon-plus"></i></button>
+			</li>
+		</ul>
+	</header>
+	<div class="page page-tasks">
+		<div class="row">
+			<div class="col-md-12">
+				<section class="task-container">
+					<section  data-ng-cloak>
+						<ul task-sortable class="task-list list-unstyled task-sort">
+							<li class="task-item ui-state-default" data-ng-repeat="task in tasks | filter:searchFilter1 | orderBy:'sort0' track by task.task_id" 
+								data-ng-class="{completed: task.complete_flag, selected: task.task_id == selectedTask.task_id}" data-task-id="{{task.task_id}}">
+								<div class="progress" ng-model="task.progress" progress-back></div>
+								<span class="view">
+									<div class="complete-handle" complete-handle ng-model="task">
+										<img ng-show="!canComplete(task)" ng-src="{{task.avartar}}" class="avartar img30_30" ng-click="selPerformer(task)">
+										<label ng-show="canComplete(task)" class="check-large-circle" check-complete ng-model="task"><input type="checkbox" checked ng-model="task.complete_flag" data-ng-change="completed(task)"><i></i></label>
+									</div>
+									<div class="task-label">
+										<span class="label hidden-xs" data-ng-class="{ 'label-warning':is_past(task), 'label-default': !is_past(task)}">{{ task.plan_end_time == null ? (task.plan_end_date | date_label) : (task.plan_end_time | date_time_label ) }}</span>
+										<span class="label hidden-xs">{{task.plan_hours | times_label}}</span>
+										<span class="label hidden-xs" ng-show="cur_mission==null || taskMode == 0 || taskMode == 3">{{task.mission_name}}</span>
+										<span class="check-priority">
+											<label class="check-star check-star-primary"><input type="checkbox" checked ng-model="task.priority"
+												data-ng-change="checkPriority(task)"><i></i></label>
+										</span>
+									</div>
+									<div class="task-name" ng-click="selectTask(task)">
+										<a href="javascript:;">{{task.task_name}}</a>
+									</div>
+									<div style="clear: both;"></div>
+								</span>
+							</li>
+						</ul>
+
+						<ul class="task-list list-unstyled">
+							<li class="task-item ui-state-default" data-ng-repeat="task in tasks | filter:searchFilter2 | orderBy:'proclevel' track by task.task_id" 
+								data-ng-class="{completed: task.complete_flag, selected: task.task_id == selectedTask.task_id}">
+								<div class="progress" ng-model="task.progress" progress-back></div>
+								<span class="view">
+									<div class="complete-handle" complete-handle ng-model="task">
+										<img ng-show="!canComplete(task)" ng-src="{{task.avartar}}" class="avartar avartar-border-primary img30_30" ng-click="selPerformer(task)">
+										<label ng-show="canComplete(task)" class="check-large-circle check-large-circle-primary" check-complete ng-model="task"><input type="checkbox" checked ng-model="task.complete_flag" data-ng-change="completed(task)"><i></i></label>
+									</div>
+									<div class="task-label">
+										<span class="label hidden-xs" data-ng-class="{ 'label-warning':is_past(task), 'label-default': !is_past(task)}">{{ task.plan_end_time == null ? (task.plan_end_date | date_label) : (task.plan_end_time | date_time_label ) }}</span>
+										<span class="label hidden-xs">{{task.plan_hours | times_label}}</span>
+										<span class="label hidden-xs" ng-show="cur_mission==null || taskMode == 0 || taskMode == 3">{{task.mission_name}}</span>
+										<span class="check-priority">
+											<label class="check-star check-star-primary"><input type="checkbox" checked ng-model="task.priority"
+												data-ng-change="checkPriority(task)"><i></i></label>
+										</span>
+									</div>
+									<div class="task-name" ng-click="selectTask(task)">
+										<a href="javascript:;">{{task.task_name}}</a>
+									</div>
+									<div style="clear: both;"></div>
+								</span>
+							</li>
+						</ul>
+
+						<ul class="task-list list-unstyled">
+							<li data-ng-repeat="task in tasks | filter:searchFilter3 track by task.task_id" 
+								class="ui-state-default completed" data-ng-class="{selected: task.task_id == selectedTask.task_id}">
+								<span class="view">
+									<div class="complete-handle" complete-handle ng-model="task">
+										<img ng-show="!canComplete(task)" ng-src="{{task.avartar}}" class="avartar avartar-border-success img30_30" ng-click="selPerformer(task)">
+										<label ng-show="canComplete(task)" class="check-large-circle check-large-circle-success"><input type="checkbox" checked ng-model="task.complete_flag" data-ng-change="completed(task)"><i></i></label>
+									</div>
+									<div class="task-label">
+										<span class="label hidden-xs label-danger">{{task.complete_time | date_time_label }}</span>
+										<span class="label hidden-xs">{{task.plan_hours | times_label}}</span>
+										<span class="label hidden-xs" ng-show="cur_mission==null || taskMode == 0 || taskMode == 3">{{task.mission_name}}</span>
+										<span class="check-priority">
+											<label class="check-star check-star-primary"><input type="checkbox" checked ng-model="task.priority"
+												data-ng-change="checkPriority(task)"><i></i></label>
+										</span>
+									</div>
+									<div class="task-name" ng-click="selectTask(task)" >
+										<a href="javascript:;" data-toggle-task-edit>{{task.task_name}}</a>
+									</div>
+								</span>
+							</li>
+						</ul>
+					</section>
+				</section>
+			</div>
+		</div>
+		<div class="row complete-bar">
+			<div class="col-md-12 text-center">
+				<button type="button" class="btn btn-gap-v btn-inverse" ng-click="loadCompleted()">完了済み</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<section data-ng-include=" 'views/process/sel_template.html' + ver "></section>
+<section data-ng-include=" 'views/task/task_edit.html' + ver "></section>

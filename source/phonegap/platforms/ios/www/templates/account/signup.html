@@ -1,0 +1,46 @@
+<ion-view view-title="ユーザー登録" hide-nav-bar="true" class="login-page">
+    <ion-content>
+        <div class="login-container">
+            <div class="text-center logo-banner">
+                <h2>ユーザー登録</h2>
+            </div>
+            <form novalidate name="form_signup">
+                <div ng-if="registered == 0">
+                    <label class="item item-input">
+                        <span class="input-label">名前</span>
+                        <input type="text" name="user_name" required ng-model="user.user_name">
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">メール</span>
+                        <input type="email" name="email" required ng-model="user.email">
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">パスワード</span>
+                        <input type="password" name="password" required ng-model="user.password">
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">パスワード<small>(確認)</small></span>
+                        <input type="password" name="password" required ng-model="user.password_retyped" data-equals="{{user.password}}">
+                    </label>
+                    <div class="item item-agree">
+                        <a href="javascript:;" ng-click="showContract()">利用契約</a>と<a href="javascript:;" ng-click="showPrivacy()">プライバシーポリシー</a>に同意します。
+                    </div>
+                </div>
+                <div class="item alert-danger" data-ng-show="showMessage">{{message}}</div>
+                <label class="item item-button" ng-show="registered == 0">
+                    <button type="submit" class="button button-block button-positive" data-ng-disabled="!canSubmit(form_signup)" ng-click="submitForm()">
+                        同意して登録
+                    </button>
+                </label>
+                <label class="item item-button" ng-show="registered == 1">
+                    <button type="submit" class="button button-block" ng-click="resendMail()">
+                        認証メール再送信
+                    </button>
+                </label>
+            </form>
+            <div class="padding">
+                <p class="text-center">アカウントを持っていますか？ <a href="#/signin" >ログイン</a></p>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

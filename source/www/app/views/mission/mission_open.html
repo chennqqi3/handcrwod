@@ -1,0 +1,24 @@
+<form name="form_mission_open" class="panel-open-mission form-horizontal form-validation">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+        <h4 class="modal-title" id="myModalLabel">チャットルームを開ける</h4>
+    </div>
+    <div class="modal-body">
+        <ul class="list-group">
+            <li data-ng-repeat="mission in missions" class="list-group-item">
+                <span class="view">
+                    <div class="pull-right">
+                        <small>{{mission.last_date | date_time_label}}</small>
+                        <button type="button" class="btn btn-xs btn-primary" ng-click="open(mission)"><i class="fa fa-fw fa-plus"></i> 開ける</button>
+                    </div>
+                    <i class="icon icon-bubbles"></i>
+                    {{mission.mission_name}} 
+                </span>
+            </li>
+        </ul>
+        <div class="alert alert-warning" ng-if="missions.length == 0">チャットルームが存在しません。</div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="cancel()">閉じる</button>
+    </div>
+</form>

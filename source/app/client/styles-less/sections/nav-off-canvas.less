@@ -1,0 +1,49 @@
+.on-canvas {
+    #nav-container {
+        left: 0;
+    }
+
+    #content {
+        left: 220px;
+    }
+}
+
+@media (max-width:@screen-xs-max) {
+    .on-canvas {
+        #nav-container {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            width: 100%;
+
+            #nav {
+                > li {
+                    > a {
+                        padding: 10px 15px;
+
+                        > i {
+                            font-size: 18px;
+                        }
+
+                        > span {
+                            font-size: 18px;
+                        }
+
+                        label.label-sup {
+                            top: 14px;
+                        }
+                    }
+                }
+            }
+        }
+
+        #content {
+            left: 0px;
+        }
+
+        .btn-float {
+            top: 8px;
+        }
+    }
+}

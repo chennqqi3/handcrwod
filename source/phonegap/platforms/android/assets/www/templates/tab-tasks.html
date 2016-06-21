@@ -1,0 +1,37 @@
+<ion-view view-title="タスク">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button menu-toggle="right" class="button button-icon icon ion-ios-search"></button>
+        <button menu-toggle="right" class="button button-icon icon ion-ios-plus-empty"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <ion-list class="item-remove-animate item-icon-right">
+            <ion-item data-ng-repeat="task in tasks | filter:searchFilter1 | orderBy:'sort0' track by task.task_id" class="item item-checkbox">
+                <label class="checkbox"><input type="checkbox"></label>
+                {{task.task_name}}
+                <ion-option-button class="button-assertive" ng-click="remove(task)">
+                    <i class="icon ion-ios-trash-outline"></i>
+                </ion-option-button>
+                <ion-option-button class="button-stable" ng-click="detail(task)"><i class="icon ion-ios-more-outline"></i></ion-option-button>
+            </ion-item>
+            <ion-item data-ng-repeat="task in tasks | filter:searchFilter2 | orderBy:'proclevel' track by task.task_id" class="item item-checkbox">
+                <label class="checkbox"><input type="checkbox"></label>
+                {{task.task_name}}
+                <ion-option-button class="button-assertive" ng-click="remove(task)">
+                    <i class="icon ion-ios-trash-outline"></i>
+                </ion-option-button>
+                <ion-option-button class="button-stable" ng-click="detail(task)"><i class="icon ion-ios-more-outline"></i></ion-option-button>
+            </ion-item>
+            <ion-item data-ng-repeat="task in tasks | filter:searchFilter3 track by task.task_id" class="item item-checkbox">
+                <label class="checkbox"><input type="checkbox"></label>
+                {{task.task_name}}
+                <ion-option-button class="button-assertive" ng-click="remove(task)">
+                    <i class="icon ion-ios-trash-outline"></i>
+                </ion-option-button>
+                <ion-option-button class="button-stable" ng-click="detail(task)"><i class="icon ion-ios-more-outline"></i></ion-option-button>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

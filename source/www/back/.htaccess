@@ -1,0 +1,44 @@
+Options FollowSymLinks
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+	RewriteBase /handcrowd/back
+	RewriteRule ^favicon.ico$ resource/ico/favicon.ico [QSA,NC,L]
+	RewriteRule ^css/(.+)$ resource/css/$1 [QSA,NC,L]
+	RewriteRule ^font/(.+)$ resource/font/$1 [QSA,NC,L]
+	RewriteRule ^img/(.+)$ resource/img/$1 [QSA,NC,L]
+	RewriteRule ^ico/(.+)$ resource/ico/$1 [QSA,NC,L]
+	RewriteRule ^fonts/(.+)$ resource/fonts/$1 [QSA,NC,L]
+	RewriteRule ^js/(.+)$ resource/js/$1 [QSA,NC,L]
+	RewriteRule ^swf/(.+)$ resource/swf/$1 [QSA,NC,L]
+	RewriteRule ^sound/(.+)$ resource/sound/$1 [QSA,NC,L]
+
+	RewriteRule ^avartar/(.+)$ data/avartar/$1 [QSA,NC,L]
+	RewriteRule ^data/avartar/$ img/unknown.png [QSA,NC,L]
+	RewriteCond %{REQUEST_FILENAME} !-s
+	RewriteRule ^data/avartar/(.*).jpg$ common/down_gravatar/$1 [QSA,NC,L]
+
+	RewriteRule ^homelogo/(.+)$ data/homelogo/$1 [QSA,NC,L]
+	RewriteCond %{REQUEST_FILENAME} !-s
+	RewriteRule ^data/homelogo/(.*)$ img/no_logo.png [QSA,NC,L]
+
+	RewriteRule mattach/(.+)/(.+)/(.+)/(.+)/(.+)$ data/thumb/$1/$2/$3_$5.jpg [QSA,NC,L]
+	RewriteCond %{REQUEST_FILENAME} !-s
+	RewriteRule ^data/thumb/(.+)/(.+)/(.+)$ common/down_thumb_mattach/$1/$2/$3 [QSA,NC,L]
+
+	RewriteRule mattach/(.+)/(.+)/(.+)/(.+).mp4$ data/mattach/$1/$2/$3?$4.mp4 [QSA,NC,L,T=video/mp4]
+	RewriteRule mattach/(.+)/(.+)/(.+)/(.+)$ data/mattach/$1/$2/$3 [QSA,NC,L]
+	RewriteRule ^data/mattach/$ img/back.png [QSA,NC,L]
+	RewriteCond %{REQUEST_FILENAME} !-s
+	RewriteRule ^data/mattach/(.*)$ img/back.png [QSA,NC,L]
+
+	RewriteRule ^$ index.php [QSA,NC,L]
+
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-s
+	RewriteRule .* index.php [QSA,NC,L]
+	RewriteRule ^backend(.*)$ index.php [QSA,NC,L]
+
+	RewriteRule ^(.+)/(.+)\.php - [F]
+	RewriteRule ^config.inc - [F]
+</IfModule>
