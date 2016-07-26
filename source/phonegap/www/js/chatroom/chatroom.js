@@ -22,7 +22,7 @@ angular.module('app.chatroom', [])
         var scroller;
         var txtInput; // ^^^
 
-        var MAX_MSG_LENGTH = 100;
+        var MAX_MSG_LENGTH = 1000;
 
         $rootScope.taskMode = 2;
 
@@ -44,7 +44,8 @@ angular.module('app.chatroom', [])
                 cmsg_id: $rootScope.cmsg_sn,
                 user_id: $session.user_id,
                 user_name: $session.user_name,
-                content: msg
+                content: msg,
+                read_class: 'read'
             };
 
             $rootScope.cmsg_sn -= 1;
@@ -86,9 +87,14 @@ angular.module('app.chatroom', [])
             $timeout(function() {
                 $('#loader').hide();
                 $rootScope.$broadcast('elastic:adjust'); 
-            }, 1000)
+            })
             var length;
             $scope.messages = messages;
+            // build html
+            messages_html = chatStorage.messages_to_html(messages, $scope.chat_id);
+
+            $('#messages').html(messages_html);
+
             $scope.scrollToBottom(false);
             length = $scope.messages.length;
             if (length > 0) {
@@ -102,10 +108,10 @@ angular.module('app.chatroom', [])
                 $timeout(function() {
                     $scope.scrollToMessage($scope.chat_id);
                     $scope.chat_id = null;
-                }, 1000);                                        
+                });                                        
             }
 
-            $scope.initPreviewLink();
+            $scope.initEventHandler();  
         }
 
         $scope.$on('receive_messages', function(event, cmsg) {
@@ -120,12 +126,18 @@ angular.module('app.chatroom', [])
                     for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {                            
                         $scope.messages.splice(i, 0, messages[i]);
                     }
+                    /*
                     if ($scope.messages.length > MAX_MSG_LENGTH) {
                         $scope.messages.splice(MAX_MSG_LENGTH, $scope.messages.length - MAX_MSG_LENGTH);
                     }
+                    */
+                    // build html
+                    messages_html = chatStorage.messages_to_html(messages, $scope.chat_id);
+                    $('#messages').prepend(messages_html);
+
                     $scope.startScrollTimer(cmsg.prev_id, "prev");
 
-                    $scope.initPreviewLink();
+                    $scope.initEventHandler();
                 }
             }
             else if (!$api.is_empty(cmsg.next_id)) {
@@ -136,12 +148,17 @@ angular.module('app.chatroom', [])
                     for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
                         $scope.messages.push(messages[i]);
                     }
+                    /*
                     if ($scope.messages.length > MAX_MSG_LENGTH) {
                         $scope.messages.splice(0, $scope.messages.length - MAX_MSG_LENGTH);
                     }
+                    */
+                    // build html
+                    messages_html = chatStorage.messages_to_html(messages, $scope.chat_id);
+                    $('#messages').append(messages_html);
                     $scope.startScrollTimer(cmsg.next_id, "next");
 
-                    $scope.initPreviewLink();
+                    $scope.initEventHandler();
                 }
             }
             else {
@@ -249,6 +266,8 @@ angular.module('app.chatroom', [])
                 chat_ta.focus();
                 chat_ta.setSelectionRange(start, start);
             });
+
+            $scope.show_more = false;
             return;
         }
 
@@ -275,6 +294,8 @@ angular.module('app.chatroom', [])
                     }
                 ]
             });
+
+            $scope.show_more = false;
         };
 
         $scope.uploadOneFile = function(file) {
@@ -407,6 +428,8 @@ angular.module('app.chatroom', [])
                     
                 }, {limit:1});
             }
+
+            $scope.show_more = false;
         };
 
         $scope.scrollTimer = null;
@@ -498,12 +521,19 @@ angular.module('app.chatroom', [])
                             for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {                            
                                 $scope.messages.splice(i, 0, messages[i]);
                             }
+                            /*
                             if ($scope.messages.length > MAX_MSG_LENGTH) {
                                 $scope.messages.splice(MAX_MSG_LENGTH, $scope.messages.length - MAX_MSG_LENGTH);
                             }
+                            */
+
+                            // build html
+                            messages_html = chatStorage.messages_to_html(messages, $scope.chat_id);
+                            $('#messages').prepend(messages_html);
+
                             $scope.startScrollTimer(prev_id, "prev");
 
-                            $scope.initPreviewLink();
+                            $scope.initEventHandler();
 
                             return messages;
                         } else {
@@ -518,30 +548,45 @@ angular.module('app.chatroom', [])
             if ($scope.messages) {
                 length = $scope.messages.length;
                 next_id = $scope.messages[length - 1].cmsg_id;
-                console.log("next() " + next_id);
 
                 if (next_id < 0)
                     return null;
+
+                console.log("next() " + next_id);
                 
                 return chatStorage.messages($scope.mission_id, null, next_id)
                     .then(function(messages) {
-                        var i, j, ref;
+                        var i, j, ref, added_message = [];
                         if (messages.length > 0) {
                             messages[0].date_label = $dateutil.ellipsis_time_str(messages[0].date, $scope.messages[length-1].date);
                             last_cmsg_id = $scope.messages[$scope.messages.length - 1].cmsg_id;
 
+                            if (last_cmsg_id < 0)
+                                return [];
+
                             for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
-                                if (last_cmsg_id < messages[i].cmsg_id)
+                                var cmsg_id = messages[i].cmsg_id;
+                                if ($('#chat_' + cmsg_id).length == 0) {
+                                    console.log("add message last:" + last_cmsg_id + " cmsg:" + messages[i].cmsg_id);
                                     $scope.messages.push(messages[i]);
+                                    added_message.push(messages[i])
+                                }
                             }
+                            /*
                             if ($scope.messages.length > MAX_MSG_LENGTH) {
                                 $scope.messages.splice(0, $scope.messages.length - MAX_MSG_LENGTH);
                             }
+                            */
+
+                            // build html
+                            messages_html = chatStorage.messages_to_html(added_message, $scope.chat_id);
+                            $('#messages').append(messages_html);
+
                             $scope.startScrollTimer(next_id, "next");
 
-                            $scope.initPreviewLink();
+                            $scope.initEventHandler();
 
-                            return messages;
+                            return added_message;
                         } else {
                             return [];
                         }
@@ -565,7 +610,8 @@ angular.module('app.chatroom', [])
             ref = $scope.messages;
             for (j = 0, len = ref.length; j < len; j++) {
                 message = ref[j];
-                if (message.cmsg_id === cmsg_id) {
+                if (message.cmsg_id == cmsg_id) {
+                    $scope.render_message(message);
                     exist = true;
                     break;
                 }
@@ -640,6 +686,24 @@ angular.module('app.chatroom', [])
         $scope.exitSearch = function() {
             return $scope.search_string = null;
         };
+
+        $scope.render_message = function(message) {
+            console.log("set message temp:" + message.temp_cmsg_id + " id:" + message.cmsg_id + " message:" + message.content);
+            if (message.cmsg_id > 0 && message.temp_cmsg_id < 0) {
+                $('#chat_' + message.temp_cmsg_id).remove();   
+            }
+
+            // build html
+            if ($('#chat_' + message.cmsg_id).length > 0) {
+                message_html = chatStorage.message_to_html(message, $scope.chat_id, false);
+                $('#chat_' + message.cmsg_id).html(message_html);
+            }
+            else {
+                message_html = chatStorage.message_to_html(message, $scope.chat_id);
+                $('#messages').append(message_html);   
+            }
+
+        };
         $scope.sendMessage = function() {
             if ($api.is_empty($scope.cmsg.content))
                 return;
@@ -649,11 +713,11 @@ angular.module('app.chatroom', [])
                 l_msg = $scope.messages[length-1];
                 if ($scope.last_cid != l_msg.cmsg_id) { // scrolled top and bottom messages was cutted
                     $scope.scrollToMessage($scope.last_cid, function() {
-                        chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg);
+                        chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg, $scope.render_message);
                     }); // scroll to last cid
                 }
                 else {
-                    chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg);
+                    chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg, $scope.render_message);
                     $scope.scrollToBottom();
                 }
             }
@@ -664,8 +728,8 @@ angular.module('app.chatroom', [])
         };
         $scope.$on('receive_message', function(event, cmsg) {
             var l_msg, length;
-            if (cmsg.mission_id === $scope.mission_id) {
-                chatStorage.set_message($scope.mission_id, $scope.messages, cmsg);
+            if (cmsg.mission_id == $scope.mission_id) {
+                chatStorage.set_message($scope.mission_id, $scope.messages, cmsg, $scope.render_message);
                 length = $scope.messages.length;
                 if (length > 1) {
                     if (cmsg.inserted) {
@@ -689,7 +753,7 @@ angular.module('app.chatroom', [])
                 
                 $scope.$apply();
 
-                $scope.initPreviewLink();
+                $scope.initEventHandler();
                 
                 $scope.scrollToBottom();
             }
@@ -702,14 +766,26 @@ angular.module('app.chatroom', [])
             $scope.modalPreviewImage = modal;
         });
 
-        $scope.initPreviewLink = function() {
+        $scope.initEventHandler = function() {
             $timeout(function() {
                 $('.preview-image').off('click');
                 $('.preview-image').on('click', function() {
                     url = $(this).attr('preview-image');
-                    $scope.image_url = url;
                     $scope.modalPreviewImage.show();
+                    $('#preview_view #board img').remove();
+                    $('#preview_view #board').append("<img width='100%' src='" + url + "'>");
                     $('#preview_view').css('height', window.screen.height - 44); // header height: 44px
+                });
+
+                $('.message-wrapper').off('hold');
+                $('.message-wrapper').on("hold", function() {
+                    cmsg_id = $(this).data('cmsg_id');
+                    for (i = 0; i < $scope.messages.length; i ++) {
+                        if ($scope.messages[i].cmsg_id == cmsg_id) {
+                            $scope.onMessageHold($scope.messages[i]);
+                            break;
+                        }
+                    } 
                 });
             }, 2000);
         }
@@ -816,6 +892,7 @@ angular.module('app.chatroom', [])
             $scope.cmsg.content = message.content;
 
             message.editing = true;
+            $scope.render_message(message);
 
             $timeout(function() { document.querySelector('#chat_ta').focus();})
         };
@@ -823,6 +900,7 @@ angular.module('app.chatroom', [])
             if(!$api.is_empty($scope.cmsg.content))
             {
                 $scope.cmsg.editing = false;
+                $scope.render_message($scope.cmsg);
                 $scope.clear_cmsg(true);
             }
 
@@ -862,6 +940,8 @@ angular.module('app.chatroom', [])
                         $scope.last_cid = null;
                     }
                 }
+
+                $('#chat_' + cmsg.cmsg_id).remove();   
                 return $scope.$apply();
             }
         });
@@ -871,6 +951,8 @@ angular.module('app.chatroom', [])
                 message.star = false;
             else
                 message.star = true;
+
+            $scope.render_message(message);
 
             chatStorage.star_message(message.cmsg_id, message.star);
         };
@@ -1018,6 +1100,9 @@ angular.module('app.chatroom', [])
                             if (readIds.indexOf(message.cmsg_id) !== -1) {
                                 message.unread = false;
                                 message.read_class = "unread read";
+                                if ($('#chat_' + message.cmsg_id).length > 0) {
+                                    $('#chat_' + message.cmsg_id + ' .unread-mark').addClass(message.read_class);
+                                }
                                 $rootScope.cur_mission.unreads--;
                                 delta--;   
                             }
@@ -1070,7 +1155,7 @@ angular.module('app.chatroom', [])
             });
         }
 
-        $scope.onMessageHold = function(e, itemIndex, message) {
+        $scope.onMessageHold = function(message) {
             if (!$rootScope.canChat())
                 return;
             
@@ -1128,7 +1213,7 @@ angular.module('app.chatroom', [])
             if (!ta) return;
 
             var taHeight = ta[0].offsetHeight;
-            console.log('taHeight: ' + taHeight);
+            //console.log('taHeight: ' + taHeight);
 
             if (!footerBar) return;
 
@@ -1211,8 +1296,9 @@ angular.module('app.chatroom', [])
 
         // show user profile
         $scope.showUserProfile = function(url) {
-            $scope.image_url = url;
             $scope.modalPreviewImage.show();
+            $('#preview_view #board img').remove();
+            $('#preview_view #board').append("<img width='100%' src='" + url + "'>");
             $('#preview_view').css('height', window.screen.height - 44); // header height: 44px
             return;
         }
@@ -1275,9 +1361,21 @@ angular.module('app.chatroom', [])
                         }, 1000);                                        
                     }
 
-                    $scope.initPreviewLink()
+                    $scope.initEventHandler()
                 });
                 */
+            }
+        };
+
+        $scope.goto_link = function(mission_id, chat_id) {
+            $scope.chat_id = chat_id;
+            if ($scope.mission_id == mission_id) {
+                $scope.scrollToMessage(chat_id);
+            }
+            else {
+                $stateParams.mission_id = mission_id;
+                $stateParams.chat_id = chat_id;
+                $scope.sync();
             }
         };
 
@@ -1503,4 +1601,23 @@ angular.module('app.chatroom', [])
 
 function onProfilePicError(ele) {
     ele.src = ''; // set a fallback
+}
+
+function onClickAvartar(url) {
+    var scope = angular.element(document.getElementById("messageView")).scope();
+    scope.$apply(function () {
+        scope.showUserProfile(url);
+    });
+}
+
+function gotoLink(href){
+    if (href != '') {
+        var arr = href.split('/');
+        mission_id = arr[0];
+        chat_id = arr[1];
+        var scope = angular.element(document.getElementById("messageView")).scope();
+        scope.$apply(function () {
+            scope.goto_link(mission_id, chat_id);
+        });
+    }
 }

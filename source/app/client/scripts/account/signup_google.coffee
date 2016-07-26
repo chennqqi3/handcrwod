@@ -28,6 +28,7 @@ angular.module('app.signup_google', [])
 
         $scope.showMessage = false
         $scope.message = ""
+        $scope.registered = false
 
         $http.get("contract.txt")
             .success((data, status, headers, config) ->
@@ -39,14 +40,20 @@ angular.module('app.signup_google', [])
             )
 
         $scope.canSubmit = ->
-            return $scope.form_signup.$valid
+            return $scope.form_signup.$valid && $scope.registered==false && $scope.posting == false
 
         $scope.submitForm = ->
+            $scope.show_error = true
+
+            return if $scope.form_signup.$valid == false
+            
+            $scope.posting = true
             $api.call("google/register", {
                     token: $routeParams.token
                     email: $scope.user.email
                 })
                 .success((data, status, headers, config) ->
+                    $scope.posting = false
                     if data.err_code == 0
                         $session.create(data)
                         $location.path('/home')

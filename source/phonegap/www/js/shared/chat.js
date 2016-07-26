@@ -2,22 +2,24 @@ angular.module('app.service.chat', [])
 
 .service('$chat', 
     function($rootScope, $session, chatStorage, userStorage, $http, CONFIG, 
-        logger, $state, $timeout, AUTH_EVENTS, $websocket, $api, chatizeService, $dateutil) {
+        logger, $state, $timeout, $interval, AUTH_EVENTS, $websocket, $api, chatizeService, $dateutil) {
         var $this;
         $this = this;
         $this.socket = null;
         $this.out_queue = [];
         $this.out_key = 0;
+        $this.client_key = Math.floor((Math.random() * 1000000) + 1);
 
         $this.connect = function() {
             var uri;
             if ($session.user_id === null) {
                 return;
             }
-            uri = $rootScope.chat_uri + $session.user_id;
+            uri = $rootScope.chat_uri + $session.user_id + "/" + $this.client_key;
             $this.socket = $websocket.$new(uri);
             $this.socket.$$config.enqueue = true;
-            if ($this.socket.$$config.reconnect === false) {
+            if ($this.socket.$$config.reconnect != true) {
+                console.log("Open connection");
                 $this.socket.$open();
             }
             $this.socket.$on('$open', function() {
@@ -31,8 +33,10 @@ angular.module('app.service.chat', [])
             });
             $this.socket.$on('$close', function() {
                 console.log('Connection closed');
-                $rootScope.error_disconnected = true;
-                return $rootScope.$apply();
+                $timeout(function() {
+                    $rootScope.error_disconnected = !($this.socket && $this.socket.$ready());
+                    $rootScope.$apply();
+                }, 3000);
             });
             $this.socket.$on('chat_message', function(cmsg) {
                 var found_mission;
@@ -47,6 +51,7 @@ angular.module('app.service.chat', [])
                                 mission.last_text = cmsg.content;
                                 $rootScope.$apply();
                                 chatStorage.sound_alert();
+                                $rootScope.$broadcast('unread-message', mission);
                             }
                         }
                     });
@@ -75,6 +80,7 @@ angular.module('app.service.chat', [])
                 else {
                     logger.logSuccess('他のホームからメッセージが届きました。');
                 }
+                console.log('receive_message temp_cmsg_id:' + cmsg.temp_cmsg_id + ' cmsg_id:' + cmsg.cmsg_id);
                 return $rootScope.$broadcast('receive_message', cmsg);
             });
             $this.socket.$on('chat_messages', function(cmsg) {
@@ -103,6 +109,7 @@ angular.module('app.service.chat', [])
             });
             $this.socket.$on('remove_message', function(cmsg) {
                 $rootScope.$broadcast('refresh-homes');
+                console.log('remove_message cmsg_id:' + cmsg.cmsg_id);
                 return $rootScope.$broadcast('remove_message', cmsg);
             });
 
@@ -197,7 +204,8 @@ angular.module('app.service.chat', [])
                     mission_id: mission_id,
                     prev_id: prev_id,
                     next_id: next_id,
-                    star: star
+                    star: star,
+                    limit: 200
                 };
                 $this.emit('chat_messages', msg);
             }
@@ -276,12 +284,20 @@ angular.module('app.service.chat', [])
         };
 
         $this.emit = function(evt, msg) {
-            if (msg.key == undefined) {
+            if (msg.key === undefined && evt != 'alive') {
                 $this.out_key = $this.out_key + 1;
                 msg.key = $this.out_key;
                 msg.event = evt;
                 msg.retry = 0;
-                $this.out_queue.push(msg);
+                pushed = false;
+                for (i = 0; i < $this.out_queue.length; i ++) {
+                    m = $this.out_queue[i];
+                    if (m.key == msg.key) { // check fail of send  
+                        pushed = true;  
+                    }
+                }
+                if (!pushed)
+                    $this.out_queue.push(msg);
             }
             $this.socket.$emit(evt, msg);
             $timeout(function() {
@@ -290,16 +306,21 @@ angular.module('app.service.chat', [])
         };
 
         $this.resend = function(msg) {
-            for (i =0; i < $this.out_queue.length; i ++) {
+            for (i = 0; i < $this.out_queue.length; i ++) {
                 m = $this.out_queue[i];
                 if (m.key == msg.key) { // check fail of send
                     // resend
                     msg.retry ++;
-                    console.log("resend messages " + msg.retry);
+                    console.log("resend messages " + msg.retry + " detail:" + JSON.stringify(msg));
                     $this.emit(m.event, m);
                     if (msg.retry > 3) {
                         $this.disconnect();
                         $this.connect();
+                        
+                        for (i = 0; i < $this.out_queue.length; i ++) {
+                            $this.out_queue[i].retry = 0;
+                        }
+                        break;
                     }
 
                 }
@@ -313,6 +334,16 @@ angular.module('app.service.chat', [])
                 return $this.disconnect();
             }
         });
+
+        $interval(function() {
+            if ($this.socket && $this.socket.$ready()) {
+                msg = {
+                    time: new Date().getTime()
+                }
+                console.log("send alive")
+                $this.emit('alive', msg);
+            }
+        }, 30000);
         return $this;
     }
 );

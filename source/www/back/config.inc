@@ -37,7 +37,7 @@ define('LOGIN_FAIL_LOCK',		5);
 define('ENTRANCE_EMAIL',		'request@reflux.jp');
 
 /* chat server */
-define('CSERVER_HOST',		'localhost');
+define('CSERVER_HOST',		'192.168.1.123');
 define('CSERVER_PORT',		'8000');
 define('CSERVER_SSL',		false);
 define('CSERVER_DEBUG',		true);

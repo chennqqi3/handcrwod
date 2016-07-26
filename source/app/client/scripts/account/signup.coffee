@@ -38,10 +38,15 @@ angular.module('app.signup', [])
             return $scope.form_signup.$valid && $scope.registered==false && $scope.posting == false
 
         $scope.submitForm = ->
+            $scope.show_error = true
+
+            return if $scope.form_signup.$valid == false
+            
             $scope.posting = true
             if $scope.registered
                 userStorage.resend_activate_mail($scope.user, (res) ->
                     $scope.posting = false
+                    $scope.err_code = res.err_code
                     if res.err_code == 0
                         $scope.message = "ご登録いただいたメールアドレスへ、認証用メールが再送信されました。認証用のメール本文から認証用リンクをクリックして、本登録を行ってください。"
                         $scope.registered = true
@@ -53,6 +58,7 @@ angular.module('app.signup', [])
             else
                 userStorage.signup($scope.user, (res) ->
                     $scope.posting = false
+                    $scope.err_code = res.err_code
                     if res.err_code == 0
                         $scope.message = "仮登録が完了しました（※まだ登録は完了していません）。認証用のメール本文から認証用リンクをクリックして、本登録を行ってください。"
                         $scope.registered = true

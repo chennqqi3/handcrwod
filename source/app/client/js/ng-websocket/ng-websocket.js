@@ -141,10 +141,12 @@
             };
 
             me.$$ws.onerror = function (error) {
+                console.log("socket error " + JSON.stringify(error));
                 me.$$fireEvent('$error', error);
             };
 
             me.$$ws.onopen = function () {
+                console.log("opened connection")
                 // Clear the reconnect task if exists
                 if (me.$$reconnectTask) {
                     clearInterval(me.$$reconnectTask);
@@ -164,9 +166,11 @@
 
             me.$$ws.onclose = function () {
                 // Activate the reconnect task
+                console.log("close connection");
                 if (me.$$config.reconnect) {
                     me.$$reconnectTask = setInterval(function () {
                         if (me.$status() === me.$CLOSED) me.$open();
+                        console.log("reconnect")
                     }, me.$$config.reconnectInterval);
                 }
 

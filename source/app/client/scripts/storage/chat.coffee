@@ -63,7 +63,7 @@ angular.module('app.storage.chat', [])
 )
 
 .factory('chatStorage', 
-    ($api, $session, $dateutil, $rootScope, filterFilter, AUTH_EVENTS, $auth, CONFIG) ->
+    ($api, $session, $dateutil, $rootScope, filterFilter, AUTH_EVENTS, $auth, CONFIG, $filter) ->
         # Initialize
         init = ->
             ###
@@ -81,10 +81,164 @@ angular.module('app.storage.chat', [])
                 if messages == undefined
                     messages = []
             else
+                if messages == null
+                    messages = []
+                if messages.length > 200
+                    tmp = messages.splice(messages.length - 200)
+                else
+                    tmp = messages.splice()
+
                 # write
-                $rootScope.g_messages[mission_id] = messages
+                $rootScope.g_messages[mission_id] = tmp
 
             return messages
+
+        is_to_mine = (message) ->
+            if $api.is_empty(message)
+                return false
+
+            message.content += ""
+            if $api.is_empty(message.content)
+                return false
+
+            mine = false
+            message.content.replace(/\[to:([^\]]*)\]/g, (item, user_id) ->
+                if $session.user_id + '' == user_id
+                    mine = true
+            )
+
+            return mine
+
+        ###
+            <div ng-repeat="message in messages track by message.cmsg_id" class="message-wrapper" ng-class="{'to-mine': isToMine(message), 'linked': message.cmsg_id==chat_id}">
+                <div id="chat_{{message.cmsg_id}}">
+                    <img class="avartar clickable left" ng-src="{{::message.avartar}}" ng-if="message.show_avartar" ng-click="showUserProfile(message.user_id)"/>
+
+                    <div class="chat-message left" ng-class="{'me': session.user_id == message.user_id, 'border-top': message.show_avartar, 'editing': message.editing}">
+                        <div class="sending" ng-if="message.cmsg_id < 0"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>
+                        <div class="message-detail">
+                            <span ng-click="viewProfile(message)" class="user-name" ng-if="message.show_avartar">{{::message.user_name}}</span> 
+                            <span class="time">{{::message.date_label}}</span>
+                            <a href="javascript:;" class="star" ng-class="{'show-hover': !message.star}" ng-click="star(message)" title="スター付き"><i class="fa text-warning" ng-class="{'fa-star': message.star, 'fa-star-o':!message.star}"></i></a>
+                            <span class="unread-mark"><i class="fa fa-circle text-danger {{message.read_class}}"></i></span>
+                        </div>
+                        <div class="message" ng-bind-html="message.content | chatize">
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="button-group" ng-class="{'editing': message.editing}" ng-if="message.cmsg_id>0">
+                    <li ng-if="canEditTask()">
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="タスク新規登録" ng-click="addTask(message)"><i class="ln-icon-check-square"></i></button>
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="リンク" ng-click="link(message)"><i class="icon-link"></i></button>
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="引用" ng-click="quote(message)"><i class="ln-icon-quote-open"></i></button>
+                    </li>
+                    <li ng-if="session.user_id == message.user_id">
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="編集" ng-click="edit(message)"><i class="icon-pencil"></i></button>
+                    </li>
+                    <li ng-if="session.user_id == message.user_id">
+                        <button type="button" class="btn btn-default btn-xs btn-circle" title="削除" ng-click="remove(message)"><i class="icon-trash"></i></button>
+                    </li>
+                </ul>
+
+                <div class="clear"></div>
+            </div>
+        ###
+        message_to_html = (message, chat_id, uninclude_self) ->
+            html = ""
+
+            cls = ""
+            if is_to_mine(message)
+                cls += ' to-mine'
+            if message.cmsg_id == chat_id
+                cls += ' linked'
+
+            avartar_cls = ""
+            if !message.show_avartar
+                avartar_cls += " hide"
+
+            message_cls = ""
+            if $session.user_id == message.user_id
+                message_cls += ' me'
+            if message.show_avartar
+                message_cls += ' border-top'
+            if message.editing
+                message_cls += ' editing'
+
+            sending_cls = ""
+            if message.cmsg_id >= 0
+                sending_cls += " hide"
+
+            username_cls = ""
+            if !message.show_avartar
+                username_cls += " hide"
+
+            if message.star
+                star_cls = ""
+                star_fa_cls = " fa-star"
+            else
+                star_cls = " show-hover"
+                star_fa_cls = " fa-star-o"
+
+            date_label = message.date_label
+            if date_label == undefined
+                date_label = ''
+
+            btn_group_cls = ' ' + message.editing
+            if message.cmsg_id < 0
+                btn_group_cls += ' hide'
+
+            if uninclude_self != true
+                html += '<div id="chat_' + message.cmsg_id + '" >'
+            html += '<div class="message-wrapper' + cls + '" data-cmsg_id="' + message.cmsg_id + '">'
+            html += '   <img class="avartar clickable left' + avartar_cls + '" src="' + message.avartar + '" onerror="this.src = \'\';" ng-click="showUserProfile(\'' + message.user_id + '\')"/>'
+            html += '   <div class="chat-message left' + message_cls + '">'
+            html += '       <div class="sending' + sending_cls + '"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>'
+            html += '       <div class="message-detail">'
+            html += '           <span class="user-name' + username_cls + '" ng-click="showUserProfile(' + message.user_id + ')">' + message.user_name + '</span>'
+            html += '           <span class="time">' + date_label + '</span>'
+            html += '           <a href="javascript:;" class="star' + star_cls + '" ng-click="star(' + message.cmsg_id + ')" title="スター付き"><i class="fa text-warning' + star_fa_cls + '"></i></a>'
+            html += '           <span class="unread-mark"><i class="fa fa-circle text-danger ' + message.read_class + '"></i></span>'
+            html += '       </div>'
+            html += '       <div class="message">' + $filter('chatize')(message.content) + '</div>'
+            html += '   </div>'
+            html += '   <ul class="button-group' + btn_group_cls + '">'
+            if $rootScope.canEditTask()
+                html += '   <li>'
+                html += '       <button type="button" class="btn btn-default btn-xs btn-circle" title="タスク新規登録" ng-click="addTask(' + message.cmsg_id + ')"><i class="ln-icon-check-square"></i></button>'
+                html += '   </li>'
+            html += '       <li>'
+            html += '           <button type="button" class="btn btn-default btn-xs btn-circle" title="リンク" ng-click="link(' + message.cmsg_id + ')"><i class="icon-link"></i></button>'
+            html += '       </li>'
+            html += '       <li>'
+            html += '           <button type="button" class="btn btn-default btn-xs btn-circle" title="引用" ng-click="quote(' + message.cmsg_id + ')"><i class="ln-icon-quote-open"></i></button>'
+            html += '       </li>'
+            if $session.user_id == message.user_id
+                html += '   <li>'
+                html += '       <button type="button" class="btn btn-default btn-xs btn-circle" title="編集" ng-click="edit(' + message.cmsg_id + ')"><i class="icon-pencil"></i></button>'
+                html += '   </li>'
+                html += '   <li>'
+                html += '       <button type="button" class="btn btn-default btn-xs btn-circle" title="削除" ng-click="remove(' + message.cmsg_id + ')"><i class="icon-trash"></i></button>'
+                html += '   </li>'
+            html += '   </ul>'
+            html += '   <div class="clear"></div>'
+            html += '</div>'
+            if uninclude_self != true
+                html += '</div>'
+
+            return html
+
+        messages_to_html = (messages, chat_id) ->
+            html = ""
+            messages.forEach((message) ->
+                html += message_to_html(message, chat_id)
+            )
+
+            return html
 
         # Search messages
         messages = (mission_id, prev_id, next_id, star) ->
@@ -94,6 +248,7 @@ angular.module('app.storage.chat', [])
                 prev_id: prev_id
                 next_id: next_id
                 star: star
+                limit: 60
 
             $api.call("chat/messages", params)
                 .then((res) ->
@@ -179,7 +334,7 @@ angular.module('app.storage.chat', [])
                     break
             return
 
-        set_message = (mission_id, messages, cmsg) ->
+        set_message = (mission_id, messages, cmsg, callback) ->
             cmsg.avartar = CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg"
             cmsg.unread = $session.user_id != cmsg.user_id
             cmsg.read_class = (if cmsg.unread then "unread" else "read")
@@ -194,6 +349,8 @@ angular.module('app.storage.chat', [])
                 else
                     cmsg.show_avartar = true
                 messages.push(cmsg)
+                if (callback)
+                    callback(cmsg)
             else
                 setted = false
                 if cmsg.temp_cmsg_id != null && cmsg.temp_cmsg_id != undefined
@@ -217,6 +374,9 @@ angular.module('app.storage.chat', [])
                                 cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, prev_message.date) 
 
                             setted = true
+
+                            if (callback)
+                                callback(cmsg)
                             break
 
                 if cmsg.inserted && setted == false # from other user
@@ -229,6 +389,9 @@ angular.module('app.storage.chat', [])
                     else
                         cmsg.show_avartar = true
                     messages.push(cmsg)
+
+                    if (callback)
+                        callback(cmsg)
 
             cache_messages(mission_id, messages)
             return
@@ -340,6 +503,8 @@ angular.module('app.storage.chat', [])
         return {
             init: init
             cache_messages: cache_messages
+            message_to_html: message_to_html
+            messages_to_html: messages_to_html
             messages: messages
             search_messages: search_messages
             read_messages : read_messages

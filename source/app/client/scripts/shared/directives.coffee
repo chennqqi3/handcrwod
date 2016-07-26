@@ -179,10 +179,10 @@ angular.module('app.directives', [])
         if $api.is_empty(str)
             return ''
         startIndex = str.indexOf("[引用 ")
-        return str  if startIndex is -1
+        return str if startIndex is -1
 
         endIndex = str.lastIndexOf("[/引用]")
-        return str  if endIndex is -1
+        return str if endIndex is -1
 
         prefix = str.substring(0, startIndex)
         suffix = str.substring(endIndex + 5)
@@ -214,7 +214,7 @@ angular.module('app.directives', [])
 )
 
 .filter('chatize', ($api, $sce, $emoticons, $dateutil, CONFIG, $compile, $session)->
-    return (text) ->
+    return (text, hideThumb) ->
         if ($api.is_empty(text))
             return ''
             
@@ -236,10 +236,10 @@ angular.module('app.directives', [])
 
             return str.replace(/\[file id=(\d+) url=\'([^\]]*)\'\]([^\]]*)\[\/file\]/g, (item, id, url, name) ->                
                 rep_str = "<div class='attach-name'>"
-                if isImage(name)
+                if (hideThumb != true && isImage(name))
                     rep_str += "<a href='javascript:;' class='preview-image' preview-image='" + CONFIG.BASE + url + "'><img src='" + CONFIG.BASE + url + "/150'></a><br/>"
                 rep_str += "<i class='icon-paper-clip'></i>&nbsp;"
-                if isVideo(name)
+                if (hideThumb != true && isVideo(name))
                     rep_str += "<a href='javascript:;' class='preview-video' preview-video='" + CONFIG.BASE + url + "'>" + name + "</a>"
                 else
                     rep_str += "<a href='" + CONFIG.BASE + url + "' target='_blank'>" + name + "</a>"
@@ -262,7 +262,9 @@ angular.module('app.directives', [])
                 return ''
                 
             return str.replace(/\[to:([^\]]*)\]/g, (item, user_id) ->
-                return "<span class='label label-info'>TO</span><img class='img-circle avartar-mini' src='" + CONFIG.AVARTAR_URL + user_id + ".jpg'>"
+                if (hideThumb != true)
+                    return "<span class='label label-info'>TO</span><img class='img-circle avartar-mini' src='" + CONFIG.AVARTAR_URL + user_id + ".jpg'>"
+                return ''
             )
 
         getQuoteInfo = (str) ->
@@ -327,35 +329,38 @@ angular.module('app.directives', [])
 
             ret.index = endIndex
 
-            if uid != null || uname != null           
-                date = new Date(time * 1000);
+            if hideThumb != true
+                if uid != null || uname != null           
+                    date = new Date(time * 1000);
 
-                years = date.getFullYear()
-                months = "0" + (date.getMonth() + 1)
-                dates = "0" + date.getDate()
-                hours = "0" + date.getHours()
-                minutes = "0" + date.getMinutes()
-                seconds = "0" + date.getSeconds()
+                    years = date.getFullYear()
+                    months = "0" + (date.getMonth() + 1)
+                    dates = "0" + date.getDate()
+                    hours = "0" + date.getHours()
+                    minutes = "0" + date.getMinutes()
+                    seconds = "0" + date.getSeconds()
 
-                dateStr = years + "-" + months.substr(-2) + "-"  + dates.substr(-2) + " " + 
-                        hours.substr(-2) + ":" + minutes.substr(-2) + ":" + seconds.substr(-2)
-                date = $dateutil.date_time_label(dateStr)
+                    dateStr = years + "-" + months.substr(-2) + "-"  + dates.substr(-2) + " " + 
+                            hours.substr(-2) + ":" + minutes.substr(-2) + ":" + seconds.substr(-2)
+                    date = $dateutil.date_time_label(dateStr)
 
-                str = prev
-                str += "<div class='chat-quote'>"
-                str += "<img class='img-circle avartar-mini' src='" + CONFIG.AVARTAR_URL + uid + ".jpg'> <i class='fa fa-fw fa-quote-left'></i>"
-                str += "<div class='title'>" + uname + "<time>" + date + "</time>" + "</div>"
-                str += "<div class='content'>"
-                str += getQuoteString(content)
-                str += "</div><div class='clear'></div>"
-                str += "</div>"
+                    str = prev
+                    str += "<div class='chat-quote'>"
+                    str += "<img class='img-circle avartar-mini' src='" + CONFIG.AVARTAR_URL + uid + ".jpg'> <i class='fa fa-fw fa-quote-left'></i>"
+                    str += "<div class='title'>" + uname + "<time>" + date + "</time>" + "</div>"
+                    str += "<div class='content'>"
+                    str += getQuoteString(content)
+                    str += "</div><div class='clear'></div>"
+                    str += "</div>"
+                else
+                    str = prev
+                    str += "<div class='chat-quote no-title'>"
+                    str += "<i class='fa fa-fw fa-quote-left'></i> <div class='content'>"
+                    str += getQuoteString(content)
+                    str += "</div><div class='clear'></div>"
+                    str += "</div>"
             else
                 str = prev
-                str += "<div class='chat-quote no-title'>"
-                str += "<i class='fa fa-fw fa-quote-left'></i> <div class='content'>"
-                str += getQuoteString(content)
-                str += "</div><div class='clear'></div>"
-                str += "</div>"
             
             ret.str = str
             return ret

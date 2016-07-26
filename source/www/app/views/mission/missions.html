@@ -2,7 +2,7 @@
 <div class="panel panel-default side-panel panel-mission shadow-right"
 	data-ng-controller="missionCtrl" data-ng-cloak>
 	<header class="panel-header with-icon-right">
-		<input type="text" class="form-control" required ng-model="search_string" placeholder="キーワードを入力">
+		<input type="text" class="form-control" required data-ng-model="search_string" placeholder="キーワードを入力">
 		<i class="fa fa-search"></i>
 	</header>
 	<!-- end panel-header -->
@@ -11,7 +11,7 @@
 			<div class="col-md-12">
 				<div class="form-group">
 					<span class="icon-left fa fa-plus"></span>
-					<input type="text" class="form-control" required ng-model="mission.mission_name" placeholder="チャットルーム名を入力">
+					<input type="text" class="form-control" required data-ng-model="mission.mission_name" placeholder="チャットルーム名を入力">
 					<a href="javascript:;" ng-click="closePanel()"><span class="icon-right fa fa-times"></span></a>
 				</div>
 			</div>

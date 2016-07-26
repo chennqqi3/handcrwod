@@ -149,8 +149,8 @@ angular.module('app.directives', [])
                 if ($api.is_empty(str))
                     return '';
                 return str.replace(/\[link href=\'([^\]]*)\'\]\[\/link\]/g, function(item, href) {
-                    href = "#/tab/chats/" + href;
-                    return "<a class='btn btn-xs btn-default' href='" + href + "'><i class='icon-link'></i> メッセージリンク</a>";
+                    
+                    return "<a class='btn btn-xs btn-default' href='javascript:;' onclick='gotoLink(\"" + href + "\")'><i class='icon-link'></i> メッセージリンク</a>";
                 });
             };
             getToString = function(str) {
@@ -232,31 +232,36 @@ angular.module('app.directives', [])
                     endIndex += 5;
                 }
                 ret.index = endIndex;
-                if (uid !== null || uname !== null) {
-                    date = new Date(time * 1000);
-                    years = date.getFullYear();
-                    months = "0" + (date.getMonth() + 1);
-                    dates = "0" + date.getDate();
-                    hours = "0" + date.getHours();
-                    minutes = "0" + date.getMinutes();
-                    seconds = "0" + date.getSeconds();
-                    dateStr = years + "-" + months.substr(-2) + "-" + dates.substr(-2) + " " + hours.substr(-2) + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
-                    date = $dateutil.date_time_label(dateStr);
+                if (hideThumb != true) {
+                    if (uid !== null || uname !== null) {
+                        date = new Date(time * 1000);
+                        years = date.getFullYear();
+                        months = "0" + (date.getMonth() + 1);
+                        dates = "0" + date.getDate();
+                        hours = "0" + date.getHours();
+                        minutes = "0" + date.getMinutes();
+                        seconds = "0" + date.getSeconds();
+                        dateStr = years + "-" + months.substr(-2) + "-" + dates.substr(-2) + " " + hours.substr(-2) + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
+                        date = $dateutil.date_time_label(dateStr);
+                        str = prev;
+                        str += "<div class='chat-quote'>";
+                        str += "<img class='img-circle avartar-mini' src='" + CONFIG.AVARTAR_URL + uid + ".jpg'> <i class='fa fa-fw fa-quote-left'></i>";
+                        str += "<div class='title'>" + uname + "<time>" + date + "</time>" + "</div>";
+                        str += "<div class='content'>";
+                        str += getQuoteString(content);
+                        str += "</div><div class='clear'></div>";
+                        str += "</div>";
+                    } else {
+                        str = prev;
+                        str += "<div class='chat-quote no-title'>";
+                        str += "<i class='fa fa-fw fa-quote-left'></i> <div class='content'>";
+                        str += getQuoteString(content);
+                        str += "</div><div class='clear'></div>";
+                        str += "</div>";
+                    }
+                }
+                else {
                     str = prev;
-                    str += "<div class='chat-quote'>";
-                    str += "<img class='img-circle avartar-mini' src='" + CONFIG.AVARTAR_URL + uid + ".jpg'> <i class='fa fa-fw fa-quote-left'></i>";
-                    str += "<div class='title'>" + uname + "<time>" + date + "</time>" + "</div>";
-                    str += "<div class='content'>";
-                    str += getQuoteString(content);
-                    str += "</div><div class='clear'></div>";
-                    str += "</div>";
-                } else {
-                    str = prev;
-                    str += "<div class='chat-quote no-title'>";
-                    str += "<i class='fa fa-fw fa-quote-left'></i> <div class='content'>";
-                    str += getQuoteString(content);
-                    str += "</div><div class='clear'></div>";
-                    str += "</div>";
                 }
                 ret.str = str;
                 return ret;

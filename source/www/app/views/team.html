@@ -1,0 +1,96 @@
+<!-- Team panel -->
+<div class="panel panel-default side-panel panel-team shadow-right"
+	data-ng-controller="teamCtrl" data-ng-cloak>
+	<header class="panel-header">
+		<input type="text" class="form-control" required data-ng-model="search_string" placeholder="キーワードを入力">
+		<i class="fa fa-search"></i>
+	</header>
+	<!-- end panel-header -->
+	<div id="team-group-add" class="team-group-add-bar">
+		<form name="form_team_group_add" class="form-horizontal form-validation" data-ng-submit="submitForm()" ng-controller="teamGroupAddCtrl">
+			<div class="col-md-12">
+				<div class="form-group">
+					<span class="icon-left fa fa-plus"></span>
+					<input type="text" class="form-control" required data-ng-model="group_name" placeholder="グループ名を入力">
+					<a href="javascript:;" ng-click="closePanel()"><span class="icon-right fa fa-times"></span></a>
+				</div>
+			</div>
+		</form>
+		<div class="clear"></div>
+	</div>
+	<div id="team-member-add" class="team-member-add-bar">
+		<form name="form_team_member_add" class="form-horizontal form-validation" data-ng-submit="submitForm()" ng-controller="teamMemberAddCtrl">
+			<div class="col-md-12">
+				<div class="form-group">
+					<span class="icon-left fa fa-plus"></span>
+					<input type="email" class="form-control" required data-ng-model="member_email" placeholder="メールアドレスを入力">
+					<a href="javascript:;" ng-click="closePanel()"><span class="icon-right fa fa-times"></span></a>
+				</div>
+			</div>
+		</form>
+		<div class="clear"></div>
+	</div>
+	<div class="page page-team">
+		<ul class="list-team-group">
+			<li id="li_group_{{group.team_group_id}}" class="list-team-group-item" data-team-group-id="{{group.team_group_id}}" data-ng-repeat="group in groups" data-ng-class="{editing: group == editedGroup}">
+				<div class="view team-group" ng-show="group.team_group_id!=null" ng-model="group.team_group_id" data-ng-class="{editmode: editmode}" group-droppable ng-click="toggleGroup(group)">
+					<input type="checkbox" data-ng-model="group.checked">
+					<label data-ng-dblclick="editGroup(group)">
+						<i class="fa fa-folder-o"></i> {{group.group_name}}
+					</label>
+				</div>
+				<form data-ng-submit="doneEditing(group, $index)">
+					<input type="text"
+						   class="edit form-control"
+						   data-ng-trim="false"
+						   data-ng-model="group.group_name"
+						   data-ng-blur="doneEditing(group, $index)"
+						   data-mission-focus="group == editedGroup">
+				</form>
+				<div class="list-team-group-item-empty"></div>
+				<ul class="list-team-member" team-member-sortable>
+					<li class="list-team-member-item" data-member-user-id="{{member.member_user_id}}" data-ng-repeat="member in members | filter:{member_name:search_string} | groupFilter:group.team_group_id" data-ng-class="{selected: member.member_user_id == selectedMember.member_user_id}" ng-click="selectMember(member)" >
+						<div class="view" data-ng-class="{editmode: editmode}">
+							<input type="checkbox" data-ng-model="member.checked">
+							<div class="pull-right">
+								<small>{{member.deliver_amount | number}}円</small>
+								<rating class="ui-rating size-h5"
+										ng-model="member.level"
+										max="max_level"
+										readonly="level_readonly"
+										ng-change="changeLevel(member)"
+										state-on="'fa fa-star'"
+										state-off="'fa fa-star-o'"></rating>
+							</div>
+							<div>
+								<img alt="" ng_src="{{member.member_avartar}}"  class="avartar img30_30">
+								<span>{{member.member_name}}</span>
+							</div>
+							<div class="skills">{{member.skill_name}}</div>
+						</div>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<footer class="panel-footer">
+		<ul class="nav-left list-unstyled">
+			<li data-ng-show="!editmode">
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="startEditMode()" title="編集"><i class="glyphicon glyphicon-pencil"></i></button>
+			</li>
+			<li data-ng-show="editmode">
+				<button type="button" class="btn btn-gap-v btn-white-primary" data-ng-disabled="!canRemove()" ng-click="removeGroups()" title="削除"><i class="glyphicon glyphicon-trash"></i></button>
+			</li>
+		</ul> 
+		<ul class="nav-right pull-right list-unstyled">
+			<li data-ng-show="editmode">
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="exitEditMode()" title="取消"><i class="fa fa-times"></i></button>
+			</li>
+			<li data-ng-show="!editmode">
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="showGroupAdd()"><i class="fa fa-plus"></i> グループ</button>
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="showMemberAdd()"><i class="fa fa-plus"></i> メンバー</button>
+			</li>
+		</ul>
+	</footer>
+</div>
+<!-- end Team panel -->

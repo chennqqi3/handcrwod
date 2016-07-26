@@ -3,7 +3,7 @@ read_timer = 2000
 angular.module('app.chatroom', [])
 
 .controller('chatroomCtrl', 
-    ($scope, $api, $chat, missionStorage, chatStorage, taskStorage, homeStorage, filterFilter, $rootScope, $routeParams, logger, $session, $dateutil, $timeout, $dialogs, $emoticons, $location, $window) ->
+    ($scope, $api, $chat, missionStorage, chatStorage, taskStorage, homeStorage, filterFilter, $rootScope, $routeParams, logger, $session, $dateutil, $timeout, $dialogs, $emoticons, $location, $window, $compile) ->
         $rootScope.nav_id = "chatroom_" + $routeParams.mission_id
         $scope.show_tasks = false
         $scope.show_process = false
@@ -68,12 +68,21 @@ angular.module('app.chatroom', [])
                 chat_ta.focus()
             catch err
 
+        $scope.get_message = (cmsg_id) ->
+            if $scope.messages
+                for msg in $scope.messages
+                    if msg.cmsg_id == cmsg_id
+                        return msg
+            return null
+
         $scope.load_messages = (messages) ->
-            $timeout(->
-                $('#loader').hide()
-                $rootScope.$broadcast('elastic:adjust')
-            , 1000)
             $scope.messages = messages
+            ## refresh message list
+            $scope.loaded = false
+            $timeout(->
+                $scope.loaded = true
+            )
+
             length = $scope.messages.length
             if length > 0
                 $scope.last_cid = $scope.messages[length-1].cmsg_id
@@ -92,8 +101,6 @@ angular.module('app.chatroom', [])
                 ##if tasks.length > 0 && !$scope.show_process
                 ##    $scope.showProcess()
             )
-
-            $scope.initPreviewLink()
 
         # Emoticon
         $rootScope.$on('$viewContentLoaded', ->
@@ -246,9 +253,10 @@ angular.module('app.chatroom', [])
             targetSearch = $location.search()
             targetHash = $location.hash()
             sending_count = 0
-            for msg in $scope.messages
-                if msg.cmsg_id < 0
-                    sending_count += 1
+            if $scope.messages
+                for msg in $scope.messages
+                    if msg.cmsg_id < 0
+                        sending_count += 1
             if sending_count > 0 || $scope.files && $scope.files.length > 0
                 event.preventDefault()
                 $dialogs.confirm('未送信のデータ', "未送信のデータが存在します。画面を遷移すると送信がキャンセルされます。よろしいでしょうか？", 'OK', ()->
@@ -371,7 +379,7 @@ angular.module('app.chatroom', [])
                     $scope.$emit 'elastic:resize', ta                    
                     if data.err_code == 0
                         str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']" + file.name + "[/file]"
-                        if $rootScope.cur_mission.private_flag == 3 
+                        if $rootScope.cur_mission && $rootScope.cur_mission.private_flag == 3 
                             to_id = $session.user_id
                         else
                             to_id = null
@@ -432,12 +440,17 @@ angular.module('app.chatroom', [])
                             for i in [0..messages.length - 1]
                                 $scope.messages.splice(i, 0, messages[i])
                             
+                            ###
                             if $scope.messages.length > MAX_MSG_LENGTH
                                 $scope.messages.splice(MAX_MSG_LENGTH, $scope.messages.length-MAX_MSG_LENGTH)
+                            ###
+                            # build html
+                            messages_html = chatStorage.messages_to_html(messages, $scope.chat_id)
+                            $('#messages').prepend(messages_html)
 
                             $scope.startScrollTimer(prev_id, "prev")
 
-                            $scope.initPreviewLink()
+                            $scope.initEventHandler()
 
                             return messages
                         else
@@ -470,13 +483,18 @@ angular.module('app.chatroom', [])
                                 if max_cid < messages[i].cmsg_id
                                     $scope.messages.push(messages[i])
                             
+                            ###
                             if $scope.messages.length > MAX_MSG_LENGTH
                                 $scope.messages.splice(0, $scope.messages.length-MAX_MSG_LENGTH)
+                            ###
+                            # build html
+                            messages_html = chatStorage.messages_to_html(messages, $scope.chat_id)
+                            $('#messages').append(messages_html)
 
                             $scope.startScrollTimer(next_id, "next")
                             console.log("next_id:" + next_id)
 
-                            $scope.initPreviewLink()
+                            $scope.initEventHandler()
 
                             return messages
                         else
@@ -604,11 +622,27 @@ angular.module('app.chatroom', [])
             $scope.focusInput()
             return
 
+        $scope.render_message = (message) ->
+            console.log("set message temp:" + message.temp_cmsg_id + " id:" + message.cmsg_id + " message:" + message.content)
+            if (message.cmsg_id > 0 && message.temp_cmsg_id < 0)
+                $('#chat_' + message.temp_cmsg_id).remove()
+
+            # build html
+            if ($('#chat_' + message.cmsg_id).length > 0)
+                message_html = chatStorage.message_to_html(message, $scope.chat_id, false)
+                $('#chat_' + message.cmsg_id).html(message_html)
+                $compile($('#chat_' + message.cmsg_id).contents())($scope)
+            else
+                message_html = chatStorage.message_to_html(message, $scope.chat_id)
+                el = $(message_html)
+                $compile(el.contents())($scope)
+                $('#messages').append(el)
+
         $scope.sendMessage = ->
             if $api.is_empty($scope.cmsg.content)
                 return
                 
-            if $rootScope.cur_mission.private_flag == 3 
+            if $rootScope.cur_mission && $rootScope.cur_mission.private_flag == 3 
                 to_id = $session.user_id
             else
                 to_id = null
@@ -618,10 +652,10 @@ angular.module('app.chatroom', [])
                 l_msg = $scope.messages[length-1]
                 if $scope.last_cid != l_msg.cmsg_id # scrolled top and bottom messages was cutted
                     $scope.scrollToMessage($scope.last_cid, -> 
-                        chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg)
+                        chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg, $scope.render_message)
                     ) # scroll to last cid
                 else
-                    chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg)
+                    chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg, $scope.render_message)
                     $scope.scrollToBottom()
 
             $chat.send($scope.cmsg.cmsg_id, $scope.mission_id, $scope.cmsg.content, to_id)
@@ -631,7 +665,7 @@ angular.module('app.chatroom', [])
         $scope.$on('receive_message', (event, cmsg) ->
             if cmsg.mission_id == $scope.mission_id
                 console.log("receive cmsg_id:" + cmsg.cmsg_id)
-                chatStorage.set_message($scope.mission_id, $scope.messages, cmsg)
+                chatStorage.set_message($scope.mission_id, $scope.messages, cmsg, $scope.render_message)
                 length = $scope.messages.length
                 if length > 1
                     if cmsg.inserted
@@ -651,23 +685,21 @@ angular.module('app.chatroom', [])
 
                 $scope.$apply()
 
-                $scope.initPreviewLink()
+                $scope.initEventHandler()
                 return
         )
 
-        $scope.initPreviewLink = ->
-            $timeout(->
-                $('.preview-image').off('click')
-                $('.preview-image').on('click', ->
-                    url = $(this).attr('preview-image')
-                    $dialogs.previewImage(url)
-                )
-                $('.preview-video').off('click')
-                $('.preview-video').on('click', ->
-                    url = $(this).attr('preview-video')
-                    $dialogs.previewVideo(url)
-                )
-            , 2000)
+        $scope.initEventHandler = ->
+            $('.preview-image').off('click')
+            $('.preview-image').on('click', ->
+                url = $(this).attr('preview-image')
+                $dialogs.previewImage(url)
+            )
+            $('.preview-video').off('click')
+            $('.preview-video').on('click', ->
+                url = $(this).attr('preview-video')
+                $dialogs.previewVideo(url)
+            )
 
         $scope.scrollToBottom = (animate) ->
             $timeout(->
@@ -683,7 +715,10 @@ angular.module('app.chatroom', [])
                 catch err
             , 1000)
 
-        $scope.quote = (message) ->
+        $scope.quote = (cmsg_id) ->
+            if cmsg_id != undefined
+                message = $scope.get_message(cmsg_id)
+                return if message == null
             if message == undefined
                 text = window.getSelection().toString()
                 $('#selection_menu').hide()
@@ -710,7 +745,9 @@ angular.module('app.chatroom', [])
             )
             return
 
-        $scope.link = (message) ->
+        $scope.link = (cmsg_id) ->
+            message = $scope.get_message(cmsg_id)
+            return if message == null
             start = $('.item-input-wrapper textarea').prop("selectionStart")
             time = new Date(message.date).getTime() / 1000
             str = "[link href='" + $scope.mission_id + "/" + message.cmsg_id + "'][/link]"
@@ -729,7 +766,9 @@ angular.module('app.chatroom', [])
             )
             return
 
-        $scope.edit = (message) ->
+        $scope.edit = (cmsg_id) ->
+            message = $scope.get_message(cmsg_id)
+            return if message == null
             $scope.cmsg.editing = false
             $scope.cmsg.cmsg_id = message.cmsg_id
             $scope.cmsg.content = message.content
@@ -746,7 +785,9 @@ angular.module('app.chatroom', [])
 
             $scope.clear_cmsg(true)
 
-        $scope.remove = (message) ->
+        $scope.remove = (cmsg_id) ->
+            message = $scope.get_message(cmsg_id)
+            return if message == null
             $dialogs.confirm('メッセージ削除', "このメッセージを削除してもよろしいでしょうか？", '削除', ()->
                 $chat.remove(message.cmsg_id, $scope.mission_id)
             )
@@ -766,14 +807,19 @@ angular.module('app.chatroom', [])
                     else
                         $scope.last_cid = null
 
+                $('#chat_' + cmsg.cmsg_id).remove();  
                 $scope.$apply()
         )
 
-        $scope.star = (message) ->
+        $scope.star = (cmsg_id) ->
+            message = $scope.get_message(cmsg_id)
+            return if message == null
             if message.star
                 message.star = false
             else
                 message.star = true
+
+            $scope.render_message(message)
 
             chatStorage.star_message(message.cmsg_id, message.star)
 
@@ -792,7 +838,7 @@ angular.module('app.chatroom', [])
 
             h = parseInt(ta[0].style.height, 10)
             if h < 34
-                h = 34            
+                h = 34
             angular.element('#input_bar').height(h + "px")
             if($scope.files)
                 fh = $scope.files.length * 25
@@ -862,6 +908,8 @@ angular.module('app.chatroom', [])
                                     if readIds.indexOf(message.cmsg_id) != -1
                                         message.unread = false
                                         message.read_class = "unread read"
+                                        if $('#chat_' + message.cmsg_id).length > 0
+                                            $('#chat_' + message.cmsg_id + ' .unread-mark i').addClass(message.read_class)
                                         $rootScope.cur_mission.unreads--
                                         if $rootScope.cur_mission.private_flag == 3
                                             $rootScope.bot_mission.unreads--
@@ -965,12 +1013,14 @@ angular.module('app.chatroom', [])
         )
 
         # タスク登録
-        $scope.addTask = (message) ->
-            if message == undefined
+        $scope.addTask = (cmsg_id) ->
+            if cmsg_id == undefined
                 text = window.getSelection().toString()
                 $('#selection_menu').hide()
             else
-                text = message.content
+                message = $scope.get_message(cmsg_id)
+                if message
+                    text = message.content
             $dialogs.addTask($rootScope.cur_mission, text)
 
         # check to
@@ -1143,6 +1193,7 @@ angular.module('app.chatroom', [])
             mission = missionStorage.get_mission($scope.mission_id)
             if $session.user_id != null 
                 $rootScope.cur_mission = mission
+                $scope.refreshBackImage()
                 if $api.is_empty(mission) || ((mission.private_flag==0 || mission.private_flag==1) && $api.is_empty(mission.members))
                     missionStorage.get($scope.mission_id, (res) ->
                         if (res.err_code == 0) 
@@ -1155,6 +1206,7 @@ angular.module('app.chatroom', [])
                                 return
 
                             $rootScope.cur_mission = res.mission
+                            $scope.refreshBackImage()
                             $rootScope.cur_mission.visible = true
                             missionStorage.set_mission($rootScope.cur_mission)
                         else 
@@ -1242,6 +1294,8 @@ angular.module('app.chatroom', [])
                         else if mirrorHeight < minHeight
                             mirrorHeight = minHeight
                         mirrorHeight += boxOuter.height
+                        if mirrorHeight < 24
+                            mirrorHeight = 24
                         ta.style.overflowY = overflow or 'hidden'
                         if taHeight != mirrorHeight
                             ta.style.height = mirrorHeight + 'px'
@@ -1348,5 +1402,27 @@ angular.module('app.chatroom', [])
                     return
                 return
 
+        }
+)
+.directive('messageList', 
+    ($compile, chatStorage, $timeout, $rootScope) ->
+        getTemplate = (scope) ->
+            # build html
+            return chatStorage.messages_to_html(scope.messages, scope.chat_id);
+
+        linker = (scope, element, attrs) ->
+            element.html(getTemplate(scope.$parent))
+            $compile(element.contents())(scope)
+
+            $timeout(->
+                $('#loader').hide()
+                $rootScope.$broadcast('elastic:adjust')
+                scope.$parent.initEventHandler()
+            )
+
+        return {
+            restrict: "E"
+            replace: true
+            link: linker
         }
 )

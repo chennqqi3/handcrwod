@@ -2,17 +2,18 @@ angular.module('app.service.chat', [])
 
 .service('$chat', 
     ($rootScope, $session, chatStorage, userStorage, $http, 
-        CONFIG, logger, $location, $timeout, AUTH_EVENTS, $websocket, $api, chatizeService) ->
+        CONFIG, logger, $location, $timeout, $interval, AUTH_EVENTS, $websocket, $api, chatizeService) ->
         $this = this
         $this.socket = null
         $this.out_queue = []
         $this.out_key = 0
+        $this.client_key = Math.floor((Math.random() * 1000000) + 1)
 
         $this.connect = ->
             if $session.user_id == null
                 return
 
-            uri = $rootScope.chat_uri + $session.user_id
+            uri = $rootScope.chat_uri + $session.user_id + "/" + $this.client_key
             $this.socket = $websocket.$new(uri) 
             $this.socket.$$config.enqueue = true
             if $this.socket.$$config.reconnect == false
@@ -31,9 +32,10 @@ angular.module('app.service.chat', [])
 
             $this.socket.$on('$close', () ->
                 console.log('Connection closed')
-                $rootScope.error_disconnected = true
-                $rootScope.$apply()
-                #$this.retryConnect()
+                $timeout(
+                    $rootScope.error_disconnected = !($this.socket && $this.socket.$ready())
+                    $rootScope.$apply()
+                , 3000)
             )
 
             $this.socket.$on('chat_message', (cmsg) ->
@@ -75,7 +77,12 @@ angular.module('app.service.chat', [])
             )
 
             $this.socket.$on('remove_message', (cmsg) ->
-                $rootScope.$broadcast('refresh-homes')
+                found_mission = false
+                angular.forEach $rootScope.missions, (mission) ->
+                    if mission.mission_id == cmsg.mission_id
+                        found_mission = true
+                if !found_mission
+                    $rootScope.$broadcast('refresh-homes')
                 $rootScope.$broadcast('remove_message', cmsg)                
             )
 
@@ -200,7 +207,7 @@ angular.module('app.service.chat', [])
                 $this.emit('bot_message', msg)
 
         $this.emit = (evt, msg) ->
-            if msg.key == undefined
+            if msg.key == undefined && evt != 'alive'
                 $this.out_key = $this.out_key + 1
                 msg.key = $this.out_key
                 msg.event = evt
@@ -224,6 +231,13 @@ angular.module('app.service.chat', [])
             if $this.socket != null
                 $this.disconnect()
         )
+
+        $interval(->
+            if $this.socket && $this.socket.$ready()
+                msg = 
+                    time: new Date().getTime()
+                $this.emit('alive', msg)
+        , 15000)
 
         return $this
 )

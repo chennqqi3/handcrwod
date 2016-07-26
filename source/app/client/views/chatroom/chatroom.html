@@ -1,4 +1,4 @@
-<div class="chat-main" data-ng-controller="chatroomCtrl" ng-class="{'show-side-panel': show_tasks || show_process || show_attach}">
+<div id="chat_main" class="chat-main" data-ng-controller="chatroomCtrl" ng-class="{'show-side-panel': show_tasks || show_process || show_attach}">
 	<header class="title-bar">
         <ul class="button-group-left" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">
             <li dropdown>
@@ -59,43 +59,7 @@
             </div>
         </div>
     	<div id="chat_view" class="chat-view page chat-container transparent" scroll-top="prev()" scroll-bottom="next()" scroll="onScroll()">
-    		<div ng-repeat="message in messages track by message.cmsg_id" class="message-wrapper" ng-class="{'to-mine': isToMine(message), 'linked': message.cmsg_id==chat_id}">
-                <div id="chat_{{message.cmsg_id}}">
-                    <img class="avartar clickable left" ng-src="{{::message.avartar}}" ng-if="message.show_avartar" ng-click="showUserProfile(message.user_id)"/>
-
-                    <div class="chat-message left" ng-class="{'me': session.user_id == message.user_id, 'border-top': message.show_avartar, 'editing': message.editing}">
-                        <div class="sending" ng-if="message.cmsg_id < 0"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>
-                        <div class="message-detail">
-                            <span ng-click="viewProfile(message)" class="user-name" ng-if="message.show_avartar">{{::message.user_name}}</span> 
-                            <span class="time">{{::message.date_label}}</span>
-                            <a href="javascript:;" class="star" ng-class="{'show-hover': !message.star}" ng-click="star(message)" title="スター付き"><i class="fa text-warning" ng-class="{'fa-star': message.star, 'fa-star-o':!message.star}"></i></a>
-                            <span class="unread-mark"><i class="fa fa-circle text-danger {{message.read_class}}"></i></span>
-                        </div>
-                        <div class="message" ng-bind-html="message.content | chatize">
-                        </div>
-                    </div>
-                </div>
-
-                <ul class="button-group" ng-class="{'editing': message.editing}" ng-if="message.cmsg_id>0">
-                    <li ng-if="canEditTask()">
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="タスク新規登録" ng-click="addTask(message)"><i class="ln-icon-check-square"></i></button>
-                    </li>
-                    <li>
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="リンク" ng-click="link(message)"><i class="icon-link"></i></button>
-                    </li>
-                    <li>
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="引用" ng-click="quote(message)"><i class="ln-icon-quote-open"></i></button>
-                    </li>
-                    <li ng-if="session.user_id == message.user_id">
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="編集" ng-click="edit(message)"><i class="icon-pencil"></i></button>
-                    </li>
-                    <li ng-if="session.user_id == message.user_id">
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="削除" ng-click="remove(message)"><i class="icon-trash"></i></button>
-                    </li>
-                </ul>
-
-                <div class="clear"></div>
-            </div>
+            <message-list id="messages" ng-if="loaded"></message-list>
             <div id="scroll_bottom"></div>
     	</div>
         <div class="chat-send-files" id="file_bar">
@@ -123,7 +87,7 @@
                 <button class="btn btn-default btn-circle btn-to" >TO</button>
             </div>
             <label class="item-input-wrapper">
-                <textarea ng-model="cmsg.content" value="" placeholder="メッセージを入力してください。(SHIFT + ENTERで送信)" required minlength="1" maxlength="1500" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()"></textarea>
+                <textarea ng-model="cmsg.content" value="" placeholder="メッセージを入力してください。(SHIFT + ENTERで送信)" required minlength="1" maxlength="5000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()"></textarea>
             </label>
             <div class="footer-btn-wrap">
                 <button class="btn btn-default btn-circle" type="submit" ng-disabled="!cmsg.content || cmsg.content === ''" ng-click="sendMessage()">

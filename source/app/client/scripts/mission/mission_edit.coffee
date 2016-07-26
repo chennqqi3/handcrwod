@@ -101,6 +101,7 @@ angular.module('app.mission.edit', [])
                     $scope.mission.prc_back = data.prc_back
                     $scope.mission.prc_back_url = data.prc_back_url
                     $scope.mission.prc_back_pos = data.prc_back_pos
+                    missionStorage.set_mission($scope.mission)
                     $rootScope.cur_mission = $scope.mission
                     logger.logSuccess("背景画像を変更しました。")
 

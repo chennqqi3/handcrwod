@@ -5,49 +5,9 @@
     <ion-nav-buttons side="right">
         <button menu-toggle="right" class="button button-icon icon ion-ios-search" ng-click="open_search_chat()"></button>
     </ion-nav-buttons>
-    <ion-content>
+    <ion-content delegate-handle="userMessageScroll">
         <ion-list class="chat-list">
-            <ion-item class="item-icon-right item-icon-left item-accordion" ng-class="{'item-calm': nav_id=='bot'}" ui-sref="tab.bot">
-                <i class="icon icon-emoticon-smile"></i>
-                <h2>アシスタント</h2>
-                <p><i class="badge badge-danger" ng-show="bot_tasks.length > 0">{{bot_tasks.length}}</i></p>
-                <i class="icon ion-chevron-right icon-accessory"></i>
-            </ion-item>
-            <ion-item class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">
-                <label ng-click="toggleGroup(0)"><i ng-class="groups[0] ? 'ion-minus' : 'ion-plus'"></i> ルーム</label>
-                <button class="button button-icon icon ion-ios-plus-empty text-gray" ng-click="addMission(0)"></button>
-            </ion-item>
-            <ion-item class="item-remove-animate item-icon-right item-icon-left item-accordion" ng-repeat="mission in missions | filter:roomFilter | orderBy:'order' track by mission.mission_id" type="item-text-wrap" ui-sref="tab.chatroom({mission_id:mission.mission_id})" ng-class="{'item-calm': nav_id=='chatroom_' + mission.mission_id, 'with-last-text': mission.last_text!='' && mission.last_text!=null}" ng-show="groups[0] || mission.visible">
-                <i class="icon icon-bubbles"></i>
-                <i class="icon-pin text-gray" ng-show="mission.pinned==1"></i>
-                <h2><i class="icon-pin text-gray" ng-show="mission.pinned==1"></i><i class="fa fa-lock" ng-if="mission.private_flag==1"></i>  {{mission.mission_name}}</h2>
-                <p><i class="badge badge-danger" ng-show="mission.unreads > 0">{{mission.unreads}}</i> <span ng-bind-html="mission.last_text | chatize:true"></span></p>
-                <i class="icon ion-chevron-right icon-accessory"></i>
-
-                <ion-option-button class="button-positive" ng-click="pinMission(mission)" ng-show="mission.pinned!=1">
-                    <i class="icon icon-pin"></i>
-                </ion-option-button>
-                <ion-option-button class="button-assertive" ng-click="pinMission(mission)" ng-show="mission.pinned==1">
-                    <i class="icon ion-ios-trash-outline"></i>
-                </ion-option-button>
-            </ion-item>
-
-            <ion-item class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">
-                <label ng-click="toggleGroup(2)"><i ng-class="groups[2] ? 'ion-minus' : 'ion-plus'"></i> メンバー</label>
-            </ion-item>
-            <ion-item class="item-remove-animate item-icon-right item-avatar item-accordion" ng-repeat="mission in missions | filter:memberFilter | orderBy:'order' track by mission.user_id" type="item-text-wrap" ng-click="open_member(mission)" ng-class="{'item-calm': nav_id=='chatroom_' + mission.mission_id, 'with-last-text': mission.last_text!='' && mission.last_text!=null}" ng-show="groups[2] || mission.visible">
-                <img ng-src="{{mission.avartar}}" class="avatar">
-                <h2><i class="icon-pin text-gray" ng-show="mission.pinned==1"></i> {{mission.mission_name}}</h2>
-                <p><i class="badge badge-danger" ng-show="mission.unreads > 0">{{mission.unreads}}</i> <span ng-bind-html="mission.last_text | chatize:true"></span></p>
-                <i class="icon ion-chevron-right icon-accessory"></i>
-
-                <ion-option-button class="button-positive" ng-click="pinMission(mission)" ng-show="mission.pinned!=1">
-                    <i class="icon icon-pin"></i>
-                </ion-option-button>
-                <ion-option-button class="button-assertive" ng-click="pinMission(mission)" ng-show="mission.pinned==1">
-                    <i class="icon ion-ios-trash-outline"></i>
-                </ion-option-button>
-            </ion-item>
+            <chat-rooms ng-if="loaded"></chat-rooms>
         </ion-list>
     </ion-content>
 </ion-view>

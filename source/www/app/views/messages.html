@@ -1,0 +1,55 @@
+<div class="message-main" data-ng-controller="messageCtrl">
+	<header class="title-bar">
+		<ul class="button-group-left">
+			<li>
+				<button type="button" class="btn btn-gap-v btn-white-primary sync-server" sync-server title="同期化"><i class="glyphicon glyphicon-refresh"></i></button>
+			</li>
+		</ul>
+		<h2>更新通知<small ng-show="unreadMessages>0">（未読{{unreadMessages}}件）</small></h2>
+	</header>
+	<div class="page page-messages">
+		<div class="row">
+			<div class="col-md-12">
+				<section class="task-container">
+					<section data-ng-cloak>
+						<ul class="message-list list-unstyled">
+							<li data-ng-repeat="message in messages | filter:{read_flag:false} track by message.message_id">
+								<span class="view">
+									<label class="check-large-circle" check-large-circle ng-model="message"><input type="checkbox" checked data-ng-model="message.read_flag" data-ng-change="read(message)"><i></i></label>
+									<p>
+										<i class="fa fa-envelope"></i>
+										<span ng-bind-html="message.title | noHTML | htmlfy"></span>
+										<span class="pull-right label label-success label-time">{{message.create_time | date_time_label}}</span>
+									</p>
+									<p>
+										<span ng-bind-html="message.content | noHTML | htmlfy"></span>
+									</p>
+									<div class="clear"></div>
+								</span>
+							</li>
+							<li data-ng-repeat="message in messages | filter:{read_flag:true} track by message.message_id">
+								<span class="view">
+									<label class="check-large-circle check-large-circle-success" check-large-circle ng-model="message"><input type="checkbox" checked data-ng-model="message.read_flag" data-ng-change="read(message)"><i></i></label>
+									<p>
+										<i class="fa fa-envelope"></i>
+										<span ng-bind-html="message.title | noHTML | htmlfy"></span>
+										<span class="pull-right label label-success label-time">{{message.create_time | date_time_label}}</span>
+									</p>
+									<p>
+										<span ng-bind-html="message.content | noHTML | htmlfy"></span>
+									</p>
+									<div class="clear"></div>
+								</span>
+							</li>
+						</ul>
+					</section>
+				</section>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 text-center">
+				<button type="button" class="btn btn-gap-v btn-inverse" ng-click="loadRead()">既読</button>
+			</div>
+		</div>
+	</div>
+</div>

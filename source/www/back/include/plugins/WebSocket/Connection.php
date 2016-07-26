@@ -17,6 +17,7 @@ class Connection
 	private $ip;
 	private $port;
 	private $connectionId = null;
+	private $clientKey = '';
 	
 	public $waitingForData = false;
 	private $_dataBuffer = '';
@@ -139,7 +140,8 @@ class Connection
 		$response.= "Sec-WebSocket-Accept: " . $secAccept . "\r\n";
 		if(isset($headers['Sec-WebSocket-Protocol']) && !empty($headers['Sec-WebSocket-Protocol']))
 		{
-			$response.= "Sec-WebSocket-Protocol: " . $path_params[0] . "\r\n";
+			//$response.= "Sec-WebSocket-Protocol: " . $path_params[0] . "\r\n";
+			$response.= "Sec-WebSocket-Protocol: " . $headers['Sec-WebSocket-Protocol'] . "\r\n";
 		}
 		$response.= "\r\n";
 		if(false === ($this->server->writeBuffer($this->socket, $response)))
@@ -286,45 +288,47 @@ class Connection
 	
 	public function close($statusCode = 1000)
 	{
-		$payload = str_split(sprintf('%016b', $statusCode), 8);
-		$payload[0] = chr(bindec($payload[0]));
-		$payload[1] = chr(bindec($payload[1]));
-		$payload = implode('', $payload);
+		if ($statusCode != null) {
+			$payload = str_split(sprintf('%016b', $statusCode), 8);
+			$payload[0] = chr(bindec($payload[0]));
+			$payload[1] = chr(bindec($payload[1]));
+			$payload = implode('', $payload);
 
-		switch($statusCode)
-		{
-			case 1000:
-				$payload .= 'normal closure';
-			break;
-		
-			case 1001:
-				$payload .= 'going away';
-			break;
-		
-			case 1002:
-				$payload .= 'protocol error';
-			break;
-		
-			case 1003:
-				$payload .= 'unknown data (opcode)';
-			break;
-		
-			case 1004:
-				$payload .= 'frame too large';
-			break;		
-		
-			case 1007:
-				$payload .= 'utf8 expected';
-			break;
-		
-			case 1008:
-				$payload .= 'message violates server policy';
-			break;
-		}
-		
-		if($this->send($payload, 'close', false) === false)
-		{
-			return false;
+			switch($statusCode)
+			{
+				case 1000:
+					$payload .= 'normal closure';
+					break;
+			
+				case 1001:
+					$payload .= 'going away';
+					break;
+			
+				case 1002:
+					$payload .= 'protocol error';
+					break;
+			
+				case 1003:
+					$payload .= 'unknown data (opcode)';
+					break;
+			
+				case 1004:
+					$payload .= 'frame too large';
+					break;		
+			
+				case 1007:
+					$payload .= 'utf8 expected';
+					break;
+			
+				case 1008:
+					$payload .= 'message violates server policy';
+					break;
+			}
+			
+			if($this->send($payload, 'close', false) === false)
+			{
+				return false;
+			}
 		}
 		
 		if($this->application)
@@ -457,31 +461,31 @@ class Connection
 			// text frame:
 			case 1:
 				$decodedData['type'] = 'text';				
-			break;
+				break;
 		
 			case 2:
 				$decodedData['type'] = 'binary';
-			break;
+				break;
 			
 			// connection close frame:
 			case 8:
 				$decodedData['type'] = 'close';
-			break;
+				break;
 			
 			// ping frame:
 			case 9:
 				$decodedData['type'] = 'ping';				
-			break;
+				break;
 			
 			// pong frame:
 			case 10:
 				$decodedData['type'] = 'pong';
-			break;
+				break;
 			
 			default:
 				// Close connection on unknown opcode:
 				$this->close(1003);
-			break;
+				break;
 		}
 		
 		if($payloadLength === 126)
@@ -563,6 +567,16 @@ class Connection
 	public function getClientApplication()
 	{
 		return (isset($this->application)) ? $this->application : false;
+	}
+
+	public function setClientKey($key)
+	{
+		$this->clientKey = $key;
+	}
+
+	public function getClientKey()
+	{
+		return $this->clientKey;
 	}
 
 	public function session($name, $value="@no_val@")

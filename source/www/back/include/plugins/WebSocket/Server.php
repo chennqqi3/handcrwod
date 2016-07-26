@@ -60,6 +60,7 @@ class Server extends Socket
 					}
 					else
 					{
+						stream_set_timeout($resource, 3);
 						$client = $this->createConnection($resource);
 						$this->clients[(int)$resource] = $client;
 						$this->allsockets[] = $resource;

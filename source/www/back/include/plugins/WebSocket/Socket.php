@@ -111,8 +111,6 @@ class Socket
 				}
 				$buffer .= fread($resource, 8192);
 			}		
-			$info = stream_get_meta_data($resource);
-			print $info['timed_out'];
 			return $buffer;
 		}
 		else
@@ -135,8 +133,6 @@ class Socket
 				$metadata = stream_get_meta_data($resource);			
 				$buffsize = ($metadata['unread_bytes'] > $buffsize) ? $buffsize : $metadata['unread_bytes'];
 			} while($metadata['unread_bytes'] > 0);		
-			$info = stream_get_meta_data($resource);
-			print $info['timed_out'];
 			
 			return $buffer;
 		}

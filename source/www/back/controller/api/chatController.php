@@ -254,15 +254,16 @@
 
 		public function messages()
 		{
-			$param_names = array("home_id", "mission_id", "prev_id", "next_id", "star");
+			$param_names = array("home_id", "mission_id", "prev_id", "next_id", "star", "limit");
 			$this->setApiParams($param_names);
 			$this->checkRequired(array("home_id"));
 			$params = $this->api_params;
 
 			if ($params->next_id < 0)
 				$cmsgs = array();
-			else
-				$cmsgs = cmsg::messages($params->home_id, $params->mission_id, _user_id(), $params->prev_id, $params->next_id, $params->star);
+			else {
+				$cmsgs = cmsg::messages($params->home_id, $params->mission_id, _user_id(), $params->prev_id, $params->next_id, $params->star, $params->limit);
+			}
 
 			$this->finish(array("messages" => $cmsgs), ERR_OK);
 		}

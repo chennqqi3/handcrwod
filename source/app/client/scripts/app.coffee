@@ -204,6 +204,22 @@ angular.module('app', [
 .run(
     ($rootScope, AUTH_EVENTS, $auth, $chat, $location, $syncServer, 
         $route, $window, CONFIG, $dialogs, $api) ->
+        $rootScope.err_required = "必須項目です。"
+        $rootScope.err_invalid_zip_code = "3文字以上の半角数字を入力してください。ハイフンは含めないで下さい。"
+        $rootScope.err_invalid_tel = "例：半角数字090-1234-5678"
+        $rootScope.err_invalid_email = "例：tanaka@gmail.com"
+        $rootScope.err_invalid_maxlength = "文字以下に入力してください。"
+        $rootScope.err_invalid_pdf = "PDFファイルではありません。"
+        $rootScope.err_invalid_date = "例：H9-01-01"
+        $rootScope.err_small_end_date = "終了日付を開始日付以降に入力してください。"            
+        $rootScope.err_no_data = "データーがありません。"
+        $rootScope.err_no_equal_password = "同じパスワードを入力してください。"
+        $rootScope.err_invalid_taking_period = "半角数字を入力して下さい。"
+        $rootScope.err_invalid_furigana = "ひらがなを入力してください。"
+        $rootScope.err_send_method = "送付方法を選択してください。"
+        $rootScope.err_invalid_youtube = "有効なYoutube　URLではありません。"
+        $rootScope.wait_responding = "データー取得中…"
+            
         $rootScope.ver = "?v=" + CONFIG.VER
         $rootScope.error_disconnected = false
 

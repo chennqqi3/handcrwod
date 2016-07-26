@@ -508,6 +508,7 @@ angular.module('app.dialogs', [])
                 if res.err_code == 0
                     mission.job_back_pos = res.job_back_pos
                     mission.prc_back_pos = res.prc_back_pos
+                    missionStorage.set_mission(mission)
                     $rootScope.cur_mission = mission
                     logger.logSuccess('配置情報を更新しました。')
                     $rootScope.$broadcast('refresh_back_image')
@@ -525,6 +526,7 @@ angular.module('app.dialogs', [])
                     mission.job_back_url = res.job_back_url
                     mission.prc_back = res.prc_back
                     mission.prc_back_url = res.prc_back_url
+                    missionStorage.set_mission(mission)
                     $rootScope.cur_mission = mission
                     logger.logSuccess('背景画像を削除しました。')
                     $rootScope.$broadcast('refresh_back_image')

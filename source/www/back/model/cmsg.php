@@ -80,10 +80,11 @@
             return ERR_OK;
         }
 
-        public static function messages($home_id, $mission_id, $user_id, $prev_id, $next_id, $star=false) 
+        public static function messages($home_id, $mission_id, $user_id, $prev_id, $next_id, $star=false, $limit=null) 
         {
-            $limit = 60;
-
+            if ($limit <= 0)
+                $limit = 60;
+            
             $cmsgs = array();
             if ($home_id == null)
                 return $cmsgs;

@@ -9,27 +9,7 @@
     </div>
     <ion-content id="chat_view" has-bouncing="true" class="has-header transparent" ng-class="{'hide-footer': !canChat()}"
       delegate-handle="userMessageScroll" on-scroll-complete="onScrollComplete()">
-      
-        <div ng-repeat="message in messages" class="message-wrapper" ng-class="{'to-mine': isToMine(message), 'linked': message.cmsg_id==chat_id}" on-hold="onMessageHold($event, $index, message)">
-
-            <div id="chat_{{message.cmsg_id}}">
-                <img class="profile-pic left" ng-src="{{::message.avartar}}" onerror="onProfilePicError(this)" ng-if="message.show_avartar" ng-click="showUserProfile(message.avartar)"/>
-
-                <div class="chat-message left" ng-class="{'me': session.user_id == message.user_id, 'border-top': message.show_avartar, 'editing': message.editing}">
-                    <div class="sending" ng-if="message.cmsg_id < 0"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>
-                    <div class="message-detail">
-                        <span class="bold" ng-if="message.show_avartar" ng-click="showUserProfile(message.avartar)">{{::message.user_name}}</span> 
-                        <span class="time"><i class="fa fa-circle text-danger {{message.read_class}}"></i><a href="javascript:;" class="star" ng-click="star(message)"><i class="fa fa-star text-warning" ng-show="message.star"></i></a> {{message.date_label}}</span>
-                    </div>
-
-                    <div class="message" ng-bind-html="message.content | chatize">
-                    </div>
-                </div>
-            </div>
-
-            <div class="cf"></div>
-
-        </div>
+      <div id="messages"></div>
     </ion-content>
 
     <div id="emoticon_gallery" style="visibility: hidden;">
@@ -96,7 +76,7 @@
                 <button type="button" class="button button-icon icon-close btn-to footer-btn" ng-click="showMore(false)"></button>
             </div>
             <label class="item-input-wrapper">
-                <textarea ng-model="cmsg.content" value="" placeholder="メッセージ" required minlength="1" maxlength="1500" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()"></textarea>
+                <textarea ng-model="cmsg.content" value="" placeholder="メッセージ" required minlength="1" maxlength="5000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()"></textarea>
             </label>
             <div class="footer-btn-wrap">
                 <button class="button button-icon icon icon-paper-plane footer-btn" type="submit" ng-click="sendMessage()">

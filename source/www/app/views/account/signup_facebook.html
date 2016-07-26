@@ -12,19 +12,25 @@
                             <form name="form_signup" class="form-horizontal form-validation" data-ng-submit="submitForm()" data-ng-controller="signupFacebookCtrl">
                                 <div class="form-group form-group-large">
                                     <span class="icon-left glyphicon glyphicon-user"></span>
-                                    <input type="text" class="form-control" required ng-model="user.user_name" placeholder="名前">
+                                    <input type="text" class="form-control" required name="user_name" ng-model="user.user_name" placeholder="名前">
+                                    <div class="err-msg" ng-show="(show_error || form_signup.user_name.$dirty) && form_signup.user_name.$invalid">
+                                        <small class="error" ng-show="form_signup.user_name.$error.required">名前を入力してください。</small>
+                                    </div>
                                 </div>
                                 <div class="form-group form-group-large">
                                     <span class="icon-left glyphicon glyphicon-envelope"></span>
-                                    <input type="email" class="form-control" required ng-model="user.email" placeholder="通知用メールアドレス">
+                                    <input type="email" class="form-control" required name="email" ng-model="user.email" placeholder="通知用メールアドレス">
+                                    <div class="err-msg" ng-show="(show_error || form_signup.email.$dirty) && form_signup.email.$invalid">
+                                        <small class="error" ng-show="form_signup.email.$error.required">メールアドレスを入力してください。</small>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <i class="fa fa-check"></i> <a href="javascript:;" ng-click="showContract()">利用契約</a>と<a href="javascript:;" ng-click="showPrivacy()">プライバシーポリシー</a>に同意します。
-                                    <div class="alert alert-danger" data-ng-show="showMessage">{{message}}</div>
+                                    <div class="alert" ng-class="{'alert-danger': err_code!=0, 'alert-info': err_code==0}" data-ng-show="showMessage">{{message}}</div>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-lg btn-block" data-ng-disabled="!canSubmit()" ng-show="!registered">同意して登録</button>
-                                    <button type="submit" class="btn btn-primary btn-lg btn-block" ng-show="registered">確認メール再発送</button>
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block" ng-show="!registered" ng-click="submitForm()">同意して登録</button>
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block" ng-show="registered" ng-click="submitForm()">確認メール再発送</button>
                                 </div>
                             </form>
                         </section>

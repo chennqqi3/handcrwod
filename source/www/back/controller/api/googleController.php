@@ -195,6 +195,8 @@
                 $user->activate_until = null;
                 $user->plan_type = PLAN_FREE;
                 $err = $user->save();
+
+                $this->checkError($err);
             }
 
             if ($err == ERR_OK) {
@@ -204,6 +206,8 @@
 
             $planconfig = new planconfig($user->plan_type);
 
+            $last_home = home::last_home();
+
             $this->finish(array(
                 "session_id" => session_id(),
                 "user_id" => $user->user_id, 
@@ -212,8 +216,13 @@
                 "avartar" => _avartar_full_url($user->user_id),
                 "language" => $user->language,
                 "time_zone" => $user->time_zone,
+                "priority_tasks" => task_user::getPriorityTasks($user->user_id),
+                "inbox_tasks" => task::getInboxTasks($user->user_id),
                 "plan" => $planconfig->props,
-                "plan_end_date" => $user->plan_end_date
+                "plan_end_date" => $user->plan_end_date,
+                "cur_home" => $last_home,
+                "alerts" => user::get_alerts($user->user_id),
+                "chat_uri" => _chat_uri()
             ), $err);   
         }
 

@@ -37,6 +37,27 @@
                 return false;
             }
 
+            if (count($params) > 2)
+            {
+                $client_key = $params[2];
+                $client_ip = $client->getClientIp();
+
+                // close other client (fix avast antivirus block websocket)
+                foreach($this->_clients as $cl) 
+                {
+                    $ip = $cl->getClientIp();
+                    $port = $cl->getClientPort();
+                    $key = $cl->getClientKey();
+                    if ($ip == $client_ip && 
+                        $key == $client_key) { 
+                        $client->log("close blocked socket ip:" . $ip . " port:" . $port . " client_key:" . $client_key);
+                        $cl->close(null);
+                    }
+                }
+
+                $client->setClientKey($client_key);
+            }
+
             $client->session("user_id", $user_id);
             $client->session("user_name", $u->user_name);
             return true;
@@ -52,7 +73,7 @@
                 $this->_users[$user_id] = array();
             $this->_users[$user_id][$id] = $client;
 
-            $client->log("User Info user_id:" . $user_id . " user_name:" . $client->session('user_name'));
+            $client->log("User Info user_id:" . $user_id . " user_name:" . $client->session('user_name') . " client_key:" . $client->getClientKey());
         }
 
         public function onDisconnect($client)
@@ -78,6 +99,9 @@
 
             $data = $decodedData['data'];
             $event = $decodedData['event'];
+            if ($event == 'alive') // check alive
+                return;
+
             if (isset($data["key"]) && $event != 'ok') {
                 // send confirm message received
                 $user_id_from = $client->session('user_id');
@@ -252,8 +276,9 @@
             $prev_id = isset($data["prev_id"]) ? $data["prev_id"] : null;
             $next_id = isset($data["next_id"]) ? $data["next_id"] : null;
             $star = isset($data["star"]) ? $data["star"] : null;
+            $limit = isset($data["limit"]) ? $data["limit"] : null;
 
-            $messages = cmsg::messages($home_id, $mission_id, $user_id_from, $prev_id, $next_id, $star);
+            $messages = cmsg::messages($home_id, $mission_id, $user_id_from, $prev_id, $next_id, $star, $limit);
 
             //prepare data to be sent to client
             $msg = array(
