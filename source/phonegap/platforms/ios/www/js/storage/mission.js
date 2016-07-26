@@ -1,7 +1,7 @@
 angular.module('app.storage.mission', [])
 
 .factory('missionStorage', 
-    function($rootScope, $api, $session, $dateutil, filterFilter, AUTH_EVENTS, $auth, $chat) {
+    function($rootScope, $api, $session, $dateutil, filterFilter, AUTH_EVENTS, $auth, $chat, $filter) {
         var add, attaches, break_mission, complete, delete_back_image, edit, get, get_mission, init, invitable_members, invite, open, open_member, pin, refresh_remaining, refresh_sort, remove, remove_attach, remove_member, search, search_completed, set_back_pos, set_mission, set_repeat, unpinned_missions;
         init = function() {
             if ($auth.isAuthenticated()) {
@@ -17,6 +17,7 @@ angular.module('app.storage.mission', [])
                 var missions;
                 if (res.data.err_code === 0) {
                     $rootScope.missions = reset_order(res.data.missions);
+                    $rootScope.missions.sort(function(a, b) { return a.order - b.order;});
                     $rootScope.mission_complete_offset = 0;
                 } else {
                     $rootScope.missions = [];
@@ -374,6 +375,135 @@ angular.module('app.storage.mission', [])
                 }
             });
         };
+
+        mission_html_id = function(mission) {
+            if (mission.private_flag == 0 || mission.private_flag == 1) 
+                return 'mission_' + mission.mission_id;
+            else if (mission.private_flag == 2)
+                return 'mission2_' + mission.user_id;
+        };
+
+        mission_unreads_to_html = function(mission) {
+            if (mission.unreads > 0)
+                return '       <i class="badge badge-danger">' + mission.unreads + '</i> ' + $filter('chatize')(mission.last_text, true);
+
+            return '';
+        };
+
+        mission_to_html = function(mission, groups, include_self) {
+            html = "";
+            if (include_self == undefined)
+                include_self = true;
+
+            mission_id = mission.mission_id;
+            if (mission.private_flag == 0 || mission.private_flag == 1) {
+                /*
+                <ion-item class="item-remove-animate item-icon-right item-icon-left item-accordion" ng-repeat="mission in missions | filter:roomFilter | orderBy:'order' track by mission.mission_id" type="item-text-wrap" ui-sref="tab.chatroom({mission_id:mission.mission_id})" ng-class="{'item-calm': nav_id=='chatroom_' + mission.mission_id, 'with-last-text': mission.last_text!='' && mission.last_text!=null}" ng-show="groups[0] || mission.visible">
+                    <i class="icon icon-bubbles"></i>
+                    <i class="icon-pin text-gray" ng-show="mission.pinned==1"></i>
+                    <h2><i class="icon-pin text-gray" ng-show="mission.pinned==1"></i><i class="fa fa-lock" ng-if="mission.private_flag==1"></i>  {{mission.mission_name}}</h2>
+                    <p><i class="badge badge-danger" ng-show="mission.unreads > 0">{{mission.unreads}}</i> <span ng-bind-html="mission.last_text | chatize:true"></span></p>
+                    <i class="icon ion-chevron-right icon-accessory"></i>
+
+                    <ion-option-button class="button-positive" ng-click="pinMission(mission)" ng-show="mission.pinned!=1">
+                        <i class="icon icon-pin"></i>
+                    </ion-option-button>
+                    <ion-option-button class="button-assertive" ng-click="pinMission(mission)" ng-show="mission.pinned==1">
+                        <i class="icon ion-ios-trash-outline"></i>
+                    </ion-option-button>
+                </ion-item>
+                */
+
+                item_class = ' ';
+                if ($rootScope.nav_id == 'chatroom_' + mission.mission_id)
+                    item_class += 'item-calm ';
+                if (mission.last_text!='' && mission.last_text!=null)
+                    item_class += 'with-last-text ';
+                if (!(groups[0] || mission.visible))
+                    item_class += 'hide';
+
+                pin_show = ' ';
+                unpin_show = ' ';
+                if (mission.pinned == 1)
+                    unpin_show = ' hide';
+                else
+                    pin_show = ' hide';
+
+                private_show = ' hide';
+                if (mission.private_flag == 1)
+                    private_show = '';
+
+                if (include_self)
+                    html += '<ion-item id="' + mission_html_id(mission) + '" class="item-remove-animate item-icon-right item-icon-left item-accordion' + item_class + '" type="item-text-wrap" ui-sref="tab.chatroom({mission_id:' + mission_id + '})">';
+                html += '    <i class="icon icon-bubbles"></i>';
+                html += '    <i class="pin icon-pin text-gray' + pin_show + '"></i>';
+                html += '    <h2><i class="fa fa-lock' + private_show + '"></i>  ' + mission.mission_name + '</h2>';
+                html += '    <p class="unreads">' + mission_unreads_to_html(mission) + '</p>';
+                html += '    <i class="icon ion-chevron-right icon-accessory"></i>';
+                html += '    <ion-option-button class="btn-pin button-positive' + unpin_show + '" ng-click="pinMission(' + mission_id + ')">';
+                html += '        <i class="icon icon-pin"></i>';
+                html += '    </ion-option-button>';
+                html += '    <ion-option-button class="btn-unpin button-assertive' + pin_show + '" ng-click="pinMission(' + mission_id + ')">';
+                html += '        <i class="icon ion-ios-trash-outline"></i>';
+                html += '    </ion-option-button>';
+                if (include_self)
+                    html += '</ion-item>';
+            }
+            else if (mission.private_flag == 2) {
+                /*
+                <ion-item class="item-remove-animate item-icon-right item-avatar item-accordion" ng-repeat="mission in missions | filter:memberFilter | orderBy:'order' track by mission.user_id" type="item-text-wrap" ng-click="open_member(mission)" ng-class="{'item-calm': nav_id=='chatroom_' + mission.mission_id, 'with-last-text': mission.last_text!='' && mission.last_text!=null}" ng-show="groups[2] || mission.visible">
+                    <img ng-src="{{mission.avartar}}" class="avatar">
+                    <h2><i class="icon-pin text-gray" ng-show="mission.pinned==1"></i> {{mission.mission_name}}</h2>
+                    <p><i class="badge badge-danger" ng-show="mission.unreads > 0">{{mission.unreads}}</i> <span ng-bind-html="mission.last_text | chatize:true"></span></p>
+                    <i class="icon ion-chevron-right icon-accessory"></i>
+
+                    <ion-option-button class="button-positive" ng-click="pinMission(mission)" ng-show="mission.pinned!=1">
+                        <i class="icon icon-pin"></i>
+                    </ion-option-button>
+                    <ion-option-button class="button-assertive" ng-click="pinMission(mission)" ng-show="mission.pinned==1">
+                        <i class="icon ion-ios-trash-outline"></i>
+                    </ion-option-button>
+                </ion-item>
+                */
+                item_class = ' ';
+                if ($rootScope.nav_id == 'chatroom_' + mission.mission_id)
+                    item_class += 'item-calm ';
+                if (mission.last_text!='' && mission.last_text!=null)
+                    item_class += 'with-last-text ';
+                if (!(groups[2] || mission.visible))
+                    item_class += 'hide';
+
+                pin_show = ' ';
+                unpin_show = ' ';
+                if (mission.pinned == 1)
+                    unpin_show = ' hide';
+                else
+                    pin_show = ' hide';
+
+                private_show = ' hide';
+                if (mission.private_flag == 1)
+                    private_show = '';
+
+                if (include_self)
+                    html += '<ion-item id="' + mission_html_id(mission) + '" class="item-remove-animate item-avatar item-icon-right item-accordion' + item_class + '" type="item-text-wrap" ng-click="open_member(' + mission.user_id + ')">';
+                html += '    <img ng-src="' + mission.avartar + '" class="avatar">';
+                html += '    <h2><i class="pin icon-pin text-gray' + pin_show + '"></i>  ' + mission.mission_name + '</h2>';
+                html += '    <p class="unreads">' + mission_unreads_to_html(mission) + '</p>';
+                html += '    <i class="icon ion-chevron-right icon-accessory"></i>';
+                html += '    <ion-option-button class="btn-pin button-positive' + unpin_show + '" ng-click="pinMission(' + mission_id + ')">';
+                html += '        <i class="icon icon-pin"></i>';
+                html += '    </ion-option-button>';
+                html += '    <ion-option-button class="btn-unpin button-assertive' + pin_show + '" ng-click="pinMission(' + mission_id + ')">';
+                html += '        <i class="icon ion-ios-trash-outline"></i>';
+                html += '    </ion-option-button>';
+                if (include_self)
+                    html += '</ion-item>';
+
+            }
+
+            return html;
+        };
+
         return {
             init: init,
             search: search,
@@ -404,7 +534,11 @@ angular.module('app.storage.mission', [])
             
             set_back_pos: set_back_pos,
             upload_back_image: upload_back_image,
-            delete_back_image: delete_back_image
+            delete_back_image: delete_back_image,
+
+            mission_html_id: mission_html_id,
+            mission_unreads_to_html: mission_unreads_to_html,
+            mission_to_html: mission_to_html
         };
     }
 );

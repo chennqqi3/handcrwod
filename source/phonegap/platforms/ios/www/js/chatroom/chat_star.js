@@ -29,9 +29,11 @@ angular.module('app.chat.star', [])
                         for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
                             $scope.messages.splice(i, 0, messages[i]);
                         }
+                        /*
                         if ($scope.messages.length > MAX_MSG_LENGTH) {
                             $scope.messages.splice(MAX_MSG_LENGTH, $scope.messages.length - MAX_MSG_LENGTH);
                         }
+                        */
                         $scope.startScrollTimer(prev_id, "prev");
                         $scope.initPreviewLink();
                         return messages;
@@ -53,9 +55,11 @@ angular.module('app.chat.star', [])
                         for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
                             $scope.messages.push(messages[i]);
                         }
+                        /*
                         if ($scope.messages.length > MAX_MSG_LENGTH) {
                             $scope.messages.splice(0, $scope.messages.length - MAX_MSG_LENGTH);
                         }
+                        */
                         $scope.startScrollTimer(next_id, "next");
                         console.log("next_id:" + next_id);
                         $scope.initPreviewLink();

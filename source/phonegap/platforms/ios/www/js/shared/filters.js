@@ -46,6 +46,7 @@ angular.module('app.filters', [])
     function($rootScope) {
         return function(input) {
             if (input != undefined) {
+                input = input + "";
                 abbr = input.substr(0, 1);
                 if (abbr >= 'A' && abbr <= 'Z' || abbr >= 'a' && abbr <= 'z' || abbr >= '0' && abbr <= '9')
                     abbr = input.substr(0, 2);

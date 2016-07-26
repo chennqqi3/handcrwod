@@ -2,7 +2,7 @@ angular.module('app.home.menu', [])
 
 .controller('homeMenuCtrl', 
     function ($scope, $rootScope, $api, AUTH_EVENTS, homeStorage, $session,
-        $ionicModal, $ionicPopup, $ionicListDelegate, $ionicSideMenuDelegate, logger, $chat) {
+        $ionicModal, $ionicPopup, $ionicListDelegate, $ionicSideMenuDelegate, logger, $chat, $timeout) {
         $scope.show_search_home = false;
         $scope.search_home = { text: '' };
 
@@ -143,6 +143,28 @@ angular.module('app.home.menu', [])
                         text: '<b>OK</b>',
                         type: 'button-positive',
                         onTap: function(e) {
+                            $timeout(function() {
+                                $scope.removeHomeConfirm(home);  
+                            });
+                        }
+                    }
+                ]
+            });
+            confirmPopup.then(function(res) {
+                $ionicListDelegate.closeOptionButtons();
+            });
+        }; 
+
+        $scope.removeHomeConfirm = function(home) {
+            var confirmPopup2 = $ionicPopup.confirm({
+                title: 'ホーム削除',
+                template: 'ホームを削除すると元に戻すことができなくなります。よろしいでしょうか？',
+                buttons: [
+                    { text: 'キャンセル' },
+                    {
+                        text: '<b>OK</b>',
+                        type: 'button-positive',
+                        onTap: function(e) {
                             homeStorage.remove(home.home_id, function(res) {
                                 if (res.err_code == 0) {
                                     logger.logSuccess("ホームを削除しました。");
@@ -158,9 +180,6 @@ angular.module('app.home.menu', [])
                         }
                     }
                 ]
-            });
-            confirmPopup.then(function(res) {
-                $ionicListDelegate.closeOptionButtons();
             });
         };
 

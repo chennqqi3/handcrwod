@@ -17,6 +17,7 @@ angular.module('app.storage.mission', [])
                 var missions;
                 if (res.data.err_code === 0) {
                     $rootScope.missions = reset_order(res.data.missions);
+                    $rootScope.missions.sort(function(a, b) { return a.order - b.order;});
                     $rootScope.mission_complete_offset = 0;
                 } else {
                     $rootScope.missions = [];
@@ -484,7 +485,7 @@ angular.module('app.storage.mission', [])
                     private_show = '';
 
                 if (include_self)
-                    html += '<ion-item id="' + mission_html_id(mission) + '" class="item-remove-animate item-avatar item-icon-left item-accordion' + item_class + '" type="item-text-wrap" ng-click="open_member(' + mission.user_id + ')">';
+                    html += '<ion-item id="' + mission_html_id(mission) + '" class="item-remove-animate item-avatar item-icon-right item-accordion' + item_class + '" type="item-text-wrap" ng-click="open_member(' + mission.user_id + ')">';
                 html += '    <img ng-src="' + mission.avartar + '" class="avatar">';
                 html += '    <h2><i class="pin icon-pin text-gray' + pin_show + '"></i>  ' + mission.mission_name + '</h2>';
                 html += '    <p class="unreads">' + mission_unreads_to_html(mission) + '</p>';

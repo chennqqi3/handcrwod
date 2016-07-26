@@ -193,7 +193,7 @@ angular.module('app.storage.chat', [])
 })
 
 .factory('chatStorage', 
-    function($api, $session, $dateutil, $rootScope, filterFilter, AUTH_EVENTS, $auth, CONFIG) {
+    function($api, $session, $dateutil, $rootScope, filterFilter, AUTH_EVENTS, $auth, CONFIG, $filter) {
         var cancel_upload_file, init, messages, read_messages, refresh_unreads_title, remove_message, search_messages, search_read, set_message, sound_alert, star_message, upload_file;
         init = function() {
 
@@ -255,12 +255,121 @@ angular.module('app.storage.chat', [])
             else {
                 if (messages == null)
                     messages = [];
+
+                if (messages.length > 200)
+                    tmp = messages.slice(messages.length - 200);
+                else
+                    tmp = messages.slice();
                 // write
-                g_messages["m_" + mission_id] = messages;
+                g_messages["m_" + mission_id] = tmp;
                 console.log("message length " + g_messages["m_" + mission_id].length + " write m_" + mission_id);
             }
 
             return messages;
+        }
+
+        is_to_mine = function(message) {
+            if ($api.is_empty(message))
+                return false;
+
+            message.content += "";
+            if ($api.is_empty(message.content))
+                return false;
+
+            mine = false;
+            message.content.replace(/\[to:([^\]]*)\]/g, function(item, user_id) {
+                if ($session.user_id + '' == user_id)
+                    mine = true;
+            });
+
+            return mine;
+        } 
+
+        /*
+            <div ng-repeat="message in messages" class="message-wrapper" ng-class="{'to-mine': isToMine(message), 'linked': message.cmsg_id==chat_id}" on-hold="onMessageHold($event, $index, message)">
+
+                <div id="chat_{{message.cmsg_id}}">
+                    <img class="profile-pic left" ng-src="{{::message.avartar}}" onerror="onProfilePicError(this)" ng-if="message.show_avartar" ng-click="showUserProfile(message.avartar)"/>
+
+                    <div class="chat-message left" ng-class="{'me': session.user_id == message.user_id, 'border-top': message.show_avartar, 'editing': message.editing}">
+                        <div class="sending" ng-if="message.cmsg_id < 0"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>
+                        <div class="message-detail">
+                            <span class="bold" ng-if="message.show_avartar" ng-click="showUserProfile(message.avartar)">{{::message.user_name}}</span> 
+                            <span class="time"><i class="fa fa-circle text-danger {{message.read_class}}"></i><a href="javascript:;" class="star" ng-click="star(message)"><i class="fa fa-star text-warning" ng-show="message.star"></i></a> {{message.date_label}}</span>
+                        </div>
+
+                        <div class="message" ng-bind-html="message.content | chatize">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cf"></div>
+            </div>
+        */
+        message_to_html = function(message, chat_id, uninclude_self) {
+            html = "";
+
+            cls = "";
+            if (is_to_mine(message))
+                cls += ' to-mine';
+            if (message.cmsg_id == chat_id)
+                cls += ' linked';
+
+            avartar_cls = "";
+            if (!message.show_avartar)
+                avartar_cls += " hide";
+
+            message_cls = "";
+            if ($session.user_id == message.user_id)
+                message_cls += ' me';
+            if (message.show_avartar)
+                message_cls += ' border-top';
+            if (message.editing)
+                message_cls += ' editing';
+
+            sending_cls = "";
+            if (message.cmsg_id >= 0)
+                sending_cls += " hide";
+
+            username_cls = "";
+            if (!message.show_avartar)
+                username_cls += " hide";
+
+            star_cls = "";
+            if (!message.star)
+                star_cls += " hide";
+
+            date_label = message.date_label;
+            if (date_label == undefined)
+                date_label = '';
+
+            if (uninclude_self != true)
+                html += '<div id="chat_' + message.cmsg_id + '" >';
+            html += '<div class="message-wrapper' + cls + '" data-cmsg_id="' + message.cmsg_id + '">';
+            html += '   <img class="profile-pic left' + avartar_cls + '" src="' + message.avartar + '" onerror="onProfilePicError(this)" onclick="onClickAvartar(\'' + message.avartar + '\')"/>';
+            html += '   <div class="chat-message left' + message_cls + '">';
+            html += '       <div class="sending' + sending_cls + '"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>';
+            html += '       <div class="message-detail">';
+            html += '           <span class="bold' + username_cls + '" onclick="onClickAvartar(\'' + message.avartar + '\')">' + message.user_name + '</span>';
+            html += '           <span class="time"><i class="unread-mark fa fa-circle text-danger ' + message.read_class + '"></i><a href="javascript:;" class="star" ng-click="star(message)"><i class="fa fa-star text-warning' + star_cls + '"></i></a>' + date_label + '</span>';
+            html += '       </div>';
+            html += '       <div class="message">' + $filter('chatize')(message.content) + '</div>';                
+            html += '   </div>';
+            html += '   <div class="cf"></div>';
+            html += '</div>';
+            if (uninclude_self != true)
+                html += '</div>';
+
+            return html;
+        }
+
+        messages_to_html = function(messages, chat_id) {
+            html = "";
+            messages.forEach(function(message) {
+                html += message_to_html(message, chat_id);
+            });
+
+            return html;
         }
 
         messages = function(mission_id, prev_id, next_id, star) {
@@ -270,7 +379,8 @@ angular.module('app.storage.chat', [])
                 mission_id: mission_id,
                 prev_id: prev_id,
                 next_id: next_id,
-                star: star
+                star: star,
+                limit: 200
             };
             return $api.call("chat/messages", params).then(function(res) {
                 var prev_date, user_id;
@@ -347,8 +457,29 @@ angular.module('app.storage.chat', [])
                 return res.data;
             });
         };
-        set_message = function(mission_id, messages, cmsg) {
-            var i, j, l_cmsg, prev_message, ref;
+
+        delete_message = function(messages, cid) {
+            var i, j, message, ref;
+
+            if ($api.is_empty(messages)) {
+                return;
+            }
+
+            i = 0;
+
+            for (i = j = ref = messages.length - 1; j >= 0; i = j += -1) {
+                message = messages[i];
+                if (message.cmsg_id === cid) {
+                    messages.splice(i, 1);
+                    break;
+                }
+            }
+
+            return;
+        };
+
+        set_message = function(mission_id, messages, cmsg, callback) {
+            var i, j, l_cmsg, prev_message, ref, setted;
             cmsg.avartar = CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg";
             cmsg.unread = $session.user_id !== cmsg.user_id;
             cmsg.read_class = (cmsg.unread ? "unread" : "read");
@@ -364,13 +495,22 @@ angular.module('app.storage.chat', [])
                     cmsg.show_avartar = true;
                 }
                 messages.push(cmsg);
+                if (callback)
+                    callback(cmsg);
             } else {
                 setted = false;
-                if (messages.length > 0) {                
+                if (cmsg.temp_cmsg_id !== null && cmsg.temp_cmsg_id !== void 0) {
+                    delete_message(messages, cmsg.cmsg_id);
+                }
+                if (messages.length > 0) {
                     for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
-                        if (messages[i].cmsg_id == cmsg.temp_cmsg_id || messages[i].cmsg_id === cmsg.cmsg_id) {
-                            cmsg.inserted = false; // from self 
+                        if (messages[i].cmsg_id === cmsg.temp_cmsg_id) {
+                            messages[i].cmsg_id = cmsg.cmsg_id;
+                        }
+                        if (messages[i].cmsg_id === cmsg.cmsg_id) {
+                            cmsg.inserted = false;
                             messages[i] = cmsg;
+                            setted = true;
                             if (i === 0) {
                                 cmsg.show_avartar = true;
                                 cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, null);
@@ -380,25 +520,29 @@ angular.module('app.storage.chat', [])
                                     cmsg.show_avartar = true;
                                 }
                                 cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, prev_message.date);
-                            }  
-                            setted = true;                      
+                            }
+                            setted = true;
+
+                            if (callback)
+                                callback(cmsg);
                             break;
                         }
                     }
                 }
-
-                if (cmsg.inserted && setted == false) { // from other user
+                if (cmsg.inserted && setted === false) {
                     if (messages.length > 0) {
                         l_cmsg = messages[messages.length - 1];
-                        if (l_cmsg.user_id == cmsg.user_id)
+                        if (l_cmsg.user_id === cmsg.user_id) {
                             cmsg.show_avartar = false;
-                        else
+                        } else {
                             cmsg.show_avartar = true;
-                    }
-                    else {
+                        }
+                    } else {
                         cmsg.show_avartar = true;
                     }
                     messages.push(cmsg);
+                    if (callback)
+                        callback(cmsg);
                 }
             }
 
@@ -501,6 +645,7 @@ angular.module('app.storage.chat', [])
                     if ($rootScope.homes[i].home_id == last_home_id)
                         $rootScope.homes[i].order = order - 1;
                 }
+                $rootScope.homes.sort(function(a, b) { return a.order - b.order;});
             }
 
             if (last_mission_id) {
@@ -514,6 +659,8 @@ angular.module('app.storage.chat', [])
                     if ($rootScope.missions[i].mission_id == last_mission_id)
                         $rootScope.missions[i].order = order - 1;
                 }
+
+                $rootScope.missions.sort(function(a, b) { return a.order - b.order;});
             }
 
             refresh_unreads_title()
@@ -544,6 +691,8 @@ angular.module('app.storage.chat', [])
             init: init,
             save_cache_messages_to_storage: save_cache_messages_to_storage,
             cache_messages: cache_messages,
+            message_to_html: message_to_html,
+            messages_to_html: messages_to_html,
             messages: messages,
             search_messages: search_messages,
             read_messages: read_messages,

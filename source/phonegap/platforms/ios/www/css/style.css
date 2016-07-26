@@ -2,6 +2,10 @@
 body {
 }
 
+.hide {
+    display: none;
+}
+
 a {
     text-decoration: none;
     color: #006699;
@@ -346,9 +350,8 @@ img.profile-pic.right {
     font-size: 12px;
     color: #999;
     vertical-align: baseline;
-    display: inline-block;
-    float: left;
-}                
+    display: block;
+}
 
 .message .chat-quote .title .time {
     padding-left: 10px;
@@ -408,7 +411,7 @@ img.profile-pic.right {
     top: 5px;
 }
 
-.message-wrapper:last-child {
+#messages>div:last-child {
     margin-bottom: 10px;
 }
 

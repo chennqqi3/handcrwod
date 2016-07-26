@@ -310,7 +310,7 @@ angular.module('app.chat.list', [])
             missionStorage.search($rootScope.cur_home.home_id)
                 .then(function(missions) {
                     $scope.loaded = true;
-                    var viewScroll = $ionicScrollDelegate.$getByHandle('userMessageScroll');
+                    var viewScroll = $ionicScrollDelegate.$getByHandle('missionScroll');
                     if (scroll_top)
                         viewScroll.scrollTop(true);
                 });
@@ -342,6 +342,14 @@ angular.module('app.chat.list', [])
         if (mission.last_text!='' && mission.last_text!=null)
             $(id).addClass('with-last-text');
         $(id + ' .unreads').html(missionStorage.mission_unreads_to_html(mission));
+
+        if (mission.private_flag == 0 || mission.private_flag == 1) {
+            $(id).insertAfter("#room_divider");
+        }
+        else {
+            $(id).insertAfter("#member_divider");   
+        }
+        
     });
 
     $scope.open_member = function(user_id) {
@@ -391,7 +399,7 @@ angular.module('app.chat.list', [])
         var n = 0;
         var template = '';
 
-        template += '<ion-item class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
+        template += '<ion-item id="room_divider" class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
         template += '    <label ng-click="toggleGroup(0)"><i ng-class="groups[0] ? \'ion-minus\' : \'ion-plus\'"></i> ルーム</label>';
         if ($rootScope.cur_home.priv == HPRIV.HMANAGER)        
             template += '    <button class="button button-icon icon ion-ios-plus-empty text-gray" ng-click="addMission(0)"></button>';
@@ -407,7 +415,7 @@ angular.module('app.chat.list', [])
             template += missionStorage.mission_to_html(mission, scope.groups);
         }
 
-        template += '<ion-item class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
+        template += '<ion-item id="member_divider" class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
         template += '    <label ng-click="toggleGroup(2)"><i ng-class="groups[2] ? \'ion-minus\' : \'ion-plus\'"></i> メンバー</label>';
         template += '</ion-item>';
 

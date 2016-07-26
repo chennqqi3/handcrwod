@@ -966,15 +966,14 @@ angular.module('app.chatroom', [])
         });
           
         $scope.$on('elastic:resize', function(event, ta) {
-            /*
             var chat_view = angular.element(document.querySelector('#chat_view'));
+            /*
             var scrollTop = viewScroll.getScrollPosition().top;
             var scrollHeight = chat_view[0].scrollHeight;
 
             mustScrollToBottom = (scrollTop >= scrollHeight);
-
-            console.log(mustScrollToBottom);
-
+            */
+            
             var fh, fileBar, h;
             h = parseInt(ta[0].style.height, 10);
             if (h < 34) {
@@ -994,7 +993,7 @@ angular.module('app.chatroom', [])
                 } else {
                     $('#chat_view').css('bottom', h + 10 + "px");
                 }
-            }*/
+            }
         });
 
         angular.element(document.querySelector('#chat_view')).on('scroll', function() {

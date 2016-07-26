@@ -645,6 +645,7 @@ angular.module('app.storage.chat', [])
                     if ($rootScope.homes[i].home_id == last_home_id)
                         $rootScope.homes[i].order = order - 1;
                 }
+                $rootScope.homes.sort(function(a, b) { return a.order - b.order;});
             }
 
             if (last_mission_id) {
@@ -658,6 +659,8 @@ angular.module('app.storage.chat', [])
                     if ($rootScope.missions[i].mission_id == last_mission_id)
                         $rootScope.missions[i].order = order - 1;
                 }
+
+                $rootScope.missions.sort(function(a, b) { return a.order - b.order;});
             }
 
             refresh_unreads_title()

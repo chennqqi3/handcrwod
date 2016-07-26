@@ -12,6 +12,7 @@ angular.module('app.storage.home', [])
                 var homes;
                 if (res.data.err_code === 0) {
                     $rootScope.homes = res.data.homes;
+                    $rootScope.homes.sort(function(a, b) { return a.order - b.order;});
                     return $rootScope.homes;
                 } else {
                     return [];

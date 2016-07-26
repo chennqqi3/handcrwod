@@ -5,7 +5,7 @@ angular.module('app.mission.edit', [])
 .controller('missionEditCtrl', 
     function($scope, $rootScope, $state, $stateParams, $api, $ionicPopup, $ionicHistory,
         $ionicModal, $session, missionStorage, $timeout, logger, HPRIV) {
-        $scope.ediatable = $rootScope.canEditMission();
+        $scope.editable = $rootScope.canEditMission();
 
         $scope.init = function() {
             $scope.mission_id = parseInt($stateParams.mission_id, 10);
@@ -26,29 +26,50 @@ angular.module('app.mission.edit', [])
 
         $scope.init();
 
+        $scope.dirty = false;
+        $scope.onChange = function() {
+            $scope.dirty = true;
+        }
+
         $scope.$on('$ionicView.beforeLeave', function() {
             if ($api.is_empty($scope.mission.mission_name))
                 $scope.mission.mission_name = $scope.mission.org_mission_name;
 
-            var mission = null;
-            if ($scope.ediatable) {
-                mission = $scope.mission
-            }
-            else if ($scope.mission.org_push_flag != $scope.mission.push_flag) {
-                mission = {
-                    'mission_id': $scope.mission.mission_id,
-                    'push_flag': $scope.mission.push_flag
-                }
-            }
+            if ($scope.dirty) {
+                var confirmPopup = $ionicPopup.confirm({
+                    title: '確認',
+                    template: '変更内容を保存してもよろしいでしょうか？',
+                    buttons: [
+                        { text: 'キャンセル' },
+                        {
+                            text: '<b>OK</b>',
+                            type: 'button-positive',
+                            onTap: function(e) {
+                                var mission = null;
+                                if ($scope.editable) {
+                                    mission = $scope.mission;
+                                }
+                                else if ($scope.mission.org_push_flag != $scope.mission.push_flag) {
+                                    mission = {
+                                        'mission_id': $scope.mission.mission_id,
+                                        'push_flag': $scope.mission.push_flag
+                                    }
+                                }
 
-            if (mission) {
-                missionStorage.edit(mission, function(data) {
-                    if (data.err_code == 0) {
-                        $rootScope.$broadcast('refresh-missions')
-                    }
-                    else
-                        logger.logError(data.err_msg)
-                }); 
+                                if (mission) {
+                                    missionStorage.edit(mission, function(data) {
+                                        if (data.err_code == 0) {
+                                            $rootScope.$broadcast('refresh-missions')
+                                        }
+                                        else
+                                            logger.logError(data.err_msg)
+                                    }); 
+                                }
+                            }
+                        }
+                    ]
+                });
+                confirmPopup.then();
             }           
         });
 
@@ -76,6 +97,25 @@ angular.module('app.mission.edit', [])
                         text: '<b>OK</b>',
                         type: 'button-positive',
                         onTap: function(e) {
+                            $timeout(function() {
+                                $scope.removeConfirm();  
+                            });
+                        }
+                    }
+                ]
+            });
+        }
+
+        $scope.removeConfirm = function(home) {
+            var confirmPopup2 = $ionicPopup.confirm({
+                title: 'チャットルーム削除',
+                template: 'チャットルームを削除すると元に戻すことができなくなります。よろしいでしょうか？',
+                buttons: [
+                    { text: 'キャンセル' },
+                    {
+                        text: '<b>OK</b>',
+                        type: 'button-positive',
+                        onTap: function(e) {
                             missionStorage.remove($rootScope.cur_mission, function(res) {
                                 if (res.err_code == 0) {
                                     $session.setCurMission(null);
@@ -94,6 +134,6 @@ angular.module('app.mission.edit', [])
                     }
                 ]
             });
-        }
+        };
     }
 );

@@ -214,8 +214,17 @@
         };
 
         me.$$send = function (message) {
-            if (me.$ready()) me.$$ws.send(JSON.stringify(message));
-            else if (me.$$config.enqueue) me.$$queue.push(message);
+            if (me.$ready()) {
+                console.log("websocket send: send in ready");
+                me.$$ws.send(JSON.stringify(message));
+            }
+            else if (me.$$config.enqueue) {
+                console.log("websocket send: push enqueue");
+                me.$$queue.push(message);
+            }
+            else {
+                console.log("websocket send: not send");
+            }
         };
 
         me.$emit = function (event, data) {

@@ -18,18 +18,23 @@ angular.module('app.alert.list', [])
                     else
                         logger.logSuccess(alert.data.home_name + "への招待を取消しました。");
 
-                    for (i = 0; i < $rootScope.alerts.length; i ++)
-                    {
-                        if ($rootScope.alerts[i].data.home_id == alert.data.home_id) {
-                            $rootScope.alerts.splice(i, 1);
-                        }
-                    }
-
                     $rootScope.$broadcast('refresh-homes');
                     userStorage.refresh_alert_label();
                 }
-                else
+                else if (res.err_code == 61 || res.err_code == 63) {
                     logger.logError(res.err_msg);
+                }
+                else {
+                    logger.logError(res.err_msg);
+                    return;
+                }
+
+                for (i = 0; i < $rootScope.alerts.length; i ++)
+                {
+                    if ($rootScope.alerts[i].data.home_id == alert.data.home_id) {
+                        $rootScope.alerts.splice(i, 1);
+                    }
+                }
 
                 return;
             });
