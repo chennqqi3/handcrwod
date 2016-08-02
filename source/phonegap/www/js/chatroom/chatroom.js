@@ -6,7 +6,7 @@ angular.module('app.chatroom', [])
     function($scope, $rootScope, $state, $stateParams, 
         $ionicActionSheet, $ionicModal, $emoticons, $session,
         missionStorage, chatStorage, taskStorage, homeStorage, $chat, $ionicPopover, chatizeService,
-        $ionicPopup, $ionicScrollDelegate, $timeout, $interval, $api, logger, $dateutil) {
+        $ionicPopup, $ionicScrollDelegate, $timeout, $interval, $api, logger, $dateutil, CONFIG) {
         $rootScope.nav_id = "chatroom_" + $stateParams.mission_id;
         $scope.isAndroid = ionic.Platform.isAndroid(); 
 
@@ -14,6 +14,7 @@ angular.module('app.chatroom', [])
         $scope.last_cid = null;
         $scope.search_string = null;
         $scope.show_more = false;
+        $scope.all_avartar = CONFIG.AVARTAR_URL + "all.jpg"
 
         var messageCheckTimer;
 
@@ -168,13 +169,13 @@ angular.module('app.chatroom', [])
         });
         $scope.$on('$ionicView.loaded', function() {
             angular.element(document.querySelector('body')).on('click', function(e) {
-                var elem = angular.element(document.querySelector('#input_bar .footer-btn-wrap .btn-emoticon'));
+                var elem = angular.element(document.querySelector('#input_bar .btn-emoticon'));
                 if (elem[0] != e.target && elem[0] != e.target.paerntNode) {
                     angular.element(document.querySelector('#emoticon_gallery')).css('visibility', 'hidden');
                     elem.data('isShowing', "false");
                 }
 
-                var elem = angular.element(document.querySelector('#input_bar .footer-btn-wrap .btn-to'));
+                var elem = angular.element(document.querySelector('#input_bar .btn-to'));
                 var elem_to_users = angular.element(document.querySelector('#to_users'));
                 if (elem[0] != e.target && elem[0] != e.target.paerntNode && 
                     elem_to_users[0] != e.target.parentNode && elem_to_users[0] != e.target.parentNode.parentNode) {
@@ -184,7 +185,7 @@ angular.module('app.chatroom', [])
             });
         });
 
-        angular.element(document.querySelector('#input_bar .footer-btn-wrap .btn-emoticon')).on('click', function(e) {
+        angular.element(document.querySelector('#input_bar .btn-emoticon')).on('click', function(e) {
             var btn_rect, elem, gheight, gwidth, isShowing, pos;
             e.preventDefault();
             elem = angular.element(this);
@@ -214,7 +215,7 @@ angular.module('app.chatroom', [])
                 str = strPrefix + emo_text + strSuffix;
             }
             $scope.cmsg.content = str;
-            angular.element(document.querySelector('#input_bar .footer-btn-wrap .btn-emoticon')).data('isShowing', "false");
+            angular.element(document.querySelector('#input_bar .btn-emoticon')).data('isShowing', "false");
             angular.element(document.querySelector('#emoticon_gallery')).css('visibility', 'hidden');
 
             $timeout(function() {
@@ -230,7 +231,7 @@ angular.module('app.chatroom', [])
 
         $scope.showTo = function() {
             var btn_rect, ele, gheight, gwidth, isShowing, pos;
-            ele = angular.element(document.querySelector('#input_bar .footer-btn-wrap .btn-to'));
+            ele = angular.element(document.querySelector('#input_bar .btn-to'));
             var to_users = angular.element(document.querySelector('#to_users')); 
             isShowing = ele.data('isShowing');
             ele.removeData('isShowing');
@@ -247,7 +248,10 @@ angular.module('app.chatroom', [])
             txta = angular.element(document.querySelector('.item-input-wrapper textarea'));
             start = txta.prop("selectionStart");
             str = "";
-            to_text = "[to:" + member.user_id + "]" + member.user_name + "さん\n";
+            if (member == undefined)
+                to_text = "[to:all]全員\n";
+            else
+                to_text = "[to:" + member.user_id + "]" + member.user_name + "さん\n";
             if ($api.is_empty($scope.cmsg.content)) {
                 str = to_text;
                 start = str.length;
@@ -259,7 +263,7 @@ angular.module('app.chatroom', [])
                 str = strPrefix + to_text + strSuffix;
             }
             $scope.cmsg.content = str;
-            angular.element(document.querySelector('#input_bar .footer-btn-wrap .btn-to')).data('isShowing', "false");
+            angular.element(document.querySelector('#input_bar .btn-to')).data('isShowing', "false");
             angular.element(document.querySelector('#to_users')).css('visibility', 'hidden');
             $timeout(function() {
                 chat_ta = document.getElementById('chat_ta');
@@ -285,6 +289,10 @@ angular.module('app.chatroom', [])
                                 $scope.files = files;
                             else
                                 $scope.files = $scope.files.concat(files);
+
+                            $timeout(function() {
+                                $rootScope.$broadcast('elastic:adjust');
+                            });
                             
                             return angular.forEach(files, function(file) {
                                 file.retry = 0;
@@ -312,7 +320,7 @@ angular.module('app.chatroom', [])
                     $scope.files.splice(i, 1);
                     if (data.err_code === 0) {
                         str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']" + file.name + "[/file]";
-                        $chat.send(null, $scope.mission_id, str, null, 1);
+                        $chat.send(null, $rootScope.cur_home.home_id, $scope.mission_id, str, null, 1);
                     } else {
                         console.log(data.err_msg);
                         logger.logError(data.err_msg);
@@ -363,7 +371,7 @@ angular.module('app.chatroom', [])
                     $scope.files.splice(i, 1);
                     if (data.err_code === 0) {
                         str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']" + file.name + "[/file]";
-                        return $chat.send(null, $scope.mission_id, str, null, 1);
+                        return $chat.send(null, $rootScope.cur_home.home_id, $scope.mission_id, str, null, 1);
                     } else {
                         console.log(data.err_msg);
                         return logger.logError(data.err_msg);
@@ -722,7 +730,7 @@ angular.module('app.chatroom', [])
                 }
             }
 
-            $chat.send($scope.cmsg.cmsg_id, $scope.mission_id, $scope.cmsg.content);
+            $chat.send($scope.cmsg.cmsg_id, $rootScope.cur_home.home_id, $scope.mission_id, $scope.cmsg.content);
 
             $scope.clear_cmsg(true);
         };
@@ -779,6 +787,7 @@ angular.module('app.chatroom', [])
 
                 $('.message-wrapper').off('hold');
                 $('.message-wrapper').on("hold", function() {
+                    console.log('hold ');
                     cmsg_id = $(this).data('cmsg_id');
                     for (i = 0; i < $scope.messages.length; i ++) {
                         if ($scope.messages[i].cmsg_id == cmsg_id) {
@@ -962,37 +971,6 @@ angular.module('app.chatroom', [])
             for (i = 0; i < len; i ++) {
                 if ($scope.messages[i].cmsg_id == message.cmsg_id)
                     $scope.messages[i].star = false;
-            }
-        });
-          
-        $scope.$on('elastic:resize', function(event, ta) {
-            var chat_view = angular.element(document.querySelector('#chat_view'));
-            /*
-            var scrollTop = viewScroll.getScrollPosition().top;
-            var scrollHeight = chat_view[0].scrollHeight;
-
-            mustScrollToBottom = (scrollTop >= scrollHeight);
-            */
-            
-            var fh, fileBar, h;
-            h = parseInt(ta[0].style.height, 10);
-            if (h < 34) {
-                h = 34;
-            }
-            $('#input_bar').height(h + "px");
-            if ($scope.files) {
-                fh = $scope.files.length * 25;
-            } else {
-                fh = 0;
-            }
-            fileBar = $('#file_bar');
-            if ($rootScope.canChat()) {
-                if (fh > 0) {
-                    fileBar.css('bottom', h + 10 + "px");
-                    $('#chat_view').css('bottom', h + 10 + fh + 10 + "px");
-                } else {
-                    $('#chat_view').css('bottom', h + 10 + "px");
-                }
             }
         });
 
@@ -1216,11 +1194,22 @@ angular.module('app.chatroom', [])
 
             if (!footerBar) return;
 
-            var newFooterHeight = taHeight + 20;
-            newFooterHeight = (newFooterHeight > 44) ? newFooterHeight : 44;
+            var newFooterHeight = taHeight + 50;
+            newFooterHeight = (newFooterHeight > 74) ? newFooterHeight : 74;
 
             footerBar.style.height = newFooterHeight + 'px';
-            scroller.style.bottom = newFooterHeight + 'px';
+
+            $('#emoticon_gallery').css('bottom', newFooterHeight + "px");
+            $('#to_users').css('bottom', newFooterHeight + "px");
+            $('#file_bar').css('bottom', newFooterHeight + "px");
+
+            if ($scope.files) {
+                fh = $scope.files.length * 25;
+            } else {
+                fh = 0;
+            }
+
+            scroller.style.bottom = newFooterHeight + fh + 'px';
 
             try {
                 var elem = angular.element(document.querySelector('#chat_view'));

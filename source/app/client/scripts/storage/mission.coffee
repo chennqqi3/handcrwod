@@ -19,6 +19,9 @@ angular.module('app.storage.mission', [])
                 .then((res) ->
                     if res.data.err_code == 0
                         $rootScope.missions = reset_order(res.data.missions)
+                        $rootScope.missions.sort((a, b)->
+                            return a.order - b.order
+                        )
                         $rootScope.mission_complete_offset = 0
                     else
                         $rootScope.missions = []
@@ -111,6 +114,7 @@ angular.module('app.storage.mission', [])
                 if mission.mission_id == mission_id
                     return mission
             return null
+
         set_mission = (mission) ->
             if $rootScope.missions != null && $rootScope.missions.length > 0
                 for i in [0..$rootScope.missions.length-1]
@@ -264,12 +268,18 @@ angular.module('app.storage.mission', [])
                         callback(res.data)
                 )
 
-        break_mission = (mission_id, complete_flag, callback) ->
+        break_mission = (mission_id, callback) ->
             params = 
                 mission_id: mission_id
 
             $api.call("mission/break_mission", params)
                 .then((res) ->
+                    if res.data.err_code == 0
+                        if $rootScope.missions
+                            for i in [0..$rootScope.missions.length - 1]
+                                if $rootScope.missions[i].mission_id == mission_id
+                                    $rootScope.missions.splice(i, 1)
+                                    break
                     if callback != undefined
                         callback(res.data)
                 )
@@ -331,6 +341,113 @@ angular.module('app.storage.mission', [])
             $chat.bot_message(home_id)
             return
 
+        mission_html_id = (mission) ->
+            if (mission.private_flag == 0 || mission.private_flag == 1) 
+                return 'mission_' + mission.mission_id
+            else if (mission.private_flag == 2)
+                return 'mission2_' + mission.user_id
+
+        select_mission_in_nav = () ->
+            $('.nav-bar>li').removeClass('active')
+            $('.nav-bar .list-item').removeClass('active')
+            if $rootScope.nav_id.indexOf('chatroom_') == 0
+                if $rootScope.cur_mission
+                    id = mission_html_id($rootScope.cur_mission)
+                    $('#' + id).addClass('active').removeClass('hide')
+            return
+
+        mission_unreads_to_html = (mission) ->
+            if (mission.unreads > 0)
+                return '       <i class="badge badge-danger">' + mission.unreads + '</i> '
+
+            return ''
+
+        mission_to_html = (mission, groups, include_self) ->
+            html = ""
+            if (include_self == undefined)
+                include_self = true
+
+            mission_id = mission.mission_id
+            if (mission.private_flag == 0 || mission.private_flag == 1)
+                ###
+                <li data-ng-repeat="mission in missions0 = (missions | filter:roomFilter | filter:{mission_name:search_string} | orderBy:'order') track by mission.mission_id" class="list-item" ng-class="{'active': nav_id=='chatroom_' + mission.mission_id }" data-mission-id="{{mission.mission_id}}" ng-show="search_string !='' && search_string != null || groups[0] || mission.visible">
+                    <div class="info">
+                        <i class="badge badge-danger" ng-show="mission.unreads > 0">{{mission.unreads}}</i>
+                        <a href="javascript:;" ng-class="{'btn-pin': mission.pinned!=1}" ng-click="pinMission(mission)"><i class="icon-pin"></i></a>
+                    </div>
+                    <a ng-href="#/chats/{{mission.mission_id}}" title="{{::mission.mission_name}}"><i class="fa fa-lock" ng-if="mission.private_flag==1"></i> {{mission.mission_name}}</a>
+                </li>
+                ###
+
+                item_class = ' '
+                if ($rootScope.nav_id == 'chatroom_' + mission.mission_id)
+                    item_class += 'active ';
+                if (!(groups[0] || mission.visible))
+                    item_class += 'hide';
+
+                pin_class = ' ';
+                if (mission.pinned != 1)
+                    pin_class = ' btn-pin';
+
+                private_show = ' hide';
+                if (mission.private_flag == 1)
+                    private_show = '';
+
+                if (include_self)
+                    html += '<li id="' + mission_html_id(mission) + '" class="list-item ' + item_class + '" data-mission-id="' + mission.mission_id + '">';
+                html += '    <div class="info">'
+                html += '        <span class="unreads">' + mission_unreads_to_html(mission) + '</span>'
+                html += '        <a href="javascript:;" class="pin ' + pin_class + '" ng-click="pinMission(' + mission_id + ')"><i class="icon-pin"></i></a>'
+                html += '    </div>'
+                html += '    <a ng-href="#/chats/' + mission.mission_id + '" title="' + mission.mission_name + '"><i class="fa fa-lock' + private_show + '"></i> ' + mission.mission_name + '</a>'
+                if (include_self)
+                    html += '</li>'
+            else if (mission.private_flag == 2)
+                ###
+                <li data-ng-repeat="mission in missions2 = (missions | filter:memberFilter | filter:{mission_name:search_string} | orderBy:'order') track by mission.user_id" class="list-item" ng-class="{'active': nav_id=='chatroom_' + mission.mission_id }" data-mission-id="{{mission.mission_id}}" ng-show="search_string !='' && search_string != null || groups[2] || mission.visible">
+                    <img alt="" ng-src="{{mission.avartar}}" class="avartar">
+                    <div class="info">
+                        <i class="badge badge-danger" ng-show="mission.unreads > 0">{{mission.unreads}}</i>
+                        <a href="javascript:;" ng-class="{'btn-pin': mission.pinned!=1}" ng-click="pinMission(mission)"><i class="icon-pin"></i></a>
+                    </div>
+                    <a href="javascript:;" ng-click="open_member(mission)" title="{{::mission.mission_name}}">{{mission.mission_name}}</a>
+                </li>
+                ###
+                item_class = ' ';
+                if ($rootScope.nav_id == 'chatroom_' + mission.mission_id)
+                    item_class += 'active ';
+                if (!(groups[2] || mission.visible))
+                    item_class += 'hide';
+
+                pin_class = ' ';
+                if (mission.pinned != 1)
+                    pin_class = ' btn-pin';
+
+                if (include_self)
+                    html += '<li id="' + mission_html_id(mission) + '" class="list-item ' + item_class + '" data-mission-id="' + mission.mission_id + '">';
+                html += '    <img alt="" ng-src="' + mission.avartar + '" class="avartar">';
+                html += '    <div class="info">'
+                html += '        <span class="unreads">' + mission_unreads_to_html(mission) + '</span>'
+                html += '        <a href="javascript:;" class="pin ' + pin_class + '" ng-click="pinMission(' + mission_id + ')"><i class="icon-pin"></i></a>'
+                html += '    </div>'
+                html += '    <a href="javascript:;" ng-click="open_member(' + mission.user_id + ')" title="' + mission.mission_name + '">' + mission.mission_name + '</a>'
+                if (include_self)
+                    html += '</li>'
+
+            return html
+
+        priv = (mission_id, user_id, priv, callback) ->
+            params = 
+                mission_id: mission_id
+                user_id: user_id
+                priv: priv
+
+            $api.call("mission/priv", params)
+                .then((res) ->
+                    if callback != undefined
+                        callback(res.data)
+                )
+
         return {
             init: init
             search: search
@@ -362,5 +479,12 @@ angular.module('app.storage.mission', [])
             delete_back_image: delete_back_image
 
             get_bot_messages: get_bot_messages
+
+            select_mission_in_nav: select_mission_in_nav
+            mission_html_id: mission_html_id
+            mission_unreads_to_html: mission_unreads_to_html
+            mission_to_html: mission_to_html
+
+            priv: priv
         }
 )

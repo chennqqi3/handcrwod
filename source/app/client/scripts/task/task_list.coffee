@@ -391,10 +391,6 @@ angular.module('app.task.list', [])
         $scope.is_past = (task) ->
             return $dateutil.is_past(task.plan_end_date)
 
-        # Check privilege            
-        $scope.canTemplate = ->
-            return $rootScope.cur_mission != null && ($session.user_id == $rootScope.cur_mission.client_id)
-
         $scope.addTask = () ->
             $dialogs.addTask($rootScope.cur_mission)
 

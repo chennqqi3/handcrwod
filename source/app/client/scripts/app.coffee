@@ -24,7 +24,6 @@ angular.module('app', [
     'app.api'
     'app.dateutil'
     'app.storage'
-    'app.filters'
     'app.auth'
     'app.dialogs'
     'app.service.chat'

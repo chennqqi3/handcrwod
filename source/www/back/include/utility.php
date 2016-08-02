@@ -10,11 +10,12 @@
 
 	define('DEFAULT_APP_URL',	'https://www.handcrowd.com/app/');
 
-	define('SITE_BASE',			preg_replace('/\/index.php/i', '', $_SERVER["SCRIPT_NAME"]) . "/");
+	define('SITE_BASE',			preg_replace('/\/'. DEFAULT_PHP . '/i', '', $_SERVER["SCRIPT_NAME"]) . "/");
+	define('SITE_ROOT',			preg_replace('/\/'. DEFAULT_PHP . '/i', '', $_SERVER["SCRIPT_FILENAME"]) . "/");
+
 	$http_schema = ((isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"]=="on") ? "https" : "http");
 	define("SITE_ORIGIN",		isset($_SERVER["HTTP_HOST"]) ? ($http_schema . "://" . $_SERVER["HTTP_HOST"]) : '');
 	define("SITE_BASEURL",		SITE_ORIGIN . SITE_BASE);
-	define('SITE_ROOT',			preg_replace('/\/index.php/i', '', $_SERVER["SCRIPT_FILENAME"]) . "/");
 
 	@include_once("config.inc");
 
@@ -1148,13 +1149,12 @@
 	function _code_label($code, $val) 
 	{
 		global $g_codes;
-		if (isset($g_codes)) {
+		if (isset($g_codes) && isset($g_codes[$code])) {
 			$codes = $g_codes[$code];
-			return $codes[$val];
+			if (isset($codes) && isset($codes[$val]))
+				return $codes[$val];
 		}
-		else {
-			return null;
-		}
+		return '';
 	}
 
 	function _err_msg($err, $param1=null, $param2=null)

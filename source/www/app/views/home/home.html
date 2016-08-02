@@ -4,8 +4,9 @@
             <li dropdown>
                 <button type="button" class="btn btn-default btn-circle" dropdown-toggle><i class="icon-settings"></i></button>
                 <ul class="dropdown-menu" aria-labelledby="simple-dropdown">
-                    <li><a href ng-click="editHome()"><i class="icon-info"></i> ホーム情報</a></li>
+                    <li><a href ng-click="editHome()"><i class="icon-info"></i> グループ情報</a></li>
                     <li><a href ng-click="importCSV()" ng-if="canEditHome()"><i class="icon-cloud-upload"></i> CSV取込</a></li>
+                    <li><a href ng-click="breakHome()" ng-if="canBreakHome()"><i class="icon-logout"></i> グループ退会</a></li>
                     <li><a href ng-click="removeHome()" ng-if="canEditHome()"><i class="icon-trash"></i> 削除</a></li>
                 </ul>
             </li>
@@ -32,7 +33,7 @@
                 <img src="images/welcome.svg">
                 <div class="alert alert-info">
                     <i class="fa fa-warning"></i>
-                    ホームが存在しません。<a href="javascript:;" class="btn btn-danger btn-sm" ng-click="addHome()">こちら</a> からマイホームを作成するか、他のホームから招待してもらってください。
+                    グループが存在しません。<a href="javascript:;" class="btn btn-danger btn-sm" ng-click="addHome()">こちら</a> からマイグループを作成するか、他のグループから招待してもらってください。
                 </div>
             </div>
         </div>
@@ -88,7 +89,7 @@
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <a href="javascript:;" class="btn btn-default btn-sm sub-right-button" title="ホームへの招待" ng-click="inviteMember()" ng-if="canEditHomeMember()"><i class="icon-user-follow"></i> ホームへの招待</a>
+                    <a href="javascript:;" class="btn btn-default btn-sm sub-right-button" title="グループへの招待" ng-click="inviteMember()" ng-if="canEditHomeMember()"><i class="icon-user-follow"></i> グループへの招待</a>
                     <h3>メンバー <span class="badge badge-primary">{{filteredMembers.length}}人</span></h3>
                 <div>
                 <div data-ng-repeat="member in filteredMembers = (missions | filter:memberFilter | filter:{user_name:search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">

@@ -8,11 +8,11 @@
             <li data-ng-repeat="member in mission.members" class="list-group-item">
                 <span class="view">
                     <div class="pull-right">
-                        <span class="label label-primary">{{memberLabel(member)}}</span>
+                        <span class="badge badge-success" ng-class="{'show-priv': member.priv!=RPRIV.MEMBER, 'hide-priv': member.priv==RPRIV.MEMBER}" ng-click="selPriv(member)" ng-if="canEditMissionMember()">{{member.priv | room_member_label}}</span>
                         <button type="button" class="btn btn-circle btn-xs btn-inverse" data-ng-show="canRemoveUser(member)" ng-click="removeUser(member)"><i class="icon-trash"></i></button>
                     </div>
                     <a href="javascript:;" ng-click="showUserProfile(member.user_id)"><img ng-src="{{member.avartar}}" class="avartar img30_30"></a>
-                    {{member.user_name}} <small>({{member.email}})</small>
+                    {{member.user_name}} <small>({{member.login_id}} <i class="icon-envelope"></i> {{member.email}})</small>
                 </span>
             </li>
         </ul>

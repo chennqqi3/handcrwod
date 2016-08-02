@@ -512,3 +512,67 @@ angular.module('app.directives', [])
                 )
         }
 ])
+
+# filters
+.filter('date_label', 
+    ($dateutil) ->
+        return (input) ->
+            return $dateutil.date_label(input)
+)
+
+.filter('min_date_label', 
+    ($dateutil) ->
+        return (input) ->
+            return $dateutil.min_date_label(input)
+)
+
+.filter('times_label', 
+    ($dateutil) ->
+        return (input) ->
+            return $dateutil.times_label(input)
+)
+
+.filter('hours_label', 
+    ($dateutil) ->
+        return (input) ->
+            return $dateutil.hours_label(input)
+)
+
+.filter('date_time_label', 
+    ($dateutil) ->
+        return (input) ->
+            return $dateutil.date_time_label(input)
+)
+
+.filter('home_label',
+    ($rootScope) ->
+        return (input) ->
+            if $rootScope.cur_home == null
+                return 'グループなし'
+            else
+                return input
+)
+
+.filter('sir_label',
+    ($rootScope) ->
+        return (input) ->
+            if input == null || input == '' || input == '全員'
+                return input
+            else
+                return input + 'さん'
+)
+
+.filter('abbr', 
+    ($rootScope) ->
+        return (input) ->
+            abbr = input.substr(0, 1)
+            if abbr >= 'A' && abbr <= 'Z' || abbr >= 'a' && abbr <= 'z' || abbr >= '0' && abbr <= '9' 
+                abbr = input.substr(0, 2)
+            return abbr
+)
+
+.filter('room_member_label',
+    ($rootScope) ->
+        return (input) ->
+            return $rootScope.get_rpriv_name(input)
+)

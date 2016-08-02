@@ -4,7 +4,7 @@ angular.module('app.dialogs', [])
     ($rootScope, logger, $modal) ->
         $this = this
 
-        this.confirm = (title, message, ok_label, callback, param) ->
+        this.confirm = (title, message, ok_label, callback, param, ok_class) ->
             modalInstance = $modal.open(
                 templateUrl: 'views/dialogs/mdl_confirm.html' + $rootScope.ver
                 controller: 'modalConfirmCtrl'
@@ -15,6 +15,8 @@ angular.module('app.dialogs', [])
                         return message
                     ok_label: ->
                         return ok_label
+                    ok_class: ->
+                        return ok_class
             )
 
             modalInstance.result.then(
@@ -128,6 +130,17 @@ angular.module('app.dialogs', [])
             modalInstance = $modal.open(
                 templateUrl: 'views/dialogs/mdl_sel_priv.html'
                 controller: 'selPrivCtrl'
+                resolve:
+                    priv: ->
+                        return priv
+                    callback: ->
+                        return callback
+            )
+
+        this.selRoomPriv = (priv, callback) ->
+            modalInstance = $modal.open(
+                templateUrl: 'views/dialogs/mdl_sel_rpriv.html'
+                controller: 'selRPrivCtrl'
                 resolve:
                     priv: ->
                         return priv
@@ -269,11 +282,16 @@ angular.module('app.dialogs', [])
 )
 
 .controller('modalConfirmCtrl', 
-    ($scope, $rootScope, $modalInstance, title, message, ok_label) ->
+    ($scope, $rootScope, $modalInstance, title, message, ok_label, ok_class) ->
 
         $scope.title = title
         $scope.message = message
         $scope.ok_label = ok_label
+
+        if ok_class == undefined
+            $scope.ok_class = 'btn-warning'
+        else
+            $scope.ok_class = ok_class
 
         $scope.ok = ->
             $modalInstance.close('ok');
@@ -624,6 +642,18 @@ angular.module('app.dialogs', [])
 )
 
 .controller('selPrivCtrl', 
+    ($scope, $rootScope, $modalInstance, $api, callback, priv) ->
+        $scope.priv = priv
+
+        $scope.ok = () ->
+            callback($scope.priv)
+            $scope.cancel()
+
+        $scope.cancel = ->
+            $modalInstance.dismiss('close')
+)
+
+.controller('selRPrivCtrl', 
     ($scope, $rootScope, $modalInstance, $api, callback, priv) ->
         $scope.priv = priv
 

@@ -16,9 +16,6 @@
                     <li ng-show="canUncomplete()">
                         <a href ng-click="uncompleteMissionConfirm()"><i class="icon-flag"></i> アーカイブしない</a>
                     </li>
-                    <li ng-show="canRemove()">
-                        <a href ng-click="removeMissionConfirm()"><i class="icon-trash"></i> 削除</a>
-                    </li>
                     <li ng-show="canBreak()">
                         <a href ng-click="breakMissionConfirm()"><i class="icon-logout"></i> 退室</a>
                     </li>
@@ -49,6 +46,9 @@
 			</li>
             <li>
                 <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_star, 'btn-default': !show_star}" title="スター付き" ng-click="showStar()"><i class="icon-star"></i></button>
+            </li>
+            <li>
+                <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_summary, 'btn-default': !show_summary}" title="概要" ng-click="showSummary()"><i class="icon-info"></i></button>
             </li>
 		</ul>
 	</header>
@@ -102,9 +102,10 @@
         <section data-ng-include=" 'views/process/process.html' + ver " ng-if="show_process"></section>
         <section data-ng-include=" 'views/mission/mission_attach.html' + ver " ng-show="show_attach"></section>
         <section data-ng-include=" 'views/chatroom/chat_star.html' + ver " ng-if="show_star"></section>
+        <section data-ng-include=" 'views/mission/mission_summary.html' + ver " ng-if="show_summary"></section>
     </div>
 
-    <div class="resize-handle-h"><i class="fa fa-bars fa-rotate-90"></i></div>
+    <div class="resize-handle-h" ng-dblclick="maxRightPanel()"><i class="fa fa-bars fa-rotate-90"></i></div>
 
     <div id="emoticon_gallery" class="popover fade top in">
         <div class="arrow"></div>
@@ -117,7 +118,7 @@
     <div id="file_drop" class="popover top">
         <div class="arrow"></div>
         <h3 class="popover-title">
-            <div class="drop-box">このエリアにドロップしてください<br/>（複数ファイル送信可能）</div>
+            <div class="drop-box"><strong>このエリアにドロップしてください</strong><br/>（複数ファイル送信可能）</div>
         </h3>
     </div>
     <div id="to_users" class="popover fade top in">
@@ -136,6 +137,7 @@
                     <img ng-src="{{member.avartar}}" class="avartar img30_30">
                     {{member.user_name}}
                 </li>
+                <li ng-click="to_message()"><img ng-src="{{all_avartar}}" class="avartar img30_30"> 全員</li>
             </ul>
         </h3>
     </div>

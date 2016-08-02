@@ -6,6 +6,7 @@ angular.module('app.home', [])
     ($scope, $api, $chat, missionStorage, homeStorage, $rootScope, $location, 
         $routeParams, logger, $session, $timeout, $dialogs, HPRIV) ->        
         $rootScope.nav_id = 'home'
+        missionStorage.select_mission_in_nav()
         
         $scope.sync = ->
             if ($rootScope.cur_home != null)
@@ -24,12 +25,12 @@ angular.module('app.home', [])
             $scope.sync()
         ) 
 
-        # ホーム編集
+        # グループ編集
         $scope.editHome = ->
             if $scope.home != null
                 $dialogs.editHome($scope.home)
           
-        # ホーム追加  
+        # グループ追加  
         $scope.addHome = ->
             $dialogs.addHome()
 
@@ -94,20 +95,18 @@ angular.module('app.home', [])
 
         # メンバー削除
         $scope.removeMember = (member) ->
-            $dialogs.confirm('メンバー削除', '「' + member.user_name + '」をホームから削除します。よろしいでしょうか？', '確認', "remove-home-member", member)
-
-        $scope.$on('remove-home-member', (event, member) ->
-            homeStorage.remove_member($scope.home.home_id, member.user_id, (res) ->
-                if res.err_code == 0
-                    $rootScope.$broadcast('refresh-missions')
-                    logger.logSuccess("メンバーをホームから削除しました。")
-                else
-                    logger.logError(res.err_msg)
+            $dialogs.confirm('メンバー削除', '「' + member.user_name + '」をグループから削除します。よろしいでしょうか？', '確認', ->
+                homeStorage.remove_member($scope.home.home_id, member.user_id, (res) ->
+                    if res.err_code == 0
+                        $rootScope.$broadcast('refresh-missions')
+                        logger.logSuccess("メンバーをグループから削除しました。")
+                    else
+                        logger.logError(res.err_msg)
+                )
+                return
             )
-            return
-        )
 
-        # ホームへの招待
+        # グループへの招待
         $scope.inviteMember = ->
             $dialogs.inviteHome($scope.home)
 
@@ -149,20 +148,34 @@ angular.module('app.home', [])
             return
         )
 
-        # ホームの削除
+        # グループの削除
         $scope.removeHome = ->
-            $dialogs.confirm('ホーム削除', 'このホームから削除します。よろしいでしょうか？', '確認', "remove-home")
-
-        $scope.$on('remove-home', (event) ->
-            homeStorage.remove($scope.home.home_id, (res) ->
-                if res.err_code == 0
-                    logger.logSuccess("ホームを削除しました。")
-                    $rootScope.$broadcast('removed_home')
-                else
-                    logger.logError(res.err_msg)
+            $dialogs.confirm('グループ削除', 'このグループを削除してもよろしいでしょうか？', '確認', ->
+                $dialogs.confirm('グループ削除', 'グループを削除すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
+                    homeStorage.remove($scope.home.home_id, (res) ->
+                        if res.err_code == 0
+                            logger.logSuccess("グループを削除しました。")
+                            $rootScope.$broadcast('removed_home')
+                        else
+                            logger.logError(res.err_msg)
+                    )
+                , null, 'btn-danger')    
             )
-            return
-        )
+
+        # グループの退会
+        $scope.breakHome = ->
+            $dialogs.confirm('グループ退会', 'このグループから退会します。よろしいでしょうか？', '確認', ->
+                $dialogs.confirm('グループ削除', 'グループから退会すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
+                    homeStorage.break_home($scope.home.home_id, (res) ->
+                        if res.err_code == 0
+                            logger.logSuccess("グループを退会しました。")
+                            $rootScope.$broadcast('removed_home')
+                        else
+                            logger.logError(res.err_msg)
+                    )
+                    return
+                , null, 'btn-danger')    
+            )
 
         # Search
         $scope.publicFilter = (mission) ->

@@ -50,7 +50,8 @@ angular.module('app.mission.edit', [])
                     else
                         mission.org_mission_name = mission.mission_name
                         $rootScope.cur_mission.mission_name = mission.mission_name
-                        $rootScope.$broadcast('refresh-missions')
+                        missionStorage.set_mission($rootScope.cur_mission)
+                        $rootScope.$broadcast('refresh-nav')
                 )
 
             $scope.editMissionNameMode = false
@@ -76,15 +77,10 @@ angular.module('app.mission.edit', [])
                 summary: mission.summary
             missionStorage.edit(params)
             $scope.mission.org_summary = $scope.mission.summary
+            $rootScope.cur_mission.summary = mission.summary
+            missionStorage.set_mission($rootScope.cur_mission)
             $scope.editSummaryMode = false
             return
-
-        # Member label
-        $scope.memberLabel = (member)->
-            if member.user_id == $scope.mission.client_id
-                return "管理者"
-            else
-                return ""
 
         # Upload background image for process
         $scope.onUploadBackImage = (files, type) ->
@@ -152,7 +148,8 @@ angular.module('app.mission.edit', [])
                 else
                     mission.org_private_flag = mission.private_flag
                     $rootScope.cur_mission.private_flag = mission.private_flag
-                    $rootScope.$broadcast('refresh-missions')
+                    missionStorage.set_mission($rootScope.cur_mission)
+                    $rootScope.$broadcast('refresh-nav')
             )
         )
 
@@ -176,11 +173,35 @@ angular.module('app.mission.edit', [])
                 else
                     mission.org_push_flag = mission.push_flag
                     $rootScope.cur_mission.push_flag = mission.push_flag
-                    $rootScope.$broadcast('refresh-missions')
+                    missionStorage.set_mission($rootScope.cur_mission)
             )
 
             return
 
+        # Remove mission
+        $scope.canRemove = ->
+            return $rootScope.cur_mission && $rootScope.canEditMission() && $rootScope.cur_mission.private_flag != 3
+
+        $scope.removeMissionConfirm = ->
+            message = $rootScope.cur_mission.mission_name + "を削除してもよろしいでしょうか？"
+            $dialogs.confirm('チャットルーム削除', message, '削除', () ->
+                $dialogs.confirm('チャットルーム削除', 'チャットルームを削除すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
+                    missionStorage.remove($rootScope.cur_mission, (data) ->
+                        if data.err_code == 0
+                            $rootScope.cur_mission = null
+                            $rootScope.$broadcast('refresh-missions')
+                            $rootScope.$broadcast('refresh-tasks')
+                            $rootScope.$broadcast('refresh_back_image')
+                            logger.logSuccess('チャットルームが削除されました。')
+                            $location.path('/home')
+                        else
+                            logger.logError(data.err_msg)
+                    )
+                    
+                    $scope.cancel()
+                    return
+                , null, 'btn-danger')
+            )
 
         return
 )

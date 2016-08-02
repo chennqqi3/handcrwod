@@ -47,8 +47,8 @@ angular.module('app.member.list', [])
 
         $scope.addMember = function() {
             content = $session.user_name + "( " + $session.email + " )様より、「ハンドクラウド」へ招待されました。\n" + 
-                    "招待されたホームは、下記の通りです。\n" +
-                    "ホーム名:" + $rootScope.cur_home.home_name + "\n";
+                    "招待されたグループは、下記の通りです。\n" +
+                    "グループ名:" + $rootScope.cur_home.home_name + "\n";
             $scope.req = {
                 email: '',
                 content: content,
@@ -80,7 +80,7 @@ angular.module('app.member.list', [])
 
                         $scope.init(true);
                     }
-                    logger.logSuccess('ホームに招待しました。');
+                    logger.logSuccess('グループに招待しました。');
                     $scope.closeAdd();
                     $rootScope.$broadcast("synced-server");
                 }
@@ -101,7 +101,7 @@ angular.module('app.member.list', [])
                         onTap: function(e) {
                             homeStorage.remove_member($rootScope.cur_home.home_id, member.user_id, function(res) {
                                 if (res.err_code == 0) {
-                                    logger.logSuccess("メンバーをホームから削除しました。");
+                                    logger.logSuccess("メンバーをグループから削除しました。");
                                     for (i=0; i < $scope.members.length; i ++) {
                                         if ($scope.members[i].user_id == member.user_id) {
                                             $scope.members.splice(i, 1);

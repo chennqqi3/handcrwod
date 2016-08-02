@@ -5,12 +5,12 @@ angular.module('app.consts', [])
     GUEST: 0,        // ゲスト
     MEMBER: 1,       // メンバー
     RMANAGER: 2,     // ルーム管理者
-    HMANAGER: 3      // ホーム管理者
+    HMANAGER: 3      // グループ管理者
     }
 )
 
 .constant("ALERT_TYPE", {
-    INVITE_HOME: 0         // ホーム招待
+    INVITE_HOME: 0         // グループ招待
     }
 )
 
@@ -46,7 +46,7 @@ angular.module('app.consts', [])
                 else if (priv == HPRIV.RMANAGER)
                     return "ルーム管理者";
                 else if (priv == HPRIV.HMANAGER)
-                    return "ホーム管理者";
+                    return "グループ管理者";
                 return "";
             };
 

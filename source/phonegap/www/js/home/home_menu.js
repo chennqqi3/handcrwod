@@ -98,8 +98,8 @@ angular.module('app.home.menu', [])
 
             // An elaborate, custom popup
             var popNewMission = $ionicPopup.show({
-                template: '<input type="text" ng-model="home.home_name" placeholder="ホーム名を入力してください。">',
-                title: 'ホーム新規登録',
+                template: '<input type="text" ng-model="home.home_name" placeholder="グループ名を入力してください。">',
+                title: 'グループ新規登録',
                 scope: $scope,
                 buttons: [
                     { text: 'キャンセル' },
@@ -115,7 +115,7 @@ angular.module('app.home.menu', [])
                                         homeStorage.select($scope.home);
 
                                         $rootScope.$broadcast('refresh-homes', res.home.home_id);
-                                        logger.logSuccess('新しいホームが作成されました。');
+                                        logger.logSuccess('新しいグループが作成されました。');
                                     }
                                     else
                                         logger.logError(res.err_msg);
@@ -135,7 +135,7 @@ angular.module('app.home.menu', [])
 
         $scope.removeHome = function(home) {
             var confirmPopup = $ionicPopup.confirm({
-                title: 'ホーム削除',
+                title: 'グループ削除',
                 template: '「' + home.home_name + '」を削除してもよろしいでしょうか？',
                 buttons: [
                     { text: 'キャンセル' },
@@ -157,8 +157,8 @@ angular.module('app.home.menu', [])
 
         $scope.removeHomeConfirm = function(home) {
             var confirmPopup2 = $ionicPopup.confirm({
-                title: 'ホーム削除',
-                template: 'ホームを削除すると元に戻すことができなくなります。よろしいでしょうか？',
+                title: 'グループ削除',
+                template: 'グループを削除すると元に戻すことができなくなります。よろしいでしょうか？',
                 buttons: [
                     { text: 'キャンセル' },
                     {
@@ -167,7 +167,7 @@ angular.module('app.home.menu', [])
                         onTap: function(e) {
                             homeStorage.remove(home.home_id, function(res) {
                                 if (res.err_code == 0) {
-                                    logger.logSuccess("ホームを削除しました。");
+                                    logger.logSuccess("グループを削除しました。");
                                     $rootScope.$broadcast('refresh-homes');
                                     
                                     if ($rootScope.cur_home.home_id == home.home_id)

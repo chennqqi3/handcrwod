@@ -51,6 +51,7 @@ angular.module('app.settings', [])
             hourly_amount = $numutil.to_num($scope.user.hourly_amount);
             userStorage.update_profile({
                 user_name: $scope.user.user_name,
+                login_id: $scope.user.login_id,
                 email: $scope.user.email,
                 skills: $scope.user.skills,
                 hourly_amount: hourly_amount,

@@ -1,16 +1,16 @@
 <form name="form_home_invite" id="form_home_invite" class="form-horizontal form-validation" data-ng-submit="submitForm()">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
-        <h4 class="modal-title" id="myModalLabel">ホームへの招待</h4>
+        <h4 class="modal-title" id="myModalLabel">グループへの招待</h4>
     </div>
     <div class="modal-body">
         <div class="col-md-12">
-            <p>招待先メールアドレスと内容を入力してください。</p>
+            <p>招待先メールアドレスやユーザーIDと内容を入力してください。</p>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <span class="icon-left icon-envelope"></span>
-                <input type="email" class="form-control" required ng-model="req.email" placeholder="メールアドレスを入力" auto-focus="true">
+                <input type="text" class="form-control" required ng-model="req.email" placeholder="メールアドレスやユーザーIDを入力" auto-focus="true">
             </div>
         </div>
         <div class="col-md-12">

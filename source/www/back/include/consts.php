@@ -35,7 +35,7 @@ define("ERR_NOTFOUND_PAGE",					'27');
 
 define("ERR_INVALID_OLDPWD",				'28');
 
-define("ERR_ALREADY_USING_USER_NAME",		'29');
+define("ERR_ALREADY_USING_LOGIN_ID",		'29');
 define("ERR_ALREADY_USING_EMAIL",			'30');
 
 define("ERR_DELUSER",						'31');
@@ -89,6 +89,9 @@ define("ERR_CANT_REMOVE_SELF",              '62');
 define("ERR_NOTFOUND_HOME_MEMBER",          '63');
 
 define("ERR_OVER_MAX_HOMES",                '64');
+
+define("ERR_HMANAGER_CANT_BREAK",			'65');
+define("ERR_EXIST_HMANAGER",				'66');
 
 
 // code
@@ -173,17 +176,24 @@ define("CMSG_FILE",                         1);
 define("HPRIV_GUEST",                       0); // ゲスト
 define("HPRIV_MEMBER",                      1); // メンバー
 define("HPRIV_RMANAGER",                    2); // ルーム管理者
-define("HPRIV_HMANAGER",                    3); // ホーム管理者
+define("HPRIV_HMANAGER",                    3); // グループ管理者
+
+define("RPRIV_MEMBER",                      0); // メンバー
+define("RPRIV_MANAGER",                     1); // ルーム管理者
 
 define("CHAT_PUBLIC",                       0); // 全メンバー用
 define("CHAT_PRIVATE",                      1); // 特定メンバー用
 define("CHAT_MEMBER",                       2); // 個別チャット
 define("CHAT_BOT",                          3); // Bot
 
-define("ALERT_INVITE_HOME",                 0); // ホーム招待
+define("ALERT_INVITE_HOME",                 0); // グループ招待
 
 define("STATUS_ACTIVE",                     1); 
 define("STATUS_PAUSED",                     0); 
+
+define("PUSH_OFF",							0); // 通知OFF
+define("PUSH_ALL",							1); // 全通知
+define("PUSH_TO",							2); // TOのみを通知
 
 define("MAIL_HEADER", "ハンドクラウド事務局です。
 いつもコミュニケーションツール「ハンドクラウド」をご利用いただきまして、ありがとうございます。\n");

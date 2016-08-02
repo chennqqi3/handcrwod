@@ -278,7 +278,7 @@ angular.module('app.storage.chat', [])
 
             mine = false;
             message.content.replace(/\[to:([^\]]*)\]/g, function(item, user_id) {
-                if ($session.user_id + '' == user_id)
+                if ($session.user_id + '' == user_id || 'all' == user_id)
                     mine = true;
             });
 
@@ -380,7 +380,7 @@ angular.module('app.storage.chat', [])
                 prev_id: prev_id,
                 next_id: next_id,
                 star: star,
-                limit: 200
+                limit: 60
             };
             return $api.call("chat/messages", params).then(function(res) {
                 var prev_date, user_id;

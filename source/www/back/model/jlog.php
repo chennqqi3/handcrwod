@@ -187,20 +187,26 @@
 		public static function write($log_type, $msg) 
 		{
 			if (LOG_MODE) {
-				$me = _user();
-				if ($me == null)
-					$me = new user;
-				$log = sprintf("%s %s %d %d %d %s %s %s %s\t%s", 
-					_date(null), _time(null, "H:i:s"), 
-					$me->user_id, $me->user_type, $log_type, _ip(),
-					_trim_all($me->email), _code_label(CODE_UTYPE, $me->user_type), _code_label(CODE_LOGTYPE, $log_type), 
-					str_replace("\n", '\\n', $msg));
+				if (DEFAULT_PHP == 'cserver.php') {
+					echo date('Y-m-d H:i:s') . ' [' . _code_label(CODE_LOGTYPE, $log_type). '] ' . $msg . PHP_EOL;
+				}
+				else {
+					$me = _user();
+					if ($me == null)
+						$me = new user;
+					$log = sprintf("%s %s %d %d %d %s %s %s %s\t%s", 
+						_date(null), _time(null, "H:i:s"), 
+						$me->user_id, $me->user_type, $log_type, _ip(),
+						_trim_all($me->email), _code_label(CODE_UTYPE, $me->user_type), _code_label(CODE_LOGTYPE, $log_type), 
+						str_replace("\n", '\\n', $msg));
 
-				$file = LOG_PATH . _date(null, "Ym") . ".log";
-				$fp = @fopen($file, "a+");
-				if($fp != null) {
-					@fputs($fp, $log . "\n");
-					@fclose($fp);
+					$file = LOG_PATH . _date(null, "Ym") . ".log";
+					
+					$fp = @fopen($file, "a+");
+					if($fp != null) {
+						@fputs($fp, $log . "\n");
+						@fclose($fp);
+					}
 				}
 			}
 		}

@@ -6,15 +6,19 @@ angular.module('app.consts', [])
     GUEST: 0         # ゲスト
     MEMBER: 1        # メンバー
     RMANAGER: 2      # ルーム管理者
-    HMANAGER: 3      # ホーム管理者
+    HMANAGER: 3      # グループ管理者
+)
+.constant("RPRIV", 
+    MEMBER: 0        # メンバー
+    MANAGER: 1       # ルーム管理者
 )
 
 .constant("ALERT_TYPE", 
-    INVITE_HOME: 0         # ホーム招待
+    INVITE_HOME: 0         # グループ招待
 )
 
 .service('$consts', 
-    ($rootScope, $timeout, $session, HPRIV) ->
+    ($rootScope, $timeout, $session, HPRIV, RPRIV) ->
         consts = this
         # Intialize global data
         consts.init = ->
@@ -48,11 +52,19 @@ angular.module('app.consts', [])
                 else if priv == HPRIV.RMANAGER
                     return "ルーム管理者"
                 else if priv == HPRIV.HMANAGER
-                    return "ホーム管理者"
+                    return "グループ管理者"
+                return ""
+
+            $rootScope.RPRIV = RPRIV
+            $rootScope.get_rpriv_name = (priv) ->
+                if priv == RPRIV.MEMBER
+                    return "メンバー"
+                else if priv == RPRIV.MANAGER
+                    return "管理者"
                 return ""
 
             $rootScope.canEditTask = () ->
-                return $rootScope.cur_home != null && ($rootScope.cur_home.priv == HPRIV.HMANAGER || $rootScope.cur_home.priv == HPRIV.RMANAGER)
+                return $rootScope.cur_home != null && ($rootScope.cur_home.priv == HPRIV.HMANAGER || $rootScope.cur_home.priv == HPRIV.RMANAGER || $rootScope.cur_mission && $rootScope.cur_mission.priv == RPRIV.MANAGER)
 
             $rootScope.canChat = () ->
                 return $rootScope.cur_home != null && ($rootScope.cur_home.priv != HPRIV.GUEST || $rootScope.cur_mission != null && ($rootScope.cur_mission.private_flag == 2 || $rootScope.cur_mission.private_flag == 3))
@@ -61,13 +73,16 @@ angular.module('app.consts', [])
                 return $rootScope.cur_home != null && ($rootScope.cur_home.priv != HPRIV.GUEST)
 
             $rootScope.canEditMission = () ->
-                return $rootScope.cur_home != null && ($rootScope.cur_home.priv == HPRIV.HMANAGER || $rootScope.cur_home.priv == HPRIV.RMANAGER)
+                return $rootScope.cur_home != null && ($rootScope.cur_home.priv == HPRIV.HMANAGER || $rootScope.cur_home.priv == HPRIV.RMANAGER || $rootScope.cur_mission && $rootScope.cur_mission.priv == RPRIV.MANAGER)
 
             $rootScope.canEditMissionMember = () ->
-                return $rootScope.cur_home != null && ($rootScope.cur_home.priv == HPRIV.HMANAGER || $rootScope.cur_home.priv == HPRIV.RMANAGER)
+                return $rootScope.cur_home != null && ($rootScope.cur_home.priv == HPRIV.HMANAGER || $rootScope.cur_home.priv == HPRIV.RMANAGER || $rootScope.cur_mission && $rootScope.cur_mission.priv == RPRIV.MANAGER)
                                 
             $rootScope.canEditHome = ->
                 return $rootScope.cur_home != null && $rootScope.cur_home.priv == HPRIV.HMANAGER
+
+            $rootScope.canBreakHome = ->
+                return true
 
             $rootScope.canEditHomeMember = ->
                 return $rootScope.cur_home != null && $rootScope.cur_home.priv == HPRIV.HMANAGER

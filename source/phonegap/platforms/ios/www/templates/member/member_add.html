@@ -1,6 +1,6 @@
 <ion-modal-view>
     <ion-header-bar class="bar bar-header bar-positive">
-        <h1 class="title">ホームへの招待</h1>
+        <h1 class="title">グループへの招待</h1>
         <div class="buttons">
             <button class="button button-icon icon ion-ios-close-outline" ng-click="closeAdd()"></button>
         </div>
@@ -8,8 +8,8 @@
     <ion-content>
         <form novalidate name="form_member_add" class="list">
             <label class="item item-input">
-                <span class="input-label">メールアドレス</span>
-                <input type="email" ng-model="req.email" required placeholder="メールアドレスを入力してください。">
+                <span class="input-label"><small>メールアドレス/ID</small></span>
+                <input type="text" ng-model="req.email" required placeholder="メールアドレス/ユーザIDを入力してください。">
             </label>
             <label class="item item-input item-floating-label">
                 <span class="input-label">内容</span>

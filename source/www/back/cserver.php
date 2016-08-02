@@ -8,6 +8,7 @@
     ---------------------------------------------------*/
     
     define('OB_DISABLE',        true);
+    define('DEFAULT_PHP',       'cserver.php');
 
     require_once("include/utility.php");
 
@@ -223,6 +224,7 @@
             } 
 
             $mission_id = $data["mission_id"];
+            $home_id = isset($data["home_id"]) ? $data["home_id"] : null; //message text
             $content = $data["content"]; //message text
             $is_file = isset($data["is_file"]) ? $data["is_file"] : null; //message text
             $to_id = isset($data["to_id"]) ? $data["to_id"] : null;
@@ -235,6 +237,8 @@
                 $client->log("[Error] Invalid mission_id:" . $mission_id);
                 break;
             }
+            if ($home_id == null)
+                $home_id = $mission->home_id;
 
             $client->log("[Chat message] ");
 
@@ -252,7 +256,7 @@
                     'user_name'=> $user_name,
                     'mission_id'=> $mission_id, 
                     'mission_name'=> $mission->mission_name,
-                    'home_id'=> $mission->home_id,
+                    'home_id'=> $home_id,
                     'home_name'=> $home_name,
                     'content'=> $content,
                     'is_file'=> $is_file,
@@ -436,7 +440,7 @@
                     $must_push = $event == "chat_message";
 
                     if ($must_push) {
-                        $must_push = mission_member::is_push($data["mission_id"], $to_id);
+                        $must_push = mission_member::is_push($data["mission_id"], $to_id, $data['content']);
                         $data["push_flag"] = $must_push;
                         $encodedData = $this->_encodeData($event, $data);
                     } 

@@ -77,7 +77,7 @@
 				if ($private_flag == CHAT_PUBLIC || $private_flag == CHAT_BOT) {
 					// 全メンバー用
 					$home_member = new home_member;
-					$err = $home_member->select("home_id=" . _sql($home_id));
+					$err = $home_member->select("home_id=" . _sql($home_id) . " AND priv>" . _sql(HPRIV_GUEST));
 
 					while ($err == ERR_OK)
 					{
@@ -85,7 +85,12 @@
 						$mission_member->mission_id = $mission->mission_id;
 						$mission_member->user_id = $home_member->user_id;
 						$mission_member->pinned = 1;
-						$mission_member->push_flag = 1;
+						$mission_member->push_flag = PUSH_TO;
+						if ($my_id == $mission_member->user_id)
+							$mission_member->priv = RPRIV_MANAGER;
+						else
+							$mission_member->priv = RPRIV_MEMBER;
+
 						$err = $mission_member->save();	
 						if ($err != ERR_OK)
 							break;
@@ -101,7 +106,8 @@
 					$mission_member = new mission_member;
 					$mission_member->mission_id = $mission->mission_id;
 					$mission_member->user_id = $my_id;
-					$mission_member->push_flag = 1;
+					$mission_member->push_flag = PUSH_TO;
+					$mission_member->priv = RPRIV_MANAGER;
 					$err = $mission_member->save();	
 				}
 				else if ($private_flag == CHAT_MEMBER) {
@@ -110,7 +116,7 @@
 					$mission_member->mission_id = $mission->mission_id;
 					$mission_member->user_id = $user_id1;
 					$mission_member->opp_user_id = $user_id2;
-					$mission_member->push_flag = 1;
+					$mission_member->push_flag = PUSH_ALL;
 					$err = $mission_member->save();	
 
 					if ($err == ERR_OK) {
@@ -118,7 +124,7 @@
 						$mission_member->mission_id = $mission->mission_id;
 						$mission_member->user_id = $user_id2;
 						$mission_member->opp_user_id = $user_id1;
-						$mission_member->push_flag = 1;
+						$mission_member->push_flag = PUSH_ALL;
 						$err = $mission_member->save();	
 					}
 				}
@@ -137,18 +143,26 @@
 
 					while ($err == ERR_OK)
 					{
+						$priv = $home_member->priv;
 						$mission_member = new mission_member;
 
 						// すでに登録された場合はスキップ
 						$err = $mission_member->select("mission_id=" . _sql($this->mission_id) . " 
 							AND user_id=" . _sql($home_member->user_id));
-						if ($err == ERR_NODATA)	{
-							$mission_member->mission_id = $this->mission_id;
-							$mission_member->user_id = $home_member->user_id;
-							$mission_member->push_flag = 1;
-							$err = $mission_member->save();
-							if ($err != ERR_OK)
-								return $err;
+						if ($priv == HPRIV_GUEST) {
+							// ゲストは削除
+							$mission_member->remove(true);
+						}
+						else {
+							if ($err == ERR_NODATA)	{
+								$mission_member->mission_id = $this->mission_id;
+								$mission_member->user_id = $home_member->user_id;
+								$mission_member->push_flag = PUSH_TO;
+								$mission_member->priv = RPRIV_MEMBER;
+								$err = $mission_member->save();
+								if ($err != ERR_OK)
+									return $err;
+							}
 						}
 
 						$err = $home_member->fetch();
@@ -432,7 +446,8 @@
 			$mission_member = new mission_member;
 			$mission_member->mission_id = $this->mission_id;
 			$mission_member->user_id = $user_id;
-			$mission_member->push_flag = 1;
+			$mission_member->push_flag = PUSH_TO;
+			$mission_member->priv = RPRIV_MEMBER;
 
 			$err = $mission_member->save();
 

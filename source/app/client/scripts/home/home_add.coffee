@@ -21,7 +21,7 @@ angular.module('app.home.add', [])
                     if res.err_code == 0
                         $rootScope.$broadcast('added_home', res.home)
                         $scope.cancel()
-                        logger.logSuccess('新しいホームが作成されました。')
+                        logger.logSuccess('新しいグループが作成されました。')
                     else
                         logger.logError(res.err_msg)
                     $scope.posting = false

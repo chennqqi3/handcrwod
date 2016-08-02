@@ -19,7 +19,7 @@
                 "plan_type_string",
                 "month_price", // 月額費用／ユーザ
                 "year_price", // 年額費用
-                "max_homes", // ホーム数
+                "max_homes", // グループ数
                 "max_missions", // チャットルーム数
                 "max_templates", // テンプレート数
                 "repeat_flag", // リピート（繰り返し）設定
@@ -137,7 +137,7 @@
             $config .= "// " . $this->plan_type_string . "\n";
             $config .= $this->define_number("month_price", "月額費用／ユーザ");
             $config .= $this->define_number("year_price", "年額費用");
-            $config .= $this->define_number("max_homes", "ホーム数");
+            $config .= $this->define_number("max_homes", "グループ数");
             $config .= $this->define_number("max_missions", "チャットルーム数");
             $config .= $this->define_number("max_templates", "テンプレート数");
             $config .= $this->define_bool("repeat_flag", "リピート（繰り返し）設定");

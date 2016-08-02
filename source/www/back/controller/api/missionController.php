@@ -84,13 +84,17 @@
 				$err = $mission->refresh_mission_member();
 			}
 
-			$mission_member = new mission_member;
-			$err = $mission_member->select("mission_id=" . _sql($params->mission_id) . " 
-				AND user_id=" . _sql($my_id));
-			if ($err == ERR_OK)
-			{
-				$mission_member->push_flag = ($params->push_flag ? 1 : 0);
-				$err = $mission_member->save();
+			if ($params->push_flag !== null) {
+				$mission_member = new mission_member;
+				$err = $mission_member->select("mission_id=" . _sql($params->mission_id) . " 
+					AND user_id=" . _sql($my_id));
+				if ($err == ERR_OK)
+				{
+					$mission_member->push_flag = $params->push_flag;
+					if ($mission_member->push_flag > PUSH_TO || $mission_member->push_flag < PUSH_OFF)
+						$mission_member->push_flag = PUSH_TO;
+					$err = $mission_member->save();
+				}
 			}
 
 			$this->finish(array("mission_id" => $mission->mission_id, "home_id" => $mission->home_id), $err);
@@ -156,13 +160,18 @@
 			$params = $this->api_params;
 			
 			$my_id = _user_id();
+			$home_id = $params->home_id;
 
-			$home = home::getModel($params->home_id);
+			$home = home::getModel($home_id);
 			if ($home == null)
 				$this->checkError(ERR_NOTFOUND_HOME);
+
+            $mine = home_member::get_member($home_id, $my_id);
+            if ($mine == null)
+				$this->checkError(ERR_NOPRIV);
 			
 			$this->start();
-			$bot = mission::get_bot($params->home_id);
+			$bot = mission::get_bot($home_id);
 			$this->commit();
 
 			$missions = array();
@@ -175,7 +184,7 @@
 				FROM t_mission m 
 				LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
 				LEFT JOIN m_user ou ON mm.opp_user_id=ou.user_id
-				WHERE m.home_id=" . _sql($params->home_id) . " AND 
+				WHERE m.home_id=" . _sql($home_id) . " AND 
 					mm.user_id=" . _sql($my_id) . " AND
 					m.private_flag != " . CHAT_MEMBER . " AND
 					m.del_flag=0";
@@ -206,7 +215,7 @@
 				$mission->load_other_info();
 
 				$m = array(
-					"home_id" => $params->home_id,
+					"home_id" => $home_id,
 					"mission_id" => $mission->mission_id,
 					"mission_name" => $mission->mission_name,
 					"job_back_url" => $mission->job_back_url,
@@ -229,16 +238,30 @@
 			}
 
 			// メンバーチャットルーム
+            $where = '';
+            if ($mine->priv == HPRIV_GUEST) {
+                // 参加しているルームのメンバーとのみ
+                $where = "AND hm.user_id IN (
+                        SELECT DISTINCT mm.user_id FROM t_mission_member mm
+                        WHERE mm.mission_id IN (
+                            SELECT DISTINCT mm.mission_id FROM t_mission_member mm
+                            LEFT JOIN t_mission m ON mm.mission_id=m.mission_id
+                            WHERE mm.del_flag=0 AND m.home_id=" . _sql($home_id) . " 
+                                AND mm.user_id=" . _sql($my_id) . " 
+                                AND m.private_flag IN (" . CHAT_PUBLIC . "," . CHAT_PRIVATE . ")
+                                )
+                        )";
+            }
 			$sql = "SELECT m.*, 
 					DATEDIFF(NOW(), m.last_date) pass_date,
 					m.last_date mm_last_date,
-					hm.user_id, u.user_name, u.email, hm.priv, hm.accepted
+					hm.user_id, u.user_name, u.email, u.login_id, hm.priv, hm.accepted
                 FROM t_home_member hm 
                 INNER JOIN m_user u ON hm.user_id=u.user_id 
                 LEFT JOIN (SELECT m.*, mm.pinned, mm.unreads, mm.opp_user_id FROM t_mission m 
 					LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
-					WHERE m.home_id=" . _sql($params->home_id) . " AND m.private_flag=" . CHAT_MEMBER . " AND mm.user_id=" . _sql($my_id) . ") m ON m.opp_user_id=u.user_id
-                WHERE hm.home_id=" . _sql($params->home_id) . " AND hm.del_flag=0
+					WHERE m.private_flag=" . CHAT_MEMBER . " AND mm.user_id=" . _sql($my_id) . ") m ON m.opp_user_id=u.user_id
+                WHERE hm.home_id=" . _sql($home_id) . " AND hm.del_flag=0 " . $where . "
                 ORDER BY m.last_date DESC, hm.priv DESC";
 
 			$err = $mission->query($sql);
@@ -251,7 +274,7 @@
 				$mission->load_other_info();
 
 				$m = array(
-					"home_id" => $params->home_id,
+					"home_id" => $home_id,
 					"mission_id" => $mission->mission_id,
 					"mission_name" => $mission->user_name,
 					"job_back_url" => $mission->job_back_url,
@@ -273,6 +296,7 @@
 					"user_name" => $mission->user_name,
 					"email" => $mission->email,
 					"priv" => $mission->priv,
+					"login_id" => $mission->login_id,
 					"accepted" => $mission->accepted
 				); 
 
@@ -437,7 +461,7 @@
 
 					$title = "～" . _user_name() . "より～　「ハンドクラウド」のルームへのご招待";
 					if ($is_home_member) {
-						// ホームメンバーの場合
+						// グループメンバーの場合
 						$params->content = MAIL_HEADER . "
 " . _user_name() . "様より、チャットルーム「" . $mission->mission_name . "」へ招待されました。
 下記のURLにアクセスして、ログインしてください。
@@ -505,7 +529,7 @@
 			$sql = "SELECT m.*, 
 					mm.pinned, mm.unreads, ou.user_name opp_user_name, mm.opp_user_id, 
 					DATEDIFF(NOW(), m.last_date) pass_date,
-					mm.last_date mm_last_date
+					mm.last_date mm_last_date, mm.push_flag, mm.priv
 				FROM t_mission m 
 				LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
 				LEFT JOIN m_user ou ON mm.opp_user_id=ou.user_id
@@ -520,7 +544,7 @@
 			$mission->load_other_info();			
 
 			$mission_member = new model;
-			$err = $mission_member->query("SELECT mm.user_id, u.user_name, u.email, mm.push_flag
+			$err = $mission_member->query("SELECT mm.user_id, u.user_name, u.email, u.login_id, mm.push_flag, mm.priv
 				FROM t_mission_member mm 
 				INNER JOIN m_user u ON mm.user_id=u.user_id 
 				WHERE mm.mission_id=" . _sql($params->mission_id) . " AND mm.del_flag=0
@@ -532,15 +556,10 @@
 			while ($err == ERR_OK)
 			{
 				$mission_member->avartar = _avartar_full_url($mission_member->user_id);
-				if ($mission_member->user_id == $my_id)
-				{
-					$mission->push_flag = $mission_member->push_flag;
-				}
 				array_push($members, $mission_member->props);
 
 				$err = $mission_member->fetch();
 			}
-			$mission->push_flag = $mission->push_flag == 1;
 
 			$mission->members = $members;
 
@@ -581,24 +600,24 @@
 					$err = ERR_NOPRIV;
 				}
 			}
-			else if (!_is_empty($params->home_id) && !_is_empty($params->user_id)) {
+			else if (!_is_empty($params->user_id)) {
 				$sql = "SELECT mm.* FROM t_mission_member mm
 					LEFT JOIN t_mission m ON mm.mission_id=m.mission_id 
-					WHERE m.home_id=" . _sql($params->home_id) . " AND m.del_flag=0
-					AND mm.user_id=" . _sql($my_id) . "
-					AND mm.opp_user_id=" . _sql($params->user_id);
+					WHERE m.del_flag=0
+						AND mm.user_id=" . _sql($my_id) . "
+						AND mm.opp_user_id=" . _sql($params->user_id);
 					
 				$err = $mission_member->query($sql);
 				
 				if ($err == ERR_NODATA)
 				{
-					$mission = mission::add_mission($params->home_id, "個別", CHAT_MEMBER, $my_id, $params->user_id);
+					$mission = mission::add_mission(null, "個別", CHAT_MEMBER, $my_id, $params->user_id);
 					if ($mission != null) {
 						$err = $mission_member->query("SELECT mm.* FROM t_mission_member mm
 							LEFT JOIN t_mission m ON mm.mission_id=m.mission_id 
-							WHERE m.home_id=" . _sql($params->home_id) . " AND m.del_flag=0
-							AND mm.user_id=" . _sql($my_id) . "
-							AND mm.opp_user_id=" . _sql($params->user_id));	
+							WHERE m.del_flag=0
+								AND mm.user_id=" . _sql($my_id) . "
+								AND mm.opp_user_id=" . _sql($params->user_id));	
 						$mission_id = $mission->mission_id;	
 					}
 				}
@@ -993,7 +1012,7 @@
 			$members = array();
 			$home_member = new home_member;
 
-			$sql = "SELECT hm.user_id, u.user_name, u.email
+			$sql = "SELECT hm.user_id, u.user_name, u.email, u.login_id
 				FROM t_home_member hm INNER JOIN m_user u ON hm.user_id=u.user_id
 				WHERE hm.del_flag=0 AND hm.home_id=" . _sql($mission->home_id);
 
@@ -1024,6 +1043,7 @@
 					array_push($members, array("user_id" => $member_user_id, 
 						"user_name" => $home_member->user_name,
 						"email" => $home_member->email,
+						"login_id" => $home_member->login_id,
 						"avartar" => _avartar_full_url($member_user_id)
 						));
 				}
@@ -1033,5 +1053,45 @@
 
 			$this->finish(array("users" => $members), ERR_OK);
 		}
+
+        public function priv()
+        {
+            $param_names = array("mission_id", "user_id", "priv");
+            $this->setApiParams($param_names);
+            $this->checkRequired($param_names);
+            $params = $this->api_params;
+
+            $this->start();
+
+            $my_id = _user_id();
+            $mission_id = $params->mission_id;
+
+            $mission = mission::getModel($mission_id);
+            if ($mission == null)
+                $this->checkError(ERR_NOTFOUND_MISSION);
+
+            $home = home::getModel($mission->home_id);
+            if ($home == null)
+                $this->checkError(ERR_NOTFOUND_HOME);
+            $home_id = $home->home_id;
+
+            $mine_home_member = home_member::get_member($home_id, $my_id);
+            if ($mine_home_member == null)
+            	$this->checkError(ERR_NOPRIV);
+
+            $mine_mission_member = mission_member::get_member($mission_id, $my_id);
+            if (!($mine_home_member->priv == HPRIV_HMANAGER || $mine_home_member->priv == HPRIV_RMANAGER || $mine_mission_member != null && $mine_mission_member->priv == RPRIV_MANAGER))
+            	$this->checkError(ERR_NOPRIV);
+
+            $mission_member = mission_member::get_member($mission_id, $params->user_id);
+            if ($mission_member == null)
+                $this->checkError(ERR_NOTFOUND_USER);
+
+            $mission_member->priv = $params->priv;
+            $err = $mission_member->save();
+            $this->checkError($err);
+
+            $this->finish(array("priv" => $mission_member->priv), ERR_OK);
+        }
 	}
 ?>

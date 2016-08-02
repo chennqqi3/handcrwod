@@ -333,7 +333,7 @@
 
 		public function update_profile() 
 		{
-			$param_names = array("user_name", "email", "hourly_amount", "time_zone", "old_password", "new_password", "skills", "alarm_mail_flag", "alarm_time");
+			$param_names = array("user_name", "login_id", "email", "hourly_amount", "time_zone", "old_password", "new_password", "skills", "alarm_mail_flag", "alarm_time");
 			$this->setApiParams($param_names);
 			$params = $this->api_params;
 
@@ -359,6 +359,8 @@
 			}
 			if (user::is_exist_by_email($user->email, $my_id))
 				$this->checkError(ERR_ALREADY_USING_EMAIL);
+			if (user::is_exist_by_login_id($user->login_id, $my_id))
+				$this->checkError(ERR_ALREADY_USING_LOGIN_ID);
 
 			$err = $user->save();
 
@@ -451,6 +453,7 @@
 			$this->finish(array("user" => array(
 				"user_id" => $user->user_id,
 				"user_name" => $user->user_name, 
+				"login_id" => $user->login_id, 
 				"email" => $user->email, 
 				"hourly_amount" => $user->hourly_amount,
 				"language" => $user->language,

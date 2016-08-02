@@ -46,8 +46,9 @@ angular.module('app.service.chat', [])
                             found_mission = true
                             if $session.user_id != cmsg.user_id
                                 mission.unreads++
-                                mission.visible=true
+                                mission.visible = true
                                 $rootScope.$apply()
+                                $rootScope.$broadcast('unread-message', mission)
                         return
 
                 angular.forEach $rootScope.homes, (home) ->
@@ -109,7 +110,7 @@ angular.module('app.service.chat', [])
                     return
                 if $rootScope.cur_home != null && $rootScope.cur_home.home_id == msg.home_id
                     if msg.type == "remove_member" && msg.user_id == $session.user_id || msg.type == "remove"
-                        logger.logSuccess("ホームから削除されました。")
+                        logger.logSuccess("グループから削除されました。")
                         $rootScope.$broadcast('removed_home')
                     else if msg.type == "accept_invite"
                         $rootScope.$broadcast('refresh-missions')
@@ -150,10 +151,11 @@ angular.module('app.service.chat', [])
 
             $this.connect()
 
-        $this.send = (cmsg_id, mission_id, content, to_id, is_file) ->
+        $this.send = (cmsg_id, home_id, mission_id, content, to_id, is_file) ->
             if $this.socket != null
                 msg = 
                     cmsg_id: cmsg_id
+                    home_id: home_id
                     mission_id: mission_id
                     content: content
                     to_id: to_id

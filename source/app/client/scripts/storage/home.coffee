@@ -55,6 +55,23 @@ angular.module('app.storage.home', [])
                             $chat.home('remove', home_id)
                 )
 
+        break_home = (home_id, callback) ->
+            params =
+                home_id: home_id
+
+            $api.call("home/break_home", params)
+                .then((res) ->
+                    if callback != undefined
+                        callback(res.data)
+                )
+
+        break_handcrowd = (callback) ->
+            $api.call("home/break_handcrowd")
+                .then((res) ->
+                    if callback != undefined
+                        callback(res.data)
+                )
+
         get = (home_id, public_complete_flag, private_complete_flag, callback) ->
             params = 
                 home_id: home_id
@@ -211,5 +228,8 @@ angular.module('app.storage.home', [])
             upload_logo: upload_logo
             remove_logo: remove_logo
             refresh_logo: refresh_logo
+
+            break_home: break_home
+            break_handcrowd: break_handcrowd
         }
 )

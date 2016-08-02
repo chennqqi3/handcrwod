@@ -10,6 +10,7 @@
 	header ("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); 
 	header ("Cache-Control: no-cache, must-revalidate"); 
 	header ("Pragma: no-cache"); 
+	define('DEFAULT_PHP', 'index.php');
 
 	require_once("include/utility.php");
 

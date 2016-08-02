@@ -3,8 +3,9 @@
 angular.module('app.settings', [])
 
 .controller('settingsCtrl', 
-    ($scope, $api, $rootScope, logger, $session, $upload, CONFIG, $location, $numutil, $timeout, userStorage) ->
+    ($scope, $api, $rootScope, logger, $session, $upload, CONFIG, $location, $numutil, $timeout, $dialogs, userStorage, missionStorage, homeStorage) ->
         $rootScope.nav_id = "settings"
+        missionStorage.select_mission_in_nav()
 
         # initialize
         $scope.init = ->
@@ -43,10 +44,24 @@ angular.module('app.settings', [])
         $scope.canUpdateProfile = ->
             return $scope.form_update_profile.$valid
 
+        $scope.breakHandcrowd = ->
+            $dialogs.confirm('退会', 'ハンドクラウドから退会します。よろしいでしょうか？', '確認', ->
+                $dialogs.confirm('退会', 'ハンドクラウドからすると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->             
+                    homeStorage.break_handcrowd((res) ->
+                        if res.err_code == 0
+                            logger.logSuccess('ハンドクラウドから退会されました')
+                            $location.path('/signin')
+                        else
+                            logger.logError(res.err_msg)
+                    )
+                , null, 'btn-danger')
+            )
+
         $scope.updateProfile = ->
             hourly_amount = $numutil.to_num($scope.user.hourly_amount)
             $api.call("user/update_profile", 
                     user_name: $scope.user.user_name
+                    login_id: $scope.user.login_id
                     email: $scope.user.email
                     skills: $scope.user.skills
                     hourly_amount: hourly_amount

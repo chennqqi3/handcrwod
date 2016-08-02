@@ -2,7 +2,7 @@ angular.module('app.storage.mission', [])
 
 .factory('missionStorage', 
     function($rootScope, $api, $session, $dateutil, filterFilter, AUTH_EVENTS, $auth, $chat, $filter) {
-        var add, attaches, break_mission, complete, delete_back_image, edit, get, get_mission, init, invitable_members, invite, open, open_member, pin, refresh_remaining, refresh_sort, remove, remove_attach, remove_member, search, search_completed, set_back_pos, set_mission, set_repeat, unpinned_missions;
+        var add, attaches, break_mission, complete, delete_back_image, edit, get, get_mission, init, invitable_members, invite, open, open_member, pin, refresh_remaining, refresh_sort, remove, remove_attach, remove_member, search, search_completed, set_back_pos, set_mission, set_repeat, unpinned_missions, priv;
         init = function() {
             if ($auth.isAuthenticated()) {
                 return search();
@@ -504,6 +504,20 @@ angular.module('app.storage.mission', [])
             return html;
         };
 
+        priv = function(mission_id, user_id, priv, callback) {
+            params = {
+                mission_id: mission_id,
+                user_id: user_id,
+                priv: priv
+            }
+
+            $api.call("mission/priv", params)
+                .then(function(res) {
+                    if (callback != undefined)
+                        callback(res.data);
+                });
+        };
+
         return {
             init: init,
             search: search,
@@ -538,7 +552,9 @@ angular.module('app.storage.mission', [])
 
             mission_html_id: mission_html_id,
             mission_unreads_to_html: mission_unreads_to_html,
-            mission_to_html: mission_to_html
+            mission_to_html: mission_to_html,
+            
+            priv: priv
         };
     }
 );

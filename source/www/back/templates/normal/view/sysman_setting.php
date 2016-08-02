@@ -171,7 +171,7 @@
 									<td>￥<?php $this->oPlanConfig3->detail("year_price"); ?></td>
 								</tr>
 								<tr>
-									<th>ホーム数</th>
+									<th>グループ数</th>
 									<td><?php $this->oPlanConfig0->detail("max_homes"); ?></td>
 									<td><?php $this->oPlanConfig1->detail("max_homes"); ?></td>
 									<td><?php $this->oPlanConfig2->detail("max_homes"); ?></td>

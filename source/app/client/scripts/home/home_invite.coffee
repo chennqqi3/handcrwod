@@ -4,8 +4,8 @@ angular.module('app.home.invite', [])
     ($scope, $rootScope, $modalInstance, $api, home, email, 
         logger, $timeout, $session, homeStorage, $chat, ALERT_TYPE) ->
         content = $session.user_name + "( " + $session.email + " )様より、「ハンドクラウド」へ招待されました。\n" + 
-            "招待されたホームは、下記の通りです。\n" +
-            "ホーム名:" + home.home_name + "\n"
+            "招待されたグループは、下記の通りです。\n" +
+            "グループ名:" + home.home_name + "\n"
 
         $scope.posting = false
         $scope.req =
@@ -29,7 +29,7 @@ angular.module('app.home.invite', [])
                             home_name: home.home_name
                         )
                     $rootScope.$broadcast('refresh-missions')
-                    logger.logSuccess('ホームに招待しました。')
+                    logger.logSuccess('グループに招待しました。')
                     $scope.cancel()
                 else
                     logger.logError(res.err_msg)

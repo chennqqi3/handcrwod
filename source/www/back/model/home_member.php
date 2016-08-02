@@ -25,13 +25,34 @@
         {
             $members = array();
 
+            $my_id = _user_id();
+            $mine = static::get_member($home_id, $my_id);
+            if ($mine == null)
+                return $members;
+
             $home_member = new model;
-            $err = $home_member->query("SELECT hm.home_id, hm.user_id, u.user_name, u.email, hm.priv, hm.accepted
+            $where = '';
+            if ($mine->priv == HPRIV_GUEST) {
+                // 参加しているルームのメンバーとのみ
+                $where = "AND hm.user_id IN (
+                        SELECT DISTINCT mm.user_id FROM t_mission_member mm
+                        WHERE mm.mission_id IN (
+                            SELECT DISTINCT mm.mission_id FROM t_mission_member mm
+                            LEFT JOIN t_mission m ON mm.mission_id=m.mission_id
+                            WHERE mm.del_flag=0 AND m.home_id=" . _sql($home_id) . " 
+                                AND mm.user_id=" . _sql($my_id) . " 
+                                AND m.private_flag IN (" . CHAT_PUBLIC . "," . CHAT_PRIVATE . ")
+                                )
+                        )";
+            }
+
+            $sql = "SELECT hm.home_id, hm.user_id, u.user_name, u.email, u.login_id, hm.priv, hm.accepted
                 FROM t_home_member hm 
                 INNER JOIN m_user u ON hm.user_id=u.user_id 
-                WHERE hm.home_id=" . _sql($home_id) . " AND hm.del_flag=0
-                ORDER BY hm.priv DESC, hm.create_time DESC");
+                WHERE hm.home_id=" . _sql($home_id) . " AND hm.del_flag=0 " . $where . "
+                ORDER BY hm.priv DESC, hm.create_time DESC";
 
+            $err = $home_member->query($sql);
             while ($err == ERR_OK)
             {
                 $home_member->avartar = _avartar_full_url($home_member->user_id);
@@ -101,5 +122,21 @@
 
             return $home_member;
         }
+
+        public static function get_member_counts($home_id, $priv=null)
+        {
+            $home_member = new home_member;
+
+            $sql = "SELECT COUNT(*) 
+                    FROM t_home_member 
+                    WHERE home_id=" . _sql($home_id) . " AND del_flag=0";
+            if ($priv !== null) 
+                $sql .= " AND priv=" . _sql($priv);
+
+            $count = $home_member->scalar($sql);
+
+            return $count;
+        }
+
     };
 ?>

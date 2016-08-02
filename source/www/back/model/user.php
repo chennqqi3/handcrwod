@@ -20,6 +20,7 @@
 					"password",
 					"facebook_id",
 					"google_id",
+					"login_id",
 					"hourly_amount",
 					"curr_type",
 					"weekly_limit",
@@ -47,7 +48,7 @@
 			}
 
 			if (is_string($pkvals)) {
-				$err = $model->select("email = " . _sql($pkvals));
+				$err = $model->select("email = " . _sql($pkvals) . " OR login_id = " . _sql($pkvals));
 				if ($err == ERR_OK)
 					return $model;
 			}
@@ -95,6 +96,19 @@
 			return $err == ERR_OK;
 		}
 
+		static public function is_exist_by_login_id($login_id, $user_id=null)
+		{
+			$user = new user;
+			$where = "login_id=" . _sql($login_id);
+			$where .= " AND activate_flag=1";
+			if ($user_id != null)
+			{
+				$where .= " AND user_id!=" . _sql($user_id);
+			}
+			$err = $user->select($where);
+			return $err == ERR_OK;
+		}
+
 		public function update_avartar($uploaded_photo)
 		{
 			if ($uploaded_photo != "") {
@@ -122,7 +136,7 @@
 
 			if ($this->email != "") {
 				$user = new user;
-				$err = $user->select("email=" . _sql($this->email));
+				$err = $user->select("email=" . _sql($this->email) . " OR login_id=" . _sql($this->email));
 				if ($err == ERR_OK && $user->password == md5($this->password) && $this->password != null)
 					$logined = $user->activate_flag == ACTIVATED ? ERR_OK : ERR_USER_UNACTIVATED;
 			}

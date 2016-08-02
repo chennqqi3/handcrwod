@@ -103,7 +103,7 @@ angular.module('app.storage.chat', [])
 
             mine = false
             message.content.replace(/\[to:([^\]]*)\]/g, (item, user_id) ->
-                if $session.user_id + '' == user_id
+                if $session.user_id + '' == user_id || 'all' == user_id
                     mine = true
             )
 

@@ -123,7 +123,7 @@
             if ($this->is_member($user_id))
                 return ERR_OK;
 
-            // ホームメンバーの追加
+            // グループメンバーの追加
             $home_member = new home_member;
             $home_member->home_id = $this->home_id;
             $home_member->user_id = $user_id;

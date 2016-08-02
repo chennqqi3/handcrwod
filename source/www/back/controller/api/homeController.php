@@ -162,7 +162,7 @@
             if (!in_array($my_id, $user_ids))
                 $this->checkError(ERR_NOPRIV);
 
-            if (count($user_ids) < 2)
+            if (count($user_ids) < 2 && $params->user_id == $my_id)
                 $params->priv = HPRIV_HMANAGER;
 
             $home_member = home_member::get_member($home_id, $params->user_id);
@@ -171,8 +171,16 @@
 
             $home_member->priv = $params->priv;
             $err = $home_member->save();
+            $this->checkError($err);
 
-            $this->finish(array("priv" => $home_member->priv), $err);
+            $mission = new mission;
+            $err = $mission->select("home_id=" . _sql($home_id) . " AND private_flag=" . _sql(CHAT_PUBLIC));
+            while ($err == ERR_OK) {
+                $mission->refresh_mission_member();
+                $err = $mission->fetch();
+            }
+
+            $this->finish(array("priv" => $home_member->priv), ERR_OK);
         }
 
         public function search()
@@ -320,7 +328,7 @@
                 $params->signin_url = DEFAULT_APP_URL . "#/signin";
 
             if (_is_empty($params->content)) 
-                $params->content = MAIL_HEADER . "\n" . _user_name() . "様より、ホーム「" . $home->home_name . "」へ招待されました。";
+                $params->content = MAIL_HEADER . "\n" . _user_name() . "様より、グループ「" . $home->home_name . "」へ招待されました。";
             else 
                 $params->content = MAIL_HEADER . "\n" . $params->content;
             
@@ -330,7 +338,11 @@
             $user = user::getModel($params->email);
 
             if ($user == null) {
-                $title = "～" . _user_name() . "より～　「ハンドクラウド」のホームへのご招待";
+                $domain = strstr($params->email, '@', true);
+                if ($domain == null)
+                    $this->finish(null, ERR_INVALID_PARAMS);
+                    
+                $title = "～" . _user_name() . "より～　「ハンドクラウド」のグループへのご招待";
                 $params->content .= "\n下記のURLにアクセスして、会員登録を行ってください。
 " . $params->signup_url . "?invite_home_id=" . $params->home_id . "&email=" . $params->email . "&key=" . _key($params->home_id . $params->email) . "
 " . MAIL_FOOTER;
@@ -346,7 +358,7 @@
                     $err = $home->add_member($user->user_id);
                     $this->checkError($err);
 
-                    $title = "～" . _user_name() . "より～　「ハンドクラウド」のホームへのご招待";
+                    $title = "～" . _user_name() . "より～　「ハンドクラウド」のグループへのご招待";
                     $params->content .= "\n下記のURLにアクセスして、招待を承認してください。
 " . $params->signin_url . "
 " . MAIL_FOOTER;
@@ -419,6 +431,109 @@
                 $this->checkError(ERR_CANT_REMOVE_SELF);
 
             $err = $home->remove_member($params->user_id);
+
+            $this->finish(null, $err);
+        }
+
+        public function break_home()
+        {
+            $param_names = array("home_id");
+            $this->setApiParams($param_names);
+            $this->checkRequired($param_names);
+            $params = $this->api_params;
+
+            $this->start();
+
+            $my_id = _user_id();
+
+            $home = home::getModel($params->home_id);
+            if ($home == null)
+                $this->checkError(ERR_NOTFOUND_HOME);
+
+            $home_member = home_member::get_member($params->home_id, $my_id);
+
+            if ($home_member == null)
+                $this->checkError(ERR_NOPRIV);
+
+            if  ($home_member->priv == HPRIV_HMANAGER) {
+                if (1 == home_member::get_member_counts($params->home_id, HPRIV_HMANAGER))
+                    $this->checkError(ERR_HMANAGER_CANT_BREAK);
+            }
+
+            $err = $home->remove_member($my_id);
+
+            $this->finish(null, $err);
+        }
+
+        public function break_handcrowd()
+        {
+            $this->start();
+
+            $my_id = _user_id();
+
+            $home = new home;
+            $sql = "SELECT h.*, hm.priv
+                    FROM t_home_member hm LEFT JOIN t_home h ON hm.home_id=h.home_id
+                    WHERE hm.user_id=" . _sql($my_id) . " AND h.del_flag=0";
+            $err = $home->query($sql);
+            while ($err == ERR_OK) {
+                $member_count = home_member::get_member_counts($home->home_id);
+
+                if ($home->priv == HPRIV_HMANAGER && 
+                    home_member::get_member_counts($home->home_id, HPRIV_HMANAGER) == 1 &&
+                    $member_count > 1)
+                    $this->checkError(ERR_EXIST_HMANAGER);
+
+                if ($member_count == 1) {
+                    $err = $home->remove();
+                    if ($err == ERR_OK)
+                    {
+                        $db = db::getDB();
+
+                        $sql = "DELETE mm FROM t_mission_member mm 
+                            LEFT JOIN t_mission m ON mm.mission_id=m.mission_id
+                            WHERE m.home_id=" . _sql($home_id) . " AND mm.user_id=" . _sql($my_id) . ";
+
+                            DELETE ma FROM t_mission_attach ma 
+                            LEFT JOIN t_mission m ON ma.mission_id=m.mission_id
+                            WHERE m.home_id=" . _sql($home_id) . ";
+
+                            DELETE t FROM t_task t 
+                            LEFT JOIN t_mission m ON t.mission_id=m.mission_id
+                            WHERE m.home_id=" . _sql($home_id) . ";
+
+                            DELETE pl FROM t_proclink pl 
+                            LEFT JOIN t_mission m ON pl.mission_id=m.mission_id
+                            WHERE m.home_id=" . _sql($home_id) . ";
+
+                            DELETE c FROM t_cmsg c 
+                            LEFT JOIN t_mission m ON c.mission_id=m.mission_id
+                            WHERE m.home_id=" . _sql($home_id) . ";
+
+                            DELETE c FROM t_cunread c 
+                            LEFT JOIN t_mission m ON c.mission_id=m.mission_id
+                            WHERE m.home_id=" . _sql($home_id) . ";
+
+                            DELETE FROM t_mission WHERE home_id=" . _sql($home_id) . ";";
+                        $err = $db->execute_batch($sql);
+                        if ($err != ERR_OK)
+                            $this->checkError($err);
+                    }                    
+                }
+                else {
+                    $err = $home->remove_member($my_id);
+                    if ($err != ERR_OK)
+                        $this->checkError($err);
+                }
+
+                $err = $home->fetch();
+            }
+
+            if ($err == ERR_OK) {
+                $user = _user();
+                if ($user)
+                    $err = $user->remove();
+            }
 
             $this->finish(null, $err);
         }

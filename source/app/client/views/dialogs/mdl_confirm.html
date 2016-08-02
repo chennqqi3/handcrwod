@@ -6,6 +6,6 @@
   <p ng-bind-html="message| noHTML | htmlfy"></p>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-warning pull-left" ng-click="ok()">{{ok_label}}</button>
+  <button type="button" class="btn pull-left {{ok_class}}" ng-click="ok()">{{ok_label}}</button>
   <button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
 </div>

@@ -29,7 +29,7 @@ angular.module('app.storage', [])
                 if $rootScope.cur_home != null
                     return $rootScope.cur_home.home_name  
                 else
-                    return "「ホームなし」"
+                    return "「グループなし」"
 
             # Mission related data
             if $rootScope.missions == undefined

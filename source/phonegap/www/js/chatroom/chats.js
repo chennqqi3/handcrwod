@@ -224,8 +224,8 @@ angular.module('app.chat.list', [])
 
         // An elaborate, custom popup
         var popNewMission = $ionicPopup.show({
-            template: '<ion-list><ion-radio ng-value="0" ng-model="mission.private_flag">全メンバー用</ion-radio>' + 
-                '<ion-radio ng-value="1" ng-model="mission.private_flag">特定メンバー用</ion-radio>' +
+            template: '<ion-list><ion-radio ng-value="1" ng-model="mission.private_flag">特定メンバー用</ion-radio>' + 
+                '<ion-radio ng-value="0" ng-model="mission.private_flag">全メンバー用</ion-radio>' +
                 '<label class="item item-input"><input type="text" ng-model="mission.mission_name" required placeholder="ルーム名を入力してください。"></label>' + 
                 '</ion-list>',
             title: 'チャットルームを新規作成します。',
@@ -267,6 +267,8 @@ angular.module('app.chat.list', [])
     }
 
     $scope.pinMission = function(mission_id) {
+        if (mission_id == null)
+            return;
         for (var i = 0; i < $rootScope.missions.length; i ++) {
             if ($rootScope.missions[i].mission_id == mission_id) {
                 mission = $rootScope.missions[i];
@@ -402,7 +404,7 @@ angular.module('app.chat.list', [])
         template += '<ion-item id="room_divider" class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
         template += '    <label ng-click="toggleGroup(0)"><i ng-class="groups[0] ? \'ion-minus\' : \'ion-plus\'"></i> ルーム</label>';
         if ($rootScope.cur_home.priv == HPRIV.HMANAGER)        
-            template += '    <button class="button button-icon icon ion-ios-plus-empty text-gray" ng-click="addMission(0)"></button>';
+            template += '    <button class="button button-icon icon ion-ios-plus-empty text-gray" ng-click="addMission(1)"></button>';
         template += '</ion-item>';
 
         len = $rootScope.missions.length;

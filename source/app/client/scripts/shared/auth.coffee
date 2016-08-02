@@ -13,7 +13,7 @@ angular.module('app.auth', [])
     user: 'user'
 )
 .service('$session', 
-    ($rootScope, $http, CONFIG, logger, $location) ->
+    ($rootScope, $http, CONFIG, logger, $location, $timeout) ->
         SESSION = 'session'
         $this = this
         this.session_id = null

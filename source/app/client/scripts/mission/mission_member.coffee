@@ -3,7 +3,7 @@
 angular.module('app.mission.member', [])
 
 .controller('missionMemberCtrl', 
-    ($scope, $rootScope, $api, $modalInstance, missionStorage, filterFilter, logger, $session, $dialogs, $timeout, mission) ->
+    ($scope, $rootScope, $api, $modalInstance, missionStorage, filterFilter, logger, $session, $dialogs, $timeout, mission, RPRIV) ->
         # Close dialog
         $scope.cancel = ->
             $modalInstance.dismiss('cancel')
@@ -49,13 +49,6 @@ angular.module('app.mission.member', [])
             return
         )
 
-        # Member label
-        $scope.memberLabel = (member)->
-            if member.user_id == $scope.mission.client_id
-                return "管理者"
-            else
-                return ""
-
         # Invite User
         $scope.addMissionMember = (mission, search_string)->
             $dialogs.addMissionMember(mission, search_string)
@@ -67,5 +60,22 @@ angular.module('app.mission.member', [])
             $dialogs.showUserProfile(user_id)
             return
 
+
+        # 管理者権限設定
+        $scope.selPriv = (member) ->
+            $dialogs.selRoomPriv(member.priv, (priv) ->
+                missionStorage.priv($scope.mission.mission_id, member.user_id, priv, (res) ->
+                    if res.err_code == 0
+                        member.priv = res.priv
+                        member.priv_name = $rootScope.get_rpriv_name(res.priv)
+
+                        if member.user_id == $session.user_id
+                            $rootScope.cur_mission.priv = res.priv
+                            missionStorage.set_mission($rootScope.cur_mission)
+                            $session.setCurMission($rootScope.cur_mission)
+                    else
+                        logger.logError(res.err_msg)
+                )
+            )
         return
 )

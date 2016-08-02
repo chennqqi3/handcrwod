@@ -3,15 +3,19 @@ read_timer = 2000
 angular.module('app.chatroom', [])
 
 .controller('chatroomCtrl', 
-    ($scope, $api, $chat, missionStorage, chatStorage, taskStorage, homeStorage, filterFilter, $rootScope, $routeParams, logger, $session, $dateutil, $timeout, $dialogs, $emoticons, $location, $window, $compile) ->
+    ($scope, $api, $chat, missionStorage, chatStorage, taskStorage, homeStorage, CONFIG, filterFilter, $rootScope, $routeParams, logger, $session, $dateutil, $timeout, $dialogs, $emoticons, $location, $window, $compile, $filter) ->
         $rootScope.nav_id = "chatroom_" + $routeParams.mission_id
         $scope.show_tasks = false
         $scope.show_process = false
         $scope.show_attach = false
         $scope.show_star = false
+        $scope.show_summary = false
         $scope.emoticons = $emoticons.icons
         $scope.last_cid = null
         $scope.loaded_messages = false
+        $scope.max_right_panel = false
+        $scope.old_sideWidth = 0
+        $scope.all_avartar = CONFIG.AVARTAR_URL + "all.jpg"
 
         MAX_MSG_LENGTH = 100
 
@@ -336,7 +340,10 @@ angular.module('app.chatroom', [])
             txta = $('.item-input-wrapper textarea')
             start = txta.prop("selectionStart")
             str = ""
-            to_text = "[to:" + member.user_id + "]" + member.user_name + "さん\n"
+            if member == undefined
+                to_text = "[to:all]全員\n"
+            else
+                to_text = "[to:" + member.user_id + "]" + $filter('sir_label')(member.user_name) + "\n"
             if $api.is_empty($scope.cmsg.content)
                 str = to_text
                 start = str.length
@@ -383,7 +390,7 @@ angular.module('app.chatroom', [])
                             to_id = $session.user_id
                         else
                             to_id = null
-                        $chat.send(null, $scope.mission_id, str, to_id, 1)
+                        $chat.send(null, $rootScope.cur_home.home_id, $scope.mission_id, str, to_id, 1)
                     else
                         logger.logError(data.err_msg)
                 )
@@ -446,7 +453,10 @@ angular.module('app.chatroom', [])
                             ###
                             # build html
                             messages_html = chatStorage.messages_to_html(messages, $scope.chat_id)
-                            $('#messages').prepend(messages_html)
+
+                            el = $(messages_html)
+                            $compile(el.contents())($scope)
+                            $('#messages').prepend(el)
 
                             $scope.startScrollTimer(prev_id, "prev")
 
@@ -469,6 +479,9 @@ angular.module('app.chatroom', [])
         $scope.next = () ->
             if $scope.messages
                 length = $scope.messages.length
+                if length == 0
+                    return null
+                    
                 next_id = $scope.messages[length-1].cmsg_id
 
                 if next_id < 0
@@ -489,7 +502,10 @@ angular.module('app.chatroom', [])
                             ###
                             # build html
                             messages_html = chatStorage.messages_to_html(messages, $scope.chat_id)
-                            $('#messages').append(messages_html)
+
+                            el = $(messages_html)
+                            $compile(el.contents())($scope)
+                            $('#messages').append(el)
 
                             $scope.startScrollTimer(next_id, "next")
                             console.log("next_id:" + next_id)
@@ -577,8 +593,10 @@ angular.module('app.chatroom', [])
                 $scope.show_process = false
                 $scope.show_attach = false
                 $scope.show_star = false
+                $scope.show_summary = false
             else
                 $scope.show_tasks = false
+                $scope.max_right_panel = false
 
             $scope.onResize(true)
             return
@@ -589,8 +607,10 @@ angular.module('app.chatroom', [])
                 $scope.show_process = true
                 $scope.show_attach = false
                 $scope.show_star = false
+                $scope.show_summary = false
             else
                 $scope.show_process = false
+                $scope.max_right_panel = false
 
             $scope.onResize(true)
             $scope.focusInput()
@@ -602,8 +622,10 @@ angular.module('app.chatroom', [])
                 $scope.show_process = false
                 $scope.show_attach = true
                 $scope.show_star = false
+                $scope.show_summary = false
             else
                 $scope.show_attach = false
+                $scope.max_right_panel = false
 
             $scope.onResize(true)
             $scope.focusInput()
@@ -615,8 +637,25 @@ angular.module('app.chatroom', [])
                 $scope.show_process = false
                 $scope.show_attach = false
                 $scope.show_star = true
+                $scope.show_summary = false
             else
                 $scope.show_star = false
+                $scope.max_right_panel = false
+
+            $scope.onResize(true)
+            $scope.focusInput()
+            return
+
+        $scope.showSummary = ->
+            if !$scope.show_summary
+                $scope.show_tasks = false
+                $scope.show_process = false
+                $scope.show_attach = false
+                $scope.show_star = false
+                $scope.show_summary = true
+            else
+                $scope.show_summary = false
+                $scope.max_right_panel = false
 
             $scope.onResize(true)
             $scope.focusInput()
@@ -658,7 +697,7 @@ angular.module('app.chatroom', [])
                     chatStorage.set_message($scope.mission_id, $scope.messages, $scope.cmsg, $scope.render_message)
                     $scope.scrollToBottom()
 
-            $chat.send($scope.cmsg.cmsg_id, $scope.mission_id, $scope.cmsg.content, to_id)
+            $chat.send($scope.cmsg.cmsg_id, $rootScope.cur_home.home_id, $scope.mission_id, $scope.cmsg.content, to_id)
 
             $scope.clear_cmsg(true)
 
@@ -799,6 +838,7 @@ angular.module('app.chatroom', [])
                     $rootScope.cur_mission.unreads--
                     homeStorage.set_unreads(-1)
                     chatStorage.refresh_unreads_title()
+                    $rootScope.$broadcast('unread-message', $rootScope.cur_mission)
 
                 if cmsg.cmsg_id == $scope.last_cid
                     length = $scope.messages.length
@@ -911,6 +951,7 @@ angular.module('app.chatroom', [])
                                         if $('#chat_' + message.cmsg_id).length > 0
                                             $('#chat_' + message.cmsg_id + ' .unread-mark i').addClass(message.read_class)
                                         $rootScope.cur_mission.unreads--
+                                        $rootScope.$broadcast('unread-message', $rootScope.cur_mission)
                                         if $rootScope.cur_mission.private_flag == 3
                                             $rootScope.bot_mission.unreads--
                                         delta--
@@ -965,9 +1006,16 @@ angular.module('app.chatroom', [])
             navHomeWidth = angular.element("#nav-home-container").width()
             navWidth = angular.element("#nav-container").width() + navHomeWidth
             x = obj.position.left
-            if x < 450 
-                x = 450
-                obj.position.left = x
+
+            if x < 400 
+                if x > 300
+                    $scope.max_right_panel = true
+                    $scope.onResize(true)
+                    return
+                else 
+                    $scope.max_right_panel = false
+                    $scope.onResize(true)
+                    return
             else if x > $window.innerWidth - navWidth - 450
                 x = $window.innerWidth - navWidth - 450
                 obj.position.left = x
@@ -977,30 +1025,47 @@ angular.module('app.chatroom', [])
 
         # Resize
         $scope.onResize = (repos_handle) ->
-            if $scope.show_tasks == false && $scope.show_process == false && $scope.show_attach == false && $scope.show_star == false
+            if $scope.show_tasks == false && $scope.show_process == false && $scope.show_attach == false && $scope.show_star == false && $scope.show_summary == false
                 angular.element(".resize-handle-h").hide()
                 angular.element('.chat-panel').css(
                     width: '100%'
-                )
+                ).show()
                 angular.element(".right-panel").hide()
             else
                 angular.element(".resize-handle-h").show()
-                if $rootScope.sideWidth != null
+
+                if $scope.max_right_panel == false
+                    if $rootScope.sideWidth != null
+                        navHomeWidth = angular.element("#nav-home-container").width()
+                        navWidth = angular.element("#nav-container").width() + navHomeWidth
+                        mainWidth = $window.innerWidth - $rootScope.sideWidth - $scope.handleWidth - navWidth
+                        angular.element('.chat-panel').css(
+                            width: mainWidth + 'px'
+                        ).show()
+                        angular.element('.right-panel').css(
+                            width: $rootScope.sideWidth + 'px'
+                            left: mainWidth + $scope.handleWidth + 'px'
+                        ).show()
+
+                    if repos_handle 
+                        angular.element(".resize-handle-h").css(
+                            left: angular.element(".chat-panel").width() + 'px'
+                        )
+                else
                     navHomeWidth = angular.element("#nav-home-container").width()
                     navWidth = angular.element("#nav-container").width() + navHomeWidth
-                    mainWidth = $window.innerWidth - $rootScope.sideWidth - $scope.handleWidth - navWidth
-                    angular.element('.chat-panel').css(
-                        width: mainWidth + 'px'
-                    )
+                    sideWidth = $window.innerWidth - $scope.handleWidth - navWidth   
+                    angular.element('.chat-panel').hide()
                     angular.element('.right-panel').css(
-                        width: $rootScope.sideWidth + 'px'
-                        left: mainWidth + $scope.handleWidth + 'px'
+                        width: sideWidth + 'px'
+                        left: $scope.handleWidth + 'px'
                     ).show()
 
-                if repos_handle 
-                    angular.element(".resize-handle-h").css(
-                        left: angular.element(".chat-panel").width() + 'px'
-                    )
+                    if repos_handle 
+                        angular.element(".resize-handle-h").css(
+                            width: $scope.handleWidth + 'px'
+                            left: 0 + 'px'
+                        )                
         
         $scope.onResize(true)
 
@@ -1011,6 +1076,12 @@ angular.module('app.chatroom', [])
         angular.element($window).bind('resize', ->
             $rootScope.$broadcast('resize-window')
         )
+
+        $scope.maxRightPanel = () ->
+            $scope.max_right_panel = !$scope.max_right_panel
+
+            $scope.onResize(true)
+            return
 
         # タスク登録
         $scope.addTask = (cmsg_id) ->
@@ -1023,23 +1094,6 @@ angular.module('app.chatroom', [])
                     text = message.content
             $dialogs.addTask($rootScope.cur_mission, text)
 
-        # check to
-        $scope.isToMine = (message) ->
-            if $api.is_empty(message)
-                return false
-
-            message.content += ""
-            if $api.is_empty(message.content)
-                return false
-                
-            mine = false
-            message.content.replace(/\[to:([^\]]*)\]/g, (item, user_id) ->
-                if $session.user_id + '' == user_id
-                    mine = true
-            )
-
-            return mine
-
         # show user profile
         $scope.showUserProfile = (user_id) ->
             $dialogs.showUserProfile(user_id)
@@ -1050,9 +1104,6 @@ angular.module('app.chatroom', [])
         )
 
         # チャットルームの管理
-        $scope.canRemove = ->
-            return $rootScope.cur_mission && $rootScope.canEditMission() && $rootScope.cur_mission.private_flag != 3
-
         $scope.canComplete = ->
             return $rootScope.cur_mission && $rootScope.canEditMission() && $rootScope.cur_mission.complete_flag == false && $rootScope.cur_mission.private_flag != 3
 
@@ -1060,25 +1111,7 @@ angular.module('app.chatroom', [])
             return $rootScope.cur_mission && $rootScope.canEditMission() && $rootScope.cur_mission.complete_flag != false && $rootScope.cur_mission.private_flag != 3
 
         $scope.canBreak = ->
-            return $rootScope.cur_mission && !($session.user_id == $rootScope.cur_mission.client_id) && $rootScope.cur_mission.private_flag != 3
-
-        # Remove mission
-        $scope.removeMissionConfirm = ->
-            message = $rootScope.cur_mission.mission_name + "を削除してもよろしいでしょうか？"
-            $dialogs.confirm('チャットルーム削除', message, '削除', () ->
-                missionStorage.remove($rootScope.cur_mission, (data) ->
-                    if data.err_code == 0
-                        $rootScope.cur_mission = null
-                        $rootScope.$broadcast('refresh-missions')
-                        $rootScope.$broadcast('refresh-tasks')
-                        $rootScope.$broadcast('refresh_back_image')
-                        logger.logSuccess('チャットルームが削除されました。')
-                        $location.path('/home')
-                    else
-                        logger.logError(data.err_msg)
-                )
-                return
-            )
+            return $rootScope.cur_mission && !($session.user_id == $rootScope.cur_mission.client_id) && $rootScope.cur_mission.private_flag == 1
 
         # Complete mission
         $scope.completeMissionConfirm = ->
@@ -1126,15 +1159,18 @@ angular.module('app.chatroom', [])
         $scope.breakMissionConfirm = ->
             message = $rootScope.cur_mission.mission_name + "から退室します。よろしいでしょうか？"
             $dialogs.confirm('チャットルームから退室', message, '退室', () ->
-                missionStorage.break_mission($rootScope.cur_mission.mission_id, (data) ->
-                    if data.err_code == 0
-                        $rootScope.$broadcast('refresh-missions')
-                        $rootScope.$broadcast('refresh-tasks')
-                        logger.logSuccess('チャットルームから外れました。')
-                    else
-                        logger.logError(data.err_msg)
-                )
-                return
+                $dialogs.confirm('チャットルームから退室', 'チャットルームから退会すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
+                    missionStorage.break_mission($rootScope.cur_mission.mission_id, (data) ->
+                        if data.err_code == 0
+                            $rootScope.$broadcast('refresh-missions')
+                            $rootScope.$broadcast('refresh-tasks')
+                            logger.logSuccess('チャットルームから外れました。')
+                            $location.path('/home')
+                        else
+                            logger.logError(data.err_msg)
+                    )
+                    return
+                , null, 'btn-danger')
             )
 
         $scope.$on('$destroy', () ->
@@ -1145,6 +1181,7 @@ angular.module('app.chatroom', [])
                             if data.err_code == 0
                                 $timeout(() ->
                                     mission.unreads = 0
+                                    $rootScope.$broadcast('unread-message', mission)
                                     chatStorage.refresh_unreads_title()
                                 , 1000)
                             else
@@ -1193,6 +1230,7 @@ angular.module('app.chatroom', [])
             mission = missionStorage.get_mission($scope.mission_id)
             if $session.user_id != null 
                 $rootScope.cur_mission = mission
+                missionStorage.select_mission_in_nav()
                 $scope.refreshBackImage()
                 if $api.is_empty(mission) || ((mission.private_flag==0 || mission.private_flag==1) && $api.is_empty(mission.members))
                     missionStorage.get($scope.mission_id, (res) ->
@@ -1208,6 +1246,7 @@ angular.module('app.chatroom', [])
                             $rootScope.cur_mission = res.mission
                             $scope.refreshBackImage()
                             $rootScope.cur_mission.visible = true
+                            missionStorage.select_mission_in_nav()
                             missionStorage.set_mission($rootScope.cur_mission)
                         else 
                             logger.logError(res.err_msg)
@@ -1417,8 +1456,9 @@ angular.module('app.chatroom', [])
             $timeout(->
                 $('#loader').hide()
                 $rootScope.$broadcast('elastic:adjust')
-                scope.$parent.initEventHandler()
-            )
+                if (scope.$parent)
+                    scope.$parent.initEventHandler()
+            , 1000)
 
         return {
             restrict: "E"

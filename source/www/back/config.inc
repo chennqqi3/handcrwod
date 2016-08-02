@@ -1,5 +1,5 @@
 <?php
-define('VERSION',		'2.4');
+define('VERSION',		'2.5');
 
 define('TIME_ZONE',		'Asia/Tokyo');
 
@@ -54,7 +54,7 @@ define('DEFAULT_LANGUAGE',		'ja_jp');
 // フリープラン
 define('MONTH_PRICE0',     0);// 月額費用／ユーザ
 define('YEAR_PRICE0',     0);// 年額費用
-define('MAX_HOMES0',     1);// ホーム数
+define('MAX_HOMES0',     1);// グループ数
 define('MAX_MISSIONS0',     15);// チャットルーム数
 define('MAX_TEMPLATES0',     1);// テンプレート数
 define('REPEAT_FLAG0',     false);// リピート（繰り返し）設定
@@ -71,7 +71,7 @@ define('VISIT_SERVICE_PRICE0',     80000);// 訪問サービス
 // スタッフプラン
 define('MONTH_PRICE1',     300);// 月額費用／ユーザ
 define('YEAR_PRICE1',     3240);// 年額費用
-define('MAX_HOMES1',     -1);// ホーム数
+define('MAX_HOMES1',     -1);// グループ数
 define('MAX_MISSIONS1',     30);// チャットルーム数
 define('MAX_TEMPLATES1',     5);// テンプレート数
 define('REPEAT_FLAG1',     true);// リピート（繰り返し）設定
@@ -88,7 +88,7 @@ define('VISIT_SERVICE_PRICE1',     80000);// 訪問サービス
 // マネージャプラン
 define('MONTH_PRICE2',     500);// 月額費用／ユーザ
 define('YEAR_PRICE2',     5400);// 年額費用
-define('MAX_HOMES2',     -1);// ホーム数
+define('MAX_HOMES2',     -1);// グループ数
 define('MAX_MISSIONS2',     50);// チャットルーム数
 define('MAX_TEMPLATES2',     10);// テンプレート数
 define('REPEAT_FLAG2',     true);// リピート（繰り返し）設定
@@ -105,7 +105,7 @@ define('VISIT_SERVICE_PRICE2',     80000);// 訪問サービス
 // プレジデントプラン
 define('MONTH_PRICE3',     900);// 月額費用／ユーザ
 define('YEAR_PRICE3',     9720);// 年額費用
-define('MAX_HOMES3',     -1);// ホーム数
+define('MAX_HOMES3',     -1);// グループ数
 define('MAX_MISSIONS3',     -1);// チャットルーム数
 define('MAX_TEMPLATES3',     -1);// テンプレート数
 define('REPEAT_FLAG3',     true);// リピート（繰り返し）設定

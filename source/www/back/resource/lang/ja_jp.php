@@ -34,7 +34,7 @@ $g_err_msgs = array(
 
 	ERR_INVALID_OLDPWD => "現在のパスワードが正しくありません。",
 
-	ERR_ALREADY_USING_USER_NAME => "このユーザー名前は既に利用しています。",
+	ERR_ALREADY_USING_LOGIN_ID => "このユーザIDは既に利用しています。",
 	ERR_ALREADY_USING_EMAIL => "このメールアドレスは既に利用しています。",
 
 	ERR_DELUSER => "このユーザーは関連データーが存在するので、削除できません。",
@@ -71,7 +71,7 @@ $g_err_msgs = array(
 	ERR_OVER_MAX_MISSIONS => "現在ユーザープランではチャットルームを最大%d個まで登録することができます。その以上のチャットルームを登録するにはユーザープランをアップグレードしてください。",
 	ERR_OVER_MAX_TEMPLATES => "現在ユーザープランではテンプレートを最大%d個まで登録することができます。その以上のテンプレートを登録するにはユーザープランをアップグレードしてください。",
 	ERR_OVER_MAX_UPLOAD => "現在ユーザープランではファイルを最大%.1fGBまで添付することができます。その以上のファイルを添付するにはユーザープランをアップグレードしてください。",
-	ERR_OVER_MAX_HOMES => "現在ユーザープランではホームを最大%d個まで登録することができます。その以上のホームを登録するにはユーザープランをアップグレードしてください。",
+	ERR_OVER_MAX_HOMES => "現在ユーザープランではグループを最大%d個まで登録することができます。その以上のグループを登録するにはユーザープランをアップグレードしてください。",
 
 	ERR_NOT_LOGINED_FACEBOOK => "Facebookにログインしていません。",
 	ERR_INVALID_CSV => "有効なCSVファイルではありません。",
@@ -83,11 +83,14 @@ $g_err_msgs = array(
 
 	ERR_NOTFOUND_CROOM => "チャットルームが存在しません。",
 
-	ERR_NOTFOUND_HOME => "ホームが存在しません。",
+	ERR_NOTFOUND_HOME => "グループが存在しません。",
 
 	ERR_CANT_REMOVE_SELF => "自分を削除することはできません。",
 
-	ERR_NOTFOUND_HOME_MEMBER => "ホームに登録されていません。"
+	ERR_NOTFOUND_HOME_MEMBER => "グループに登録されていません。",
+
+	ERR_HMANAGER_CANT_BREAK => "自分が管理者なので、グループから退会できません。",
+	ERR_EXIST_HMANAGER => "自分が管理者のグループが存在します。"
 );
 
 $g_codes = array(

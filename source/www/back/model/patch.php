@@ -388,6 +388,8 @@ No.157 タスクの詳細画面を出すのに、タスクを選んで右上の�
 			"2.4" => array("func" => "patch2_4", "description" => "パッチ(2016/03/16-r638)
 バグパッチ
 -プッシュ通知が失敗すると、３回まで再送信する。
+"),
+			"2.5" => array("func" => "patch2_5", "description" => "パッチ(2016/07/22)
 ")
 			);
 
@@ -1108,6 +1110,28 @@ MODIFY COLUMN `cmsg_id`  bigint(11) NOT NULL AFTER `mission_id`;
 ALTER TABLE `t_push_msg`
 ADD COLUMN `fail_count`  int(2) NULL AFTER `message`;
 			";
+
+			$this->db->execute_batch($sql);
+			return ERR_OK;
+		}
+
+		public function patch2_5() {
+			$sql = "ALTER TABLE `m_user`
+ADD COLUMN `login_id`  varchar(30) NULL AFTER `user_type`;
+
+ALTER TABLE `t_mission_member`
+ADD COLUMN `priv`  int(1) NULL AFTER `push_flag`;
+
+UPDATE t_mission_member mm
+INNER JOIN (
+SELECT mm.user_id, mm.mission_id FROM t_mission_member mm 
+INNER JOIN t_mission m ON mm.mission_id=m.mission_id AND m.client_id=mm.user_id
+WHERE m.private_flag IN (0, 1) AND mm.priv IS NULL) a 
+	ON mm.user_id=a.user_id AND mm.mission_id=a.mission_id
+SET mm.priv=1;
+
+UPDATE t_mission_member SET priv=0 WHERE priv IS NULL;
+";
 
 			$this->db->execute_batch($sql);
 			return ERR_OK;

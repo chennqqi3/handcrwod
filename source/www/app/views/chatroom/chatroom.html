@@ -1,4 +1,4 @@
-<div class="chat-main" data-ng-controller="chatroomCtrl" ng-class="{'show-side-panel': show_tasks || show_process || show_attach}">
+<div id="chat_main" class="chat-main" data-ng-controller="chatroomCtrl" ng-class="{'show-side-panel': show_tasks || show_process || show_attach}">
 	<header class="title-bar">
         <ul class="button-group-left" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">
             <li dropdown>
@@ -15,9 +15,6 @@
                     </li>
                     <li ng-show="canUncomplete()">
                         <a href ng-click="uncompleteMissionConfirm()"><i class="icon-flag"></i> アーカイブしない</a>
-                    </li>
-                    <li ng-show="canRemove()">
-                        <a href ng-click="removeMissionConfirm()"><i class="icon-trash"></i> 削除</a>
                     </li>
                     <li ng-show="canBreak()">
                         <a href ng-click="breakMissionConfirm()"><i class="icon-logout"></i> 退室</a>
@@ -50,6 +47,9 @@
             <li>
                 <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_star, 'btn-default': !show_star}" title="スター付き" ng-click="showStar()"><i class="icon-star"></i></button>
             </li>
+            <li>
+                <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_summary, 'btn-default': !show_summary}" title="概要" ng-click="showSummary()"><i class="icon-doc"></i></button>
+            </li>
 		</ul>
 	</header>
     <div class="chat-panel">
@@ -59,43 +59,7 @@
             </div>
         </div>
     	<div id="chat_view" class="chat-view page chat-container transparent" scroll-top="prev()" scroll-bottom="next()" scroll="onScroll()">
-    		<div ng-repeat="message in messages track by message.cmsg_id" class="message-wrapper" ng-class="{'to-mine': isToMine(message), 'linked': message.cmsg_id==chat_id}">
-                <div id="chat_{{message.cmsg_id}}">
-                    <img class="avartar clickable left" ng-src="{{::message.avartar}}" ng-if="message.show_avartar" ng-click="showUserProfile(message.user_id)"/>
-
-                    <div class="chat-message left" ng-class="{'me': session.user_id == message.user_id, 'border-top': message.show_avartar, 'editing': message.editing}">
-                        <div class="sending" ng-if="message.cmsg_id < 0"><span>メッセージ送信中 <i class="fa fa-spinner fa-spin"></i></span></div>
-                        <div class="message-detail">
-                            <span ng-click="viewProfile(message)" class="user-name" ng-if="message.show_avartar">{{::message.user_name}}</span> 
-                            <span class="time">{{::message.date_label}}</span>
-                            <a href="javascript:;" class="star" ng-class="{'show-hover': !message.star}" ng-click="star(message)" title="スター付き"><i class="fa text-warning" ng-class="{'fa-star': message.star, 'fa-star-o':!message.star}"></i></a>
-                            <span class="unread-mark"><i class="fa fa-circle text-danger {{message.read_class}}"></i></span>
-                        </div>
-                        <div class="message" ng-bind-html="message.content | chatize">
-                        </div>
-                    </div>
-                </div>
-
-                <ul class="button-group" ng-class="{'editing': message.editing}" ng-if="message.cmsg_id>0">
-                    <li ng-if="canEditTask()">
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="タスク新規登録" ng-click="addTask(message)"><i class="ln-icon-check-square"></i></button>
-                    </li>
-                    <li>
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="リンク" ng-click="link(message)"><i class="icon-link"></i></button>
-                    </li>
-                    <li>
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="引用" ng-click="quote(message)"><i class="ln-icon-quote-open"></i></button>
-                    </li>
-                    <li ng-if="session.user_id == message.user_id">
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="編集" ng-click="edit(message)"><i class="icon-pencil"></i></button>
-                    </li>
-                    <li ng-if="session.user_id == message.user_id">
-                        <button type="button" class="btn btn-default btn-xs btn-circle" title="削除" ng-click="remove(message)"><i class="icon-trash"></i></button>
-                    </li>
-                </ul>
-
-                <div class="clear"></div>
-            </div>
+            <message-list id="messages" ng-if="loaded"></message-list>
             <div id="scroll_bottom"></div>
     	</div>
         <div class="chat-send-files" id="file_bar">
@@ -138,9 +102,10 @@
         <section data-ng-include=" 'views/process/process.html' + ver " ng-if="show_process"></section>
         <section data-ng-include=" 'views/mission/mission_attach.html' + ver " ng-show="show_attach"></section>
         <section data-ng-include=" 'views/chatroom/chat_star.html' + ver " ng-if="show_star"></section>
+        <section data-ng-include=" 'views/mission/mission_summary.html' + ver " ng-if="show_summary"></section>
     </div>
 
-    <div class="resize-handle-h"><i class="fa fa-bars fa-rotate-90"></i></div>
+    <div class="resize-handle-h" ng-dblclick="maxRightPanel()"><i class="fa fa-bars fa-rotate-90"></i></div>
 
     <div id="emoticon_gallery" class="popover fade top in">
         <div class="arrow"></div>
@@ -153,7 +118,7 @@
     <div id="file_drop" class="popover top">
         <div class="arrow"></div>
         <h3 class="popover-title">
-            <div class="drop-box">このエリアにドロップしてください<br/>（複数ファイル送信可能）</div>
+            <div class="drop-box"><strong>このエリアにドロップしてください</strong><br/>（複数ファイル送信可能）</div>
         </h3>
     </div>
     <div id="to_users" class="popover fade top in">
@@ -172,6 +137,7 @@
                     <img ng-src="{{member.avartar}}" class="avartar img30_30">
                     {{member.user_name}}
                 </li>
+                <li ng-click="to_message()"><img ng-src="{{all_avartar}}" class="avartar img30_30"> 全員</li>
             </ul>
         </h3>
     </div>

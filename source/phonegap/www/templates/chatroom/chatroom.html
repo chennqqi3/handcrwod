@@ -28,6 +28,7 @@
                 <img ng-src="{{member.avartar}}" class="avartar img30_30">
                 {{member.user_name}}
             </li>
+            <li ng-click="to_message()"><img ng-src="{{all_avartar}}" class="avartar img30_30"> 全員</li>
         </ul>
     </div>
 
@@ -50,31 +51,18 @@
 
     <form id="input_bar" name="sendMessageForm" novalidate ng-show="canChat()">
         <ion-footer-bar class="bar-stable item-input-inset message-footer" keyboard-attach>
-            <div class="footer-btn-wrap">
-                <button class="button button-icon icon icon-emoticon-smile footer-btn btn-emoticon">
+            <div class="button-top-bar">
+                <button class="button button-icon icon icon-emoticon-smile btn-emoticon">
+                </button>
+                <button type="button" class="button button-icon btn-to" ng-click="showTo()">TO</button>
+                <button class="button button-icon icon icon-paper-clip" multiple="true" ng-file-select="onUploadFiles($files)">
+                </button>
+                <button class="button button-icon icon icon-camera" ng-click="onCapture(false)" ng-if="isAndroid">
+                </button>
+                <button class="button button-icon icon icon-camcorder" ng-click="onCapture(true)" ng-if="isAndroid">
                 </button>
             </div>
-            <div class="footer-btn-wrap" ng-if="!show_more">
-                <button type="button" class="button button-icon icon-plus btn-to footer-btn" ng-click="showMore(true)"></button>
-            </div>
-            <div class="footer-btn-wrap" ng-show="show_more">
-                <button type="button" class="button button-icon btn-to footer-btn" ng-click="showTo()">TO</button>
-            </div>
-            <div class="footer-btn-wrap" ng-show="show_more">
-                <button class="button button-icon icon icon-paper-clip footer-btn" ng-file-select="onUploadFiles($files)">
-                </button>
-            </div>
-            <div class="footer-btn-wrap" ng-show="show_more && isAndroid">
-                <button class="button button-icon icon icon-camera footer-btn" ng-click="onCapture(false)">
-                </button>
-            </div>
-            <div class="footer-btn-wrap" ng-show="show_more && isAndroid">
-                <button class="button button-icon icon icon-camcorder footer-btn" ng-click="onCapture(true)">
-                </button>
-            </div>
-            <div class="footer-btn-wrap" ng-show="show_more">
-                <button type="button" class="button button-icon icon-close btn-to footer-btn" ng-click="showMore(false)"></button>
-            </div>
+
             <label class="item-input-wrapper">
                 <textarea ng-model="cmsg.content" value="" placeholder="メッセージ" required minlength="1" maxlength="5000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()"></textarea>
             </label>

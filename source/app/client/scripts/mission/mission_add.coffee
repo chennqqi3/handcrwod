@@ -6,7 +6,7 @@ angular.module('app.mission.add', [])
         $scope.mission = 
             home_id: $rootScope.cur_home.home_id
             mission_name: ""
-            private_flag: 0
+            private_flag: 1
 
         $scope.cancel = ->
             $modalInstance.dismiss('cancel')

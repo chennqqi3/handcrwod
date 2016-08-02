@@ -19,7 +19,8 @@
 					"unreads",
 					"opp_user_id",
 					"last_date",
-					"push_flag"),
+					"push_flag",
+					"priv"),
 				array("auto_inc" => true));
 		}
 
@@ -54,14 +55,66 @@
             $db->execute($sql);
 		}
 
-		public static function is_push($mission_id, $user_id)
+		public static function is_push($mission_id, $user_id, $content)
 		{
 			$db = db::getDB();
             
-            $sql = "SELECT push_flag FROM t_mission_member";
-            $sql .= " WHERE mission_id=" . _sql($mission_id) . " AND user_id=" . _sql($user_id);
+            $member = new model;
+            $sql = "SELECT mm.push_flag, m.private_flag FROM t_mission_member mm 
+            	LEFT JOIN t_mission m ON m.mission_id=mm.mission_id
+            	WHERE mm.mission_id=" . _sql($mission_id) . " AND user_id=" . _sql($user_id);
 
-            return $db->scalar($sql) == 1;
+            $err = $member->query($sql);
+            if ($err == ERR_NODATA)
+            	return false;
+
+            $push_flag = $member->push_flag;
+            $private_flag = $member->private_flag;
+
+            if ($push_flag < PUSH_OFF || $push_flag > PUSH_TO)
+            	$push_flag = PUSH_TO;
+
+            $to = "[to:" . $user_id . "]";
+            $to_all = "[to:all]";
+
+            $is_to = (strstr($content, $to) !== FALSE || strstr($content, $to_all) !== FALSE);
+            $none_to = (strstr($content, "[to:") === FALSE);
+
+            if ($private_flag == CHAT_MEMBER) {
+            	return $push_flag == PUSH_ALL;
+            }
+            else {
+	            // ルームの通知設定（全通知）、
+	            if ($push_flag == PUSH_ALL) {
+	            	// メッセージのTO指定（無し）　→　ルーム内の全員に通知
+	            	// メッセージのTO指定（有り）　→　ルーム内の指定者にのみ通知
+	            	if ($none_to || $is_to) 
+	            		return true;
+	            	return false;
+	            }
+	            // ルームの通知設定（TOのみを通知）
+	            else if ($push_flag == PUSH_TO) {
+	            	// メッセージのTO指定（無し）　→　通知無し
+	            	// メッセージのTO指定（有り）　→　TO指定者のみ通知
+	            	if ($is_to)
+	            		return true;
+	            	return false;
+	            }
+	            // ルームの通知設定（通知OFF）、メッセージのTO指定（無し）　→　通知無し
+	            // ルームの通知設定（通知OFF）、メッセージのTO指定（有り）　→　通知無し
+	            return false;	
+            }
+        }
+
+        public static function get_member($mission_id, $user_id)
+        {
+            $mission_member = new mission_member;
+
+            $err = $mission_member->select("mission_id=" . _sql($mission_id) . " AND user_id=" . _sql($user_id));
+            if ($err == ERR_NODATA)
+                return null;
+
+            return $mission_member;
         }
 	};
 ?>

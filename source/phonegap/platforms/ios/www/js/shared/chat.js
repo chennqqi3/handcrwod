@@ -78,7 +78,7 @@ angular.module('app.service.chat', [])
                     }
                 }
                 else {
-                    logger.logSuccess('他のホームからメッセージが届きました。');
+                    logger.logSuccess('他のグループからメッセージが届きました。');
                 }
                 console.log('receive_message temp_cmsg_id:' + cmsg.temp_cmsg_id + ' cmsg_id:' + cmsg.cmsg_id);
                 return $rootScope.$broadcast('receive_message', cmsg);
@@ -136,7 +136,7 @@ angular.module('app.service.chat', [])
                 }
                 if ($rootScope.cur_home !== null && $rootScope.cur_home.home_id === msg.home_id) {
                     if (msg.type === "remove_member" || msg.type === "remove") {
-                        logger.logSuccess("ホームから削除されました。");
+                        logger.logSuccess("グループから削除されました。");
                         return $rootScope.$broadcast('removed_home');
                     } else if (msg.type === "accept_invite") {
                         return $rootScope.$broadcast('refresh-missions');
@@ -182,11 +182,12 @@ angular.module('app.service.chat', [])
             }
             return $this.connect();
         };
-        $this.send = function(cmsg_id, mission_id, content, to_id, is_file) {
+        $this.send = function(cmsg_id, home_id, mission_id, content, to_id, is_file) {
             var msg;
             if ($this.socket !== null) {
                 msg = {
                     cmsg_id: cmsg_id,
+                    home_id: home_id,
                     mission_id: mission_id,
                     content: content,
                     to_id: to_id,
