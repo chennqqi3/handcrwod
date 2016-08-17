@@ -13,11 +13,17 @@
             </label>
             <label class="item item-input item-floating-label">
                 <span class="input-label">内容</span>
-                <textarea ng-model="req.content" rows=20 required placeholder="内容を入力してください。"></textarea>
+                <textarea ng-model="req.content" rows=15 required placeholder="内容を入力してください。"></textarea>
             </label>
             <label class="item item-button">
                 <button class="button button-block button-positive" ng-disabled="!canMemberAdd(form_member_add)" ng-click="invite()">招待</button>
             </label>
+            <ion-item class="item">
+                <span class="input-label"><strong>招待QRコード</strong></span>
+            </ion-item>
+            <ion-item class="item">
+                <image ng-src="{{qr_image_url}}" style="width:100%;">
+            </ion-item>
         </form>
     </ion-content>
 </ion-modal-view>

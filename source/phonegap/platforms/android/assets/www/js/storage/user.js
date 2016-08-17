@@ -1,7 +1,7 @@
 angular.module('app.storage.user', [])
 
 .factory('userStorage', 
-    function($rootScope, $api, $session, $cordovaPush, $auth) {
+    function($rootScope, $api, $session, $cordovaPush) {
         var alerts, get_profile, resend_activate_mail, signup, update_profile;
         signup = function(user, callback) {
             $api.call("user/signup", user)

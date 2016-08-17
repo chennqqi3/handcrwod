@@ -96,7 +96,7 @@ angular.module('app.storage', [])
                             )
                              */
                         });
-                        homeStorage.bot_messages($rootScope.cur_home.home_id, false);
+                        //homeStorage.bot_messages($rootScope.cur_home.home_id, false);
                     }
                     return
                 });
@@ -118,12 +118,6 @@ angular.module('app.storage', [])
         $rootScope.$on('refresh-tasks', function(event, msg) {
             if ($rootScope.cur_mission !== null) {
                 return taskStorage.search($rootScope.cur_mission.mission_id);
-            }
-        });
-        $rootScope.$on('select-home', function(event, new_mission_id) {
-            if ($rootScope.cur_home !== null) {
-                missionStorage.search($rootScope.cur_home.home_id);
-                return homeStorage.bot_messages($rootScope.cur_home.home_id, false);
             }
         });
 

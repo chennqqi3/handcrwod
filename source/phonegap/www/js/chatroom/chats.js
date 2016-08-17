@@ -1,7 +1,7 @@
 angular.module('app.chat.list', [])
 
 .controller('chatsCtrl', 
-    function($scope, $rootScope, $session, $ionicPopup, $ionicModal, $ionicListDelegate, $ionicScrollDelegate, $ionicActionSheet, missionStorage, chatStorage, logger, $timeout, $state) {
+    function($scope, $rootScope, $session, $ionicPopup, $ionicModal, $ionicListDelegate, $ionicScrollDelegate, $ionicActionSheet, missionStorage, chatStorage, logger, $timeout, $state, qrStorage) {
     // toggle group
     $scope.groups = [true, true, true];
     $scope.toggleGroup = function(index) {
@@ -375,6 +375,10 @@ angular.module('app.chat.list', [])
                 }
             }
         }
+    };
+
+    $scope.scan_qr = function() {
+        qrStorage.scan();
     };
            
 })

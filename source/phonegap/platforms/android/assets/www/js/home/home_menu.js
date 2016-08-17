@@ -171,7 +171,7 @@ angular.module('app.home.menu', [])
                                     $rootScope.$broadcast('refresh-homes');
                                     
                                     if ($rootScope.cur_home.home_id == home.home_id)
-                                        $session.setCurHome(null);
+                                        homeStorage.set_cur_home(null);
                                 }
                                 else {
                                     logger.logError(res.err_msg);

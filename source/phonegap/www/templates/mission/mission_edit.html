@@ -13,6 +13,9 @@
                     <span class="input-label">ルーム名</span>
                     {{mission.mission_name}}
                 </label>
+                <label class="item">
+                    <span class="input-label"><strong>タイプ</strong></span>
+                </label>
                 <ion-radio ng-value="0" name="private_flag" ng-model="mission.private_flag" ng-readonly="!editable" ng-if="editable" ng-change="onChange()">全メンバー用</ion-radio>
                 <ion-radio ng-value="1" name="private_flag" ng-model="mission.private_flag" ng-readonly="!editable" ng-if="editable" ng-change="onChange()">特定メンバー用</ion-radio>
                 <label class="item item-input">
@@ -23,7 +26,20 @@
                     <span class="input-label">合計工数</span>
                     {{ mission.total_hours | hours_label }}
                 </label>
-                <ion-toggle name="push_flag" ng-model="mission.push_flag" ng-change="onChange()">通知</ion-toggle>
+                <label class="item">
+                    <span class="input-label"><strong>通知設定</strong></span>
+                </label>
+                <ion-radio ng-value="0" name="push_flag" ng-model="mission.push_flag" ng-change="onChange()">通知OFF</ion-radio>
+                <ion-radio ng-value="1" name="push_flag" ng-model="mission.push_flag" ng-change="onChange()">全通知</ion-radio>
+                <ion-radio ng-value="2" name="push_flag" ng-model="mission.push_flag" ng-change="onChange()">TOのみを通知</ion-radio>
+                <label class="item item-input">
+                    <span class="input-label"><strong>チャットルームQRコード</strong></span>
+                </label>
+                <label class="item">
+                    <image ng-src="{{qr_image_url}}" style="width:100%;">
+                </label>
+                <!--
+                <label class="item item-input">
                 <label class="item item-input item-floating-label" ng-if="editable">
                     <span class="input-label">チャットルームの概要</span>
                     <textarea placeholder="チャットルームの概要を入力してください。" ng-model="mission.summary" rows=10 ng-change="onChange()"></textarea>
@@ -31,6 +47,7 @@
                 <label class="item item-input" ng-if="!editable && mission.summary != null && mission.summary != ''">
                     <p ng-bind-html="mission.summary | noHTML | htmlfy"></p>
                 </label>
+                -->
             </div>
         </form>
     </ion-content>

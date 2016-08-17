@@ -5,9 +5,74 @@
     },
     "config_munge": {
         "files": {
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"Keyboard\"><param name=\"ios-package\" onload=\"true\" value=\"IonicKeyboard\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"PushPlugin\"><param name=\"ios-package\" value=\"PushPlugin\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"AppVersion\"><param name=\"ios-package\" value=\"AppVersion\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Badge\"><param name=\"ios-package\" value=\"APPBadge\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Camera\"><param name=\"ios-package\" value=\"CDVCamera\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<preference name=\"CameraUsesGeolocation\" value=\"false\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Console\"><param name=\"ios-package\" value=\"CDVLogger\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Device\"><param name=\"ios-package\" value=\"CDVDevice\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"File\"><param name=\"ios-package\" value=\"CDVFile\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"FileTransfer\"><param name=\"ios-package\" value=\"CDVFileTransfer\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"InAppBrowser\"><param name=\"ios-package\" value=\"CDVInAppBrowser\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Capture\"><param name=\"ios-package\" value=\"CDVCapture\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"SplashScreen\"><param name=\"ios-package\" value=\"CDVSplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Toast\"><param name=\"ios-package\" value=\"Toast\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"BarcodeScanner\"><param name=\"ios-package\" value=\"CDVBarcodeScanner\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
             "framework": {
                 "parents": {
-                    "AudioToolbox.framework": [],
                     "ImageIO.framework": [
                         {
                             "xml": true,
@@ -23,13 +88,13 @@
                     "CoreGraphics.framework": [
                         {
                             "xml": false,
-                            "count": 3
+                            "count": 6
                         }
                     ],
                     "AssetsLibrary.framework": [
                         {
                             "xml": false,
-                            "count": 3
+                            "count": 4
                         }
                     ],
                     "MobileCoreServices.framework": [
@@ -41,36 +106,36 @@
                     "AVFoundation.framework": [
                         {
                             "xml": false,
+                            "count": 2
+                        }
+                    ],
+                    "QuartzCore.framework": [
+                        {
+                            "xml": false,
+                            "count": 2
+                        }
+                    ],
+                    "libiconv.dylib": [
+                        {
+                            "xml": false,
                             "count": 1
                         }
-                    ]
-                }
-            },
-            "config.xml": {
-                "parents": {
-                    "/*": [
+                    ],
+                    "CoreVideo.framework": [
                         {
-                            "xml": "<feature name=\"Camera\"><param name=\"ios-package\" value=\"CDVCamera\" /></feature>",
+                            "xml": false,
                             "count": 1
-                        },
+                        }
+                    ],
+                    "CoreImage.framework": [
                         {
-                            "xml": "<preference name=\"CameraUsesGeolocation\" value=\"false\" />",
+                            "xml": false,
                             "count": 1
-                        },
+                        }
+                    ],
+                    "AudioToolbox.framework": [
                         {
-                            "xml": "<feature name=\"File\"><param name=\"ios-package\" value=\"CDVFile\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"Capture\"><param name=\"ios-package\" value=\"CDVCapture\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"FileTransfer\"><param name=\"ios-package\" value=\"CDVFileTransfer\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"AppVersion\"><param name=\"ios-package\" value=\"AppVersion\" /></feature>",
+                            "xml": false,
                             "count": 1
                         }
                     ]
@@ -83,22 +148,62 @@
                             "xml": "<string />",
                             "count": 1
                         }
+                    ],
+                    "CFBundleURLTypes": [
+                        {
+                            "xml": "<array><dict><key>CFBundleURLSchemes</key><array><string>handcrowd</string></array></dict></array>",
+                            "count": 1
+                        }
                     ]
                 }
             }
         }
     },
     "installed_plugins": {
+        "com.iniciacomunicacion.cordova.devicenotification": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
         "com.ionic.keyboard": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "com.phonegap.plugins.PushPlugin": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "cordova-plugin-app-event": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "cordova-plugin-app-version": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "cordova-plugin-badge": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "cordova-plugin-compat": {
             "PACKAGE_NAME": "com.reflux.HandCrowd"
         },
         "cordova-plugin-console": {
             "PACKAGE_NAME": "com.reflux.HandCrowd"
         },
+        "cordova-plugin-customurlscheme": {
+            "URL_SCHEME": "handcrowd",
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
         "cordova-plugin-device": {
             "PACKAGE_NAME": "com.reflux.HandCrowd"
         },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
         "cordova-plugin-inappbrowser": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "cordova-plugin-media-capture": {
             "PACKAGE_NAME": "com.reflux.HandCrowd"
         },
         "cordova-plugin-splashscreen": {
@@ -110,38 +215,9 @@
         "cordova-plugin-x-toast": {
             "PACKAGE_NAME": "com.reflux.HandCrowd"
         },
-        "com.phonegap.plugins.PushPlugin": {
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        },
-        "com.iniciacomunicacion.cordova.devicenotification": {
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        },
-        "cordova-plugin-camera": {
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        },
-        "cordova-plugin-file": {
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        },
-        "cordova-plugin-badge": {
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        },
-        "cordova-plugin-media-capture": {
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        },
-        "cordova-plugin-file-transfer": {
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        },
-        "cordova-plugin-customurlscheme": {
-            "URL_SCHEME": "handcrowd",
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        },
-        "cordova-plugin-app-version": {
+        "phonegap-plugin-barcodescanner": {
             "PACKAGE_NAME": "com.reflux.HandCrowd"
         }
     },
-    "dependent_plugins": {
-        "cordova-plugin-app-event": {
-            "PACKAGE_NAME": "com.reflux.HandCrowd"
-        }
-    }
+    "dependent_plugins": {}
 }

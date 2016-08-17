@@ -138,7 +138,7 @@ angular.module('app.directives', [])
                     var rep_str;
                     rep_str = "<div class='attach-name'>";
                     if (hideThumb != true && isImage(name))
-                        rep_str += "<a href='javascript:;' class='preview-image' preview-image='" + CONFIG.BASE + url + "'><img src='" + CONFIG.BASE + url + "/150'></a><br/>";                
+                        rep_str += "<a href='javascript:;' class='preview-image' preview-image='" + CONFIG.BASE + url + "'><img src='" + CONFIG.BASE + url + "/150' style='max-width:150px'></a><br/>";                
                     rep_str += "<i class='icon-paper-clip'></i>&nbsp;";
                     rep_str += '<a href="#" onclick="window.open(\'' + CONFIG.API_BASE + url + '\', \'_system\', \'location=yes\'); return false;">' + name + "</a>";
                     rep_str += "</div>";

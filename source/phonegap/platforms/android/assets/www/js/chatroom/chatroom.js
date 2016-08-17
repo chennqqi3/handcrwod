@@ -604,14 +604,6 @@ angular.module('app.chatroom', [])
         $scope.$on("synced-server", function() {
             $scope.sync();
         });
-        $scope.title = function() {
-            var title;
-            title = "";
-            if ($rootScope.cur_mission) {
-                title = $rootScope.cur_mission.mission_name;
-            }
-            return title;
-        };
         $scope.isMessageExist = function(cmsg_id) {
             var exist, j, len, message, ref;
             exist = false;
@@ -974,6 +966,27 @@ angular.module('app.chatroom', [])
             }
         });
 
+        $scope.copy = function(message) {
+            var start, str, strPrefix, strSuffix, time;
+            start = angular.element(document.querySelector('.item-input-wrapper textarea')).prop("selectionStart");
+            time = new Date(message.date).getTime() / 1000;
+            str = message.content;
+            if (!$api.is_empty($scope.cmsg.content)) {
+                strPrefix = $scope.cmsg.content.substring(0, start);
+                strSuffix = $scope.cmsg.content.substring(start);
+                start += str.length;
+                str = strPrefix + str + strSuffix;
+            }
+            else
+                start = str.length;
+            $scope.cmsg.content = str;
+            $timeout(function() {
+                chat_ta = document.getElementById('chat_ta');
+                chat_ta.focus();
+                chat_ta.setSelectionRange(start + 1, start + 1);
+            });
+        };
+
         angular.element(document.querySelector('#chat_view')).on('scroll', function() {
             return $scope.startReadTimer(read_timer);
         });
@@ -1142,9 +1155,10 @@ angular.module('app.chatroom', [])
                 { text: '<i class="ion-quote icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージ引用</i>' }, 
                 { text: '<i class="ion-edit icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージ編集</i>' }, 
                 { text: '<i class="ion-trash-a icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージ削除</i>' }, 
-                { text: '<i class="fa ' + (message.star ? 'fa-star' : 'fa-star-o') + ' icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">スター付き</i>' }
+                { text: '<i class="fa ' + (message.star ? 'fa-star' : 'fa-star-o') + ' icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">スター付き</i>' },
+                { text: '<i class="ion-ios-copy-outline icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージコピー</i>' }
             ];
-            var indices = [0, 1, 2, 3, 4, 5];
+            var indices = [0, 1, 2, 3, 4, 5, 6];
 
             if (message.user_id !== $session.user_id) {
                 buttons.splice(3, 2);
@@ -1177,6 +1191,9 @@ angular.module('app.chatroom', [])
                             break;
                         case 5: // star
                             $scope.star(message);
+                            break;
+                        case 6: // copy
+                            $scope.copy(message);
                             break;
                     }
 
@@ -1296,33 +1313,40 @@ angular.module('app.chatroom', [])
             $scope.mission_id = parseInt($stateParams.mission_id, 10);
             $scope.chat_id = parseInt($stateParams.chat_id, 10);
 
-            $scope.load_messages(chatStorage.cache_messages($scope.mission_id));
+            /*
+            if (isNaN($scope.chat_id))
+                $scope.load_messages(chatStorage.cache_messages($scope.mission_id));
+            */
 
-            $rootScope.cur_mission = missionStorage.get_mission($scope.mission_id);
-            if ($session.user_id !== null) { 
-                if ($api.is_empty($rootScope.cur_mission)) {
-                    $state.go('tab.chats');
-                    return;
-                }
-                else if ($api.is_empty($rootScope.cur_mission.members)) {
+            mission = missionStorage.get_mission($scope.mission_id);
+            if ($session.user_id !== null) {
+                missionStorage.set_cur_mission(mission);
+
+                if ($api.is_empty(mission) || ((mission.private_flag==0 || mission.private_flag==1) && $api.is_empty(mission.members)))
+                {
                     missionStorage.get($scope.mission_id, function(res) {
+                        console.log("get mission detail");
                         var m;
                         if (res.err_code === 0) {
-                            if ($rootScope.cur_home.home_id == res.mission.home_id) {
-                                $rootScope.cur_mission = res.mission;
-                                $rootScope.cur_mission.visible = true;
-                                missionStorage.set_mission($rootScope.cur_mission);
+                            if (res.mission.private_flag != 2 && $rootScope.cur_home.home_id != res.mission.home_id) {
+                                home = homeStorage.get_home(res.mission.home_id);
+                                if (home == null) {
+                                    $state.go('tab.chats');
+                                    return;
+                                }
+                                console.log("new set_cur_home");
+                                homeStorage.set_cur_home(home);
                             }
-                            else
-                                $state.go('tab.chats');
+                            else if (res.mission.private_flag == 2 && $rootScope.cur_home)
+                                res.mission.home_id = $rootScope.cur_home.home_id;
+                            
+                            missionStorage.set_cur_mission(res.mission);
                         } else {
                             logger.logError(res.err_msg);
                             $state.go('tab.chats');
                         }
                     });
                 }
-                else 
-                    $rootScope.cur_mission.visible = true;
 
                 $scope.init_cmsg();
                 $chat.messages($scope.mission_id);

@@ -1,13 +1,8 @@
 angular.module('app.storage.mission', [])
 
 .factory('missionStorage', 
-    function($rootScope, $api, $session, $dateutil, filterFilter, AUTH_EVENTS, $auth, $chat, $filter) {
-        var add, attaches, break_mission, complete, delete_back_image, edit, get, get_mission, init, invitable_members, invite, open, open_member, pin, refresh_remaining, refresh_sort, remove, remove_attach, remove_member, search, search_completed, set_back_pos, set_mission, set_repeat, unpinned_missions, priv;
-        init = function() {
-            if ($auth.isAuthenticated()) {
-                return search();
-            }
-        };
+    function($rootScope, $api, $session, $dateutil, $chat, $filter) {
+        var add, attaches, break_mission, complete, delete_back_image, edit, get, get_mission, invitable_members, invite, open, open_member, pin, refresh_remaining, refresh_sort, remove, remove_attach, remove_member, search, search_completed, set_back_pos, set_mission, set_repeat, unpinned_missions, priv;
         search = function(home_id) {
             var params;
             params = {
@@ -140,6 +135,19 @@ angular.module('app.storage.mission', [])
             $rootScope.missions = reset_order($rootScope.missions);
             return null;
         };
+        set_cur_mission = function(mission, toStorage) {
+            if (toStorage == undefined) {
+                toStorage = true;
+            }
+            $rootScope.cur_mission = mission;
+            if ($rootScope.cur_mission) {
+                $rootScope.cur_mission.visible = true;
+                set_mission($rootScope.cur_mission);
+            }
+            if (toStorage) {
+                $session.statesToStorage();
+            }
+        };
         add = function(mission, callback) {
             return $api.call("mission/add", mission).then(function(res) {
                 if (callback !== void 0) {
@@ -147,6 +155,16 @@ angular.module('app.storage.mission', [])
                     if (res.data.err_code === 0) {
                         return $chat.mission('add', res.data.mission_id, res.data.home_id);
                     }
+                }
+            });
+        };
+        get_name = function(mission_id, callback) {
+            var params = {
+                mission_id: mission_id
+            };
+            return $api.call("mission/get_name", params).then(function(res) {
+                if (callback !== void 0) {
+                    callback(res.data);
                 }
             });
         };
@@ -280,6 +298,17 @@ angular.module('app.storage.mission', [])
                     if (res.data.err_code === 0) {
                         return $chat.mission('invite', res.data.mission_id, res.data.home_id);
                     }
+                }
+            });
+        };
+        self_invite = function(mission_id, invite_key, callback) {
+            var req = {
+                mission_id: mission_id,
+                invite_key: invite_key
+            }
+            return $api.call("mission/self_invite", req).then(function(res) {
+                if (callback !== void 0) {
+                    callback(res.data);
                 }
             });
         };
@@ -519,15 +548,17 @@ angular.module('app.storage.mission', [])
         };
 
         return {
-            init: init,
             search: search,
             unpinned_missions: unpinned_missions,
             search_completed: search_completed,
             refresh_remaining: refresh_remaining,
             get_mission: get_mission,
             set_mission: set_mission,
+            set_cur_mission: set_cur_mission,
             add: add,
+            get_mission: get_mission,
             get: get,
+            get_name: get_name,
             edit: edit,
             open: open,
             pin: pin,
@@ -540,6 +571,7 @@ angular.module('app.storage.mission', [])
             remove_member: remove_member,
             invitable_members: invitable_members,
             invite: invite,
+            self_invite: self_invite,
 
             remove_attach: remove_attach,
             complete: complete,

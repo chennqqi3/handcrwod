@@ -1,12 +1,7 @@
 angular.module('app.storage.home', [])
 .factory('homeStorage', 
-    function($rootScope, $api, $session, $dateutil, filterFilter, AUTH_EVENTS, $auth, $chat) {
-        var accept_invite, add, bot_messages, edit, get, get_home, init, invite, open, priv, remove, remove_member, search, select;
-        init = function() {
-            if ($auth.isAuthenticated()) {
-                return search();
-            }
-        };
+    function($rootScope, $api, $session, $chat) {
+        var accept_invite, add, bot_messages, edit, get, get_home, invite, open, priv, remove, remove_member, search, select;
         search = function() {
             return $api.call("home/search").then(function(res) {
                 var homes;
@@ -24,7 +19,7 @@ angular.module('app.storage.home', [])
             ref = $rootScope.homes;
             for (i = 0, len = ref.length; i < len; i++) {
                 home = ref[i];
-                if (home.home_id === home_id) {
+                if (home.home_id == home_id) {
                     return home;
                 }
             }
@@ -34,10 +29,38 @@ angular.module('app.storage.home', [])
             var home, i, len, ref;
             ref = $rootScope.homes;
             for (i = 0, len = ref.length; i < len; i++) {
-                if (ref[i].home_id === home.home_id) {
+                if (ref[i].home_id == home.home_id) {
                     ref[i] = home;
                     return;
                 }
+            }
+            $rootScope.homes.push(home);
+        };
+        set_cur_home = function(home, toStorage) {
+            var new_home_id, old_home_id;
+            if (toStorage == undefined) {
+                toStorage = true;
+            }
+            old_home_id = null;
+            new_home_id = null;
+            if ($rootScope.cur_home == undefined) {
+                $rootScope.cur_home = null;
+            }
+            if ($rootScope.cur_home != null) {
+                old_home_id = $rootScope.cur_home.home_id;
+            }
+            if (home != null && home.home_id != null) {
+                new_home_id = home.home_id;
+            }
+            $rootScope.cur_home = home;
+            if ($rootScope.cur_home)
+                set_home($rootScope.cur_home);
+
+            if (toStorage) {
+                $session.statesToStorage();
+            }
+            if (old_home_id != new_home_id) {
+                $rootScope.$broadcast('select-home');
             }
         };
         add = function(home, callback) {
@@ -60,6 +83,16 @@ angular.module('app.storage.home', [])
                     if (res.data.err_code === 0) {
                         return $chat.home('remove', home_id);
                     }
+                }
+            });
+        };
+        get_name = function(home_id, callback) {
+            var params = {
+                home_id: home_id
+            };
+            return $api.call("home/get_name", params).then(function(res) {
+                if (callback !== void 0) {
+                    callback(res.data);
                 }
             });
         };
@@ -112,7 +145,7 @@ angular.module('app.storage.home', [])
                     return callback(res.data);
                 }
             });
-            $session.setCurHome(home);
+            set_cur_home(home);
         };
         priv = function(home_id, user_id, priv, callback) {
             var params = {
@@ -157,6 +190,17 @@ angular.module('app.storage.home', [])
                     if (res.data.err_code === 0) {
                         return $chat.home('invite', req.home_id);
                     }
+                }
+            });
+        };
+        self_invite = function(home_id, invite_key, callback) {
+            var req = {
+                home_id: home_id,
+                invite_key: invite_key
+            }
+            return $api.call("home/self_invite", req).then(function(res) {
+                if (callback !== void 0) {
+                    callback(res.data);
                 }
             });
         };
@@ -232,12 +276,13 @@ angular.module('app.storage.home', [])
         };
 
         return {
-            init: init,
             search: search,
             get_home: get_home,
             set_home: set_home,
+            set_cur_home: set_cur_home,
             add: add,
             remove: remove,
+            get_name: get_name,
             get: get,
             edit: edit,
             open: open,
@@ -246,6 +291,8 @@ angular.module('app.storage.home', [])
             members: members,
             remove_member: remove_member,
             invite: invite,
+            self_invite: self_invite,
+            
             accept_invite: accept_invite,
             bot_messages: bot_messages,
             set_unreads: set_unreads,

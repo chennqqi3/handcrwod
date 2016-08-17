@@ -180,10 +180,16 @@
         },
         "cordova-plugin-app-version": {
             "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "phonegap-plugin-barcodescanner": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
         }
     },
     "dependent_plugins": {
         "cordova-plugin-app-event": {
+            "PACKAGE_NAME": "com.reflux.HandCrowd"
+        },
+        "cordova-plugin-compat": {
             "PACKAGE_NAME": "com.reflux.HandCrowd"
         }
     }

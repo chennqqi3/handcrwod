@@ -2,13 +2,8 @@
 angular.module('app.storage.task', [])
 
 .factory('taskStorage', 
-    function($rootScope, $api, $session, $dateutil, filterFilter, missionStorage, AUTH_EVENTS, $auth, $chat) {
-        var add, add_comment, add_proclink, all_skills, edit, get_candidates, get_comments, get_completed_offset, get_proclinks, get_skills, get_task, get_taskcount, help_entrance, init, isEqual, isEqualLink, isEqualLinks, isEqualTasks, push_tasks, refresh_remaining, refresh_sort, remove, remove_comment, remove_proclink, request_entrance, search, search_completed, set_completed_offset, set_skills;
-        init = function() {
-            if ($auth.isAuthenticated()) {
-                return search();
-            }
-        };
+    function($rootScope, $api, $session, $dateutil, missionStorage, $chat) {
+        var add, add_comment, add_proclink, all_skills, edit, get_candidates, get_comments, get_completed_offset, get_proclinks, get_skills, get_task, get_taskcount, help_entrance, isEqual, isEqualLink, isEqualLinks, isEqualTasks, push_tasks, refresh_remaining, refresh_sort, remove, remove_comment, remove_proclink, request_entrance, search, search_completed, set_completed_offset, set_skills;
         search = function(mission_id) {
             var params;
             params = null;
@@ -416,7 +411,6 @@ angular.module('app.storage.task', [])
             });
         };
         return {
-            init: init,
             search: search,
             search_completed: search_completed,
             get_proclinks: get_proclinks,

@@ -36,7 +36,8 @@
     "cordova-plugin-inappbrowser",
     "cordova-plugin-badge",
     "cordova-plugin-media-capture",
-    "cordova-plugin-file-transfer"
+    "cordova-plugin-file-transfer",
+    "phonegap-plugin-barcodescanner"
   ],
   "cordovaPlatforms": [
     "ios",

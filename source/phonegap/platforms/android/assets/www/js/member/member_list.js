@@ -12,6 +12,7 @@ angular.module('app.member.list', [])
             if ($rootScope.cur_home != null) {
                 if ($scope.home_id != $rootScope.cur_home.home_id || force) {
                     $scope.home_id = $rootScope.cur_home.home_id;
+                    $scope.qr_image_url = $api.qr_image_url("https://www.handcrowd.com/app/#/qr/home/" + $scope.home_id + "/" + $rootScope.cur_home.invite_key)
                     $api.show_waiting();
                     homeStorage.members($rootScope.cur_home.home_id, function(res) {
                         $api.hide_waiting();

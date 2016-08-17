@@ -139,6 +139,23 @@ angular.module('app.api', [])
             $ionicLoading.hide();
         };
 
+        qr_image_url = function(url, size) {
+            if (size == undefined)
+                size = 300;
+            return "http://chart.apis.google.com/chart?cht=qr&chs=" + size + "x" + size + "&chl=" + encodeURIComponent(url) + "&chld=H|0";
+        };
+            
+        init_emoticon = function(icon) {
+            icon.image = CONFIG.BASE + icon.image;
+            icon.exp = icon.alt.replace(/\)/g, '\\)');
+            icon.exp = icon.exp.replace(/\(/g, '\\(');
+            icon.exp = icon.exp.replace(/\:/g, '\\:');
+            icon.exp = icon.exp.replace(/\|/g, '\\|');
+            icon.exp = icon.exp.replace(/\*/g, '\\*');
+            icon.exp = icon.exp.replace(/\^/g, '\\^');
+            icon.exp = new RegExp(icon.exp, 'g');
+        }
+
         return {
             call: call_api,
             upload_file: upload_file,
@@ -150,7 +167,9 @@ angular.module('app.api', [])
             mobile_operating_system: get_mobile_operating_system,
             device_type: get_device_type,
             show_waiting: show_waiting,
-            hide_waiting: hide_waiting
+            hide_waiting: hide_waiting,
+            qr_image_url: qr_image_url,
+            init_emoticon: init_emoticon
         };
     }
 )

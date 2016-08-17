@@ -193,16 +193,8 @@ angular.module('app.storage.chat', [])
 })
 
 .factory('chatStorage', 
-    function($api, $session, $dateutil, $rootScope, filterFilter, AUTH_EVENTS, $auth, CONFIG, $filter) {
-        var cancel_upload_file, init, messages, read_messages, refresh_unreads_title, remove_message, search_messages, search_read, set_message, sound_alert, star_message, upload_file;
-        init = function() {
-
-            /*
-            if $auth.isAuthenticated()
-                    search()
-             */
-        };
-
+    function($api, $session, $dateutil, $rootScope, CONFIG, $filter) {
+        var cancel_upload_file, messages, read_messages, refresh_unreads_title, remove_message, search_messages, search_read, set_message, sound_alert, star_message, upload_file;
         save_cache_messages_to_storage = function () {
             if ($session.user_id) {
                 try {
@@ -688,7 +680,6 @@ angular.module('app.storage.chat', [])
             return params.limit = 10;
         };
         return {
-            init: init,
             save_cache_messages_to_storage: save_cache_messages_to_storage,
             cache_messages: cache_messages,
             message_to_html: message_to_html,

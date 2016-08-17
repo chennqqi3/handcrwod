@@ -98,11 +98,8 @@ angular.module('app.auth', [])
             this.time_zone = data.time_zone;
             this.states = {};
             this.planconfig = data.plan;
-            $rootScope.cur_home = data.cur_home;
             $rootScope.alerts = data.alerts;
             $rootScope.chat_uri = data.chat_uri;
-            this.setCurHome(data.cur_home, false);
-            this.setCurMission(data.cur_mission, false);
             this.statesToStorage();
             try {
                 encoded = sjcl.encrypt("hc2015", JSON.stringify({
@@ -126,11 +123,11 @@ angular.module('app.auth', [])
             this.time_zone = null;
             this.states = null;
             this.planconfig = null;
-            this.setCurHome(null);
-            this.setCurMission(null);
-            $rootScope.homes = null;
-            $rootScope.missions = null;
-            $rootScope.tasks = null;
+            $rootScope.homes = [];
+            $rootScope.cur_home = null;
+            $rootScope.missions = [];
+            $rootScope.cur_mission = null;
+            $rootScope.tasks = [];
             try {
                 localStorage.setItem(SESSION, null);
                 localStorage.setItem(STATES, null);
@@ -144,46 +141,12 @@ angular.module('app.auth', [])
             }
             return this.user_id + ":" + this.session_id;
         };
-
-        this.setCurHome = function(home, toStorage) {
-            var new_home_id, old_home_id;
-            if (toStorage == undefined) {
-                toStorage = true;
-            }
-            old_home_id = null;
-            new_home_id = null;
-            if ($rootScope.cur_home == undefined) {
-                $rootScope.cur_home = null;
-            }
-            if ($rootScope.cur_home != null) {
-                old_home_id = $rootScope.cur_home.home_id;
-            }
-            if (home != null && home.home_id != null) {
-                new_home_id = home.home_id;
-            }
-            $rootScope.cur_home = home;
-            if (toStorage) {
-                $this.statesToStorage();
-            }
-            if (old_home_id != new_home_id) {
-                $rootScope.$broadcast('select-home');
-            }
-        };
-        this.setCurMission = function(mission, toStorage) {
-            if (toStorage == undefined) {
-                toStorage = true;
-            }
-            $rootScope.cur_mission = mission;
-            if (toStorage) {
-                $this.statesToStorage();
-            }
-        };
         return this;
     }
 )
 
 .factory('$auth', 
-    function($api, $session, $rootScope, $location, $state, $http, AUTH_EVENTS, CONFIG, logger) {
+    function($api, $session, $rootScope, $location, $state, $http, AUTH_EVENTS, CONFIG, logger, homeStorage, missionStorage) {
         var authService;
         authService = {};
         authService.autoLogin = function(session_id, authorizedRoles, event, onLoginSuccess) {
@@ -222,6 +185,9 @@ angular.module('app.auth', [])
                             alerts: data.user.alerts,
                             chat_uri: data.user.chat_uri
                         });
+
+                        homeStorage.set_cur_home(data.user.cur_home, false);
+                        missionStorage.set_cur_mission((states.cur_mission != null ? states.cur_mission : null), false)
 
                         $rootScope.$broadcast('reload_session');
 
@@ -262,6 +228,8 @@ angular.module('app.auth', [])
             return $api.call('user/signin', credentials).then(function(res) {
                 if (res.data.err_code == 0) {
                     $session.create(res.data);
+                    homeStorage.set_cur_home(res.data.cur_home, false);
+                    missionStorage.set_cur_mission(res.data.cur_mission, false);
                 }
                 return res.data.err_code;
             });
@@ -270,6 +238,8 @@ angular.module('app.auth', [])
             return $api.call('user/activate', credentials).then(function(res) {
                 if (res.data.err_code == 0) {
                     $session.create(res.data);
+                    homeStorage.set_cur_home(res.data.cur_home, false);
+                    missionStorage.set_cur_mission(res.data.cur_mission, false);
                 }
                 return res.data;
             });
@@ -280,6 +250,8 @@ angular.module('app.auth', [])
             }).then(function(res) {
                 if (res.data.err_code == 0) {
                     $session.create(res.data);
+                    homeStorage.set_cur_home(res.data.cur_home, false);
+                    missionStorage.set_cur_mission(res.data.cur_mission, false);
                 }
                 return res.data.err_code;
             });
@@ -290,6 +262,8 @@ angular.module('app.auth', [])
             }).then(function(res) {
                 if (res.data.err_code == 0) {
                     $session.create(res.data);
+                    homeStorage.set_cur_home(res.data.cur_home, false);
+                    missionStorage.set_cur_mission(res.data.cur_mission, false);
                 }
                 return res.data.err_code;
             });

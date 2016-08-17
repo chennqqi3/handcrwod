@@ -15,6 +15,7 @@ angular.module('handcrowd', [
     'ngWebsocket',
     'duScroll',
     'ngCordova',
+    'ngCordova.plugins.barcodeScanner',
 
     // common
     'app.api',
@@ -33,6 +34,7 @@ angular.module('handcrowd', [
     'app.storage.home',
     'app.storage.mission',
     'app.storage.task',
+    'app.storage.qr',
 
     // controller
     'app.signin',

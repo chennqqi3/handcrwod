@@ -385,6 +385,14 @@ module.exports = [
         "clobbers": [
             "cordova.getAppVersion"
         ]
+    },
+    {
+        "file": "plugins/phonegap-plugin-barcodescanner/www/barcodescanner.js",
+        "id": "phonegap-plugin-barcodescanner.BarcodeScanner",
+        "pluginId": "phonegap-plugin-barcodescanner",
+        "clobbers": [
+            "cordova.plugins.barcodeScanner"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -397,7 +405,9 @@ module.exports.metadata =
     "cordova-plugin-file": "4.1.1",
     "cordova-plugin-media-capture": "1.2.0",
     "cordova-plugin-file-transfer": "1.5.0",
-    "cordova-plugin-app-version": "0.1.8"
+    "cordova-plugin-app-version": "0.1.8",
+    "cordova-plugin-compat": "1.0.0",
+    "phonegap-plugin-barcodescanner": "6.0.1"
 }
 // BOTTOM OF METADATA
 });
