@@ -20,7 +20,7 @@ angular.module('app.api', [])
                 data: data
             };
             return $http(req).error(function(data, status, headers, config) {
-                logger.logError('エラーで読み込めませんでした。ページを更新して下さい。');
+                logger.logError('エラーで読み込めませんでした。');
                 $rootScope.g_finished_ajax = true;
                 hide_waiting();
             });
