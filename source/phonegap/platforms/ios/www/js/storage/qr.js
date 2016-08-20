@@ -42,7 +42,7 @@ angular.module('app.storage.qr', [])
                                         if (res.err_code == 0 && !$api.is_empty(res.home_name)) {
                                             $ionicPopup.confirm({
                                                 title: 'グループ招待',
-                                                template: 'グループ「' + res.home_name + '」に招待されます。よろしいでしょうか？',
+                                                template: 'グループ「' + res.home_name + '」に参加します。よろしいでしょうか？',
                                                 buttons: [
                                                     { text: 'キャンセル' },
                                                     {
@@ -97,7 +97,7 @@ angular.module('app.storage.qr', [])
                                         if (res.err_code == 0 && !$api.is_empty(res.mission_name)) {
                                             $ionicPopup.confirm({
                                                 title: 'グループ招待',
-                                                template: 'チャットルーム「' + res.mission_name + '」に招待されます。よろしいでしょうか？',
+                                                template: 'チャットルーム「' + res.mission_name + '」に参加します。よろしいでしょうか？',
                                                 buttons: [
                                                     { text: 'キャンセル' },
                                                     {

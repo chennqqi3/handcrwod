@@ -99,6 +99,7 @@ angular.module('app.auth', [])
             this.states = {};
             this.planconfig = data.plan;
             $rootScope.alerts = data.alerts;
+            $rootScope.unreads = data.unreads;
             $rootScope.chat_uri = data.chat_uri;
             this.statesToStorage();
             try {
@@ -128,6 +129,8 @@ angular.module('app.auth', [])
             $rootScope.missions = [];
             $rootScope.cur_mission = null;
             $rootScope.tasks = [];
+            $rootScope.alerts = [];
+            $rootScope.unreads = [];
             try {
                 localStorage.setItem(SESSION, null);
                 localStorage.setItem(STATES, null);
@@ -170,21 +173,7 @@ angular.module('app.auth', [])
                     'cur_home_id': cur_home_id
                 }).success(function(data, status, headers, config) {
                     if (data.err_code == 0) {
-                        $session.create({
-                            session_id: session_id,
-                            user_id: data.user.user_id,
-                            user_role: 'user',
-                            user_name: data.user.user_name,
-                            email: data.user.email,
-                            avartar: data.user.avartar,
-                            language: data.user.language,
-                            time_zone: data.user.time_zone,
-                            plan: data.user.plan,
-                            cur_home: states.cur_home !== null ? states.cur_home : null,
-                            cur_mission: states.cur_mission != null ? states.cur_mission : null,
-                            alerts: data.user.alerts,
-                            chat_uri: data.user.chat_uri
-                        });
+                        $session.create(data.user);
 
                         homeStorage.set_cur_home(data.user.cur_home, false);
                         missionStorage.set_cur_mission((states.cur_mission != null ? states.cur_mission : null), false)

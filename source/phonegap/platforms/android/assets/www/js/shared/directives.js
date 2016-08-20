@@ -25,7 +25,7 @@ angular.module('app.directives', [])
 .filter('htmlfy', function($sce) {
     return function(text) {
         text = text + '';
-        t = text.replace(/(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \?\=\&\;\#\%\.-]*)*\/?/g, 
+        t = text.replace(/(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\:][\d]+)?([\/\w \?\=\&\;\#\%\.-]*)*\/?/g, 
             function(url) {
                 return '<a href="#" onclick="window.open(\'' + url + '\', \'_system\', \'location=yes\'); return false;">' + url + '</a>';
             }
@@ -50,7 +50,7 @@ angular.module('app.directives', [])
     }
 })
 
-.service('chatizeService', function($api) {
+.service('chatizeService', function($api, $rootScope) {
     this.stripAttachString = function(str) {
         if ($api.is_empty(str)) {
             return '';
@@ -114,11 +114,23 @@ angular.module('app.directives', [])
         
         return str;
     };
+
+    this.emoticon = function(emoticon_id) {
+        if ($rootScope.emoticons) {
+            for(var i=0; i<$rootScope.emoticons.length; i++){
+                e = $rootScope.emoticons[i];
+                if (e.emoticon_id == emoticon_id)
+                    return '<i class="emoticon" style="background-image:url(' + e.image + ')"></i>';
+            }
+        }
+        return '';
+    };
+
     return this;
 })
 
 .filter('chatize', 
-    function($api, $sce, $emoticons, $dateutil, CONFIG, $compile, $session) {
+    function($api, $sce, $dateutil, CONFIG, $compile, $session, $rootScope) {
         return function(text, hideThumb) {
             if ($api.is_empty(text))
                 return '';
@@ -285,10 +297,12 @@ angular.module('app.directives', [])
                 return '<a href="#" onclick="window.open(\'' + url + '\', \'_system\', \'location=yes\'); return false;">' + url + '</a>';
             });
 
-            l = $emoticons.icons.length
-            for (i =0; i < l; i ++) { // fix bug for ]:) (^^;)
-                e = $emoticons.icons[l - i - 1];
-                t = t.replace(e.exp, '<i class="emoticon ' + e.class + '"></i>');
+            if ($rootScope.emoticons) {
+                l = $rootScope.emoticons.length
+                for (i =0; i < l; i ++) { // fix bug for ]:) (^^;)
+                    e = $rootScope.emoticons[l - i - 1];
+                    t = t.replace(e.exp, '<i class="emoticon" style="background-image:url(' + e.image + ')"></i>');
+                }    
             }
 
             t = getFileAttachString(t);

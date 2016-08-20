@@ -378,6 +378,31 @@ img.profile-pic.right {
     color: #999;
 }
 
+.message .reacts {
+    list-style: none;
+    padding-left: 0px;
+    margin-bottom: 0px;
+}
+
+.message .reacts li {
+    display: inline-block;
+    margin: 3px 2px;
+    padding: 1px 4px;
+    border: solid 1px #2196f3;
+    border-radius: 3px;
+    background-color: #e3f2fd;
+    cursor: pointer; 
+    color: #2196f3;
+}
+
+.message .reacts li:first-child {
+    margin-left: 0px;
+}
+
+.message .reacts li:first-child .emoticon {
+    margin-right: 5px;
+}
+
 .message-detail .time .unread {
     visibility: visible;
     opacity: 1;
@@ -555,6 +580,18 @@ div#emoticon_gallery .footer-btn {
 .emoticonGallery li:hover {
     background-color: #dcf0fa;
     border-color: #b1d6ed;
+}
+
+.emoticon {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+
+    background-repeat: no-repeat;
+    background-color: rgba(0, 0, 0, 0);
+    background-position: center;
+
+    font-size: 20px !important;
 }
 
 #to_users {    

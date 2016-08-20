@@ -30,7 +30,10 @@ angular.module('app.storage.home', [])
             ref = $rootScope.homes;
             for (i = 0, len = ref.length; i < len; i++) {
                 if (ref[i].home_id == home.home_id) {
-                    ref[i] = home;
+                    if (ref[i] != home) {
+                        home.order = ref[i].order;
+                        ref[i] = home;
+                    }
                     return;
                 }
             }
@@ -231,16 +234,6 @@ angular.module('app.storage.home', [])
             });
         };
 
-        set_unreads = function(delta) {
-            len = $rootScope.homes.length;
-            for (i = 0; i < len; i ++) {
-                home = $rootScope.homes[i];
-                if (home.home_id == $rootScope.cur_home.home_id)
-                    home.unreads = home.unreads + delta;
-            }
-            return;
-        };
-
         upload_logo = function(home_id, file) {
             return $api.upload_file('home/upload_logo', file, {
                 home_id: home_id
@@ -275,6 +268,25 @@ angular.module('app.storage.home', [])
             return;
         };
 
+        emoticons = function(home_id) {
+            params = {
+                home_id: home_id
+            }
+
+            $api.call("home/emoticons", params)
+                .then(function(res) {
+                    if (res.data.err_code == 0) {
+                        for (i = 0; i<res.data.emoticons.length; i ++) {
+                            icon = res.data.emoticons[i];
+                            $api.init_emoticon(icon);
+                        }
+
+                        $rootScope.emoticons = res.data.emoticons;
+                    }
+                });
+            return;
+        }
+
         return {
             search: search,
             get_home: get_home,
@@ -295,11 +307,12 @@ angular.module('app.storage.home', [])
             
             accept_invite: accept_invite,
             bot_messages: bot_messages,
-            set_unreads: set_unreads,
 
             upload_logo: upload_logo,
             remove_logo: remove_logo,
-            refresh_logo: refresh_logo
+            refresh_logo: refresh_logo,
+
+            emoticons: emoticons
         };
     }
 );

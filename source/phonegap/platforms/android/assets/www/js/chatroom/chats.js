@@ -1,7 +1,7 @@
 angular.module('app.chat.list', [])
 
 .controller('chatsCtrl', 
-    function($scope, $rootScope, $session, $ionicPopup, $ionicModal, $ionicListDelegate, $ionicScrollDelegate, $ionicActionSheet, missionStorage, chatStorage, logger, $timeout, $state, qrStorage) {
+    function($scope, $rootScope, $session, $ionicPopup, $ionicModal, $ionicListDelegate, $ionicScrollDelegate, $ionicActionSheet, homeStorage, missionStorage, chatStorage, logger, $timeout, $state, qrStorage) {
     // toggle group
     $scope.groups = [true, true, true];
     $scope.toggleGroup = function(index) {
@@ -316,6 +316,8 @@ angular.module('app.chat.list', [])
                     if (scroll_top)
                         viewScroll.scrollTop(true);
                 });
+
+            homeStorage.emoticons($rootScope.cur_home.home_id);
         }
     }
 

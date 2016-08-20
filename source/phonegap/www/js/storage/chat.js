@@ -2,199 +2,9 @@ var g_messages = null;
 
 angular.module('app.storage.chat', [])
 
-.factory('$emoticons', function() {
-    var icons;
-    icons = [
-        {
-            "class": 'emoticon-smile',
-            title: '笑顔',
-            alt: ':)'
-        }, {
-            "class": 'emoticon-sad',
-            title: '悲しい',
-            alt: ':('
-        }, {
-            "class": 'emoticon-more-smile',
-            title: 'もっとスマイル',
-            alt: ':D'
-        }, {
-            "class": 'emoticon-lucky',
-            title: 'やったね',
-            alt: '8-)'
-        }, {
-            "class": 'emoticon-surprise',
-            title: 'びっくり',
-            alt: ':o'
-        }, {
-            "class": 'emoticon-wink',
-            title: 'ウィンク',
-            alt: ';)'
-        }, {
-            "class": 'emoticon-tears',
-            title: 'ウェ～ん',
-            alt: ';('
-        }, {
-            "class": 'emoticon-sweat',
-            title: '汗',
-            alt: '(sweat)'
-        }, {
-            "class": 'emoticon-mumu',
-            title: 'むむ',
-            alt: ':|'
-        }, {
-            "class": 'emoticon-kiss',
-            title: 'チュ！',
-            alt: ':*'
-        }, {
-            "class": 'emoticon-tongueout',
-            title: 'べー',
-            alt: ':p'
-        }, {
-            "class": 'emoticon-blush',
-            title: '恥ずかしい',
-            alt: '(blush)'
-        }, {
-            "class": 'emoticon-wonder',
-            title: '何なに',
-            alt: ':^)'
-        }, {
-            "class": 'emoticon-snooze',
-            title: '眠い',
-            alt: '|-)'
-        }, {
-            "class": 'emoticon-love',
-            title: '恋してます',
-            alt: '(inlove)'
-        }, {
-            "class": 'emoticon-grin',
-            title: 'ニヤッ',
-            alt: ']:)'
-        }, {
-            "class": 'emoticon-talk',
-            title: '話す',
-            alt: '(talk)'
-        }, {
-            "class": 'emoticon-yawn',
-            title: 'あくび',
-            alt: '(yawn)'
-        }, {
-            "class": 'emoticon-puke',
-            title: 'ゲーッ',
-            alt: '(puke)'
-        }, {
-            "class": 'emoticon-ikemen',
-            title: 'イケメン',
-            alt: '(emo)'
-        }, {
-            "class": 'emoticon-otaku',
-            title: 'オタク',
-            alt: '8-|'
-        }, {
-            "class": 'emoticon-ninmari',
-            title: 'ニンマリ',
-            alt: ':#)'
-        }, {
-            "class": 'emoticon-nod',
-            title: 'うんうん',
-            alt: '(nod)'
-        }, {
-            "class": 'emoticon-shake',
-            title: 'いやいや',
-            alt: '(shake)'
-        }, {
-            "class": 'emoticon-wry-smile',
-            title: '苦笑い',
-            alt: '(^^;)'
-        }, {
-            "class": 'emoticon-whew',
-            title: 'やれやれ',
-            alt: '(whew)'
-        }, {
-            "class": 'emoticon-clap',
-            title: '拍手',
-            alt: '(clap)'
-        }, {
-            "class": 'emoticon-bow',
-            title: 'おじぎ',
-            alt: '(bow)'
-        }, {
-            "class": 'emoticon-roger',
-            title: '了解！',
-            alt: '(roger)'
-        }, {
-            "class": 'emoticon-muscle',
-            title: '筋肉モリモリ',
-            alt: '(flex)'
-        }, {
-            "class": 'emoticon-dance',
-            title: 'ダンス',
-            alt: '(dance)'
-        }, {
-            "class": 'emoticon-komanechi',
-            title: 'コマネチ',
-            alt: '(:/)'
-        }, {
-            "class": 'emoticon-devil',
-            title: '悪魔',
-            alt: '(devil)'
-        }, {
-            "class": 'emoticon-star',
-            title: '星',
-            alt: '(*)'
-        }, {
-            "class": 'emoticon-heart',
-            title: 'ハート',
-            alt: '(h)'
-        }, {
-            "class": 'emoticon-flower',
-            title: '花',
-            alt: '(F)'
-        }, {
-            "class": 'emoticon-cracker',
-            title: 'クラッカー',
-            alt: '(cracker)'
-        }, {
-            "class": 'emoticon-cake',
-            title: 'ケーキ',
-            alt: '(^)'
-        }, {
-            "class": 'emoticon-coffee',
-            title: 'コーヒー',
-            alt: '(coffee)'
-        }, {
-            "class": 'emoticon-beer',
-            title: 'ビール',
-            alt: '(beer)'
-        }, {
-            "class": 'emoticon-handshake',
-            title: '握手',
-            alt: '(handshake)'
-        }, {
-            "class": 'emoticon-yes',
-            title: 'はい',
-            alt: '(y)'
-        }
-    ];
-
-    for(i = 0; i < icons.length; i ++)
-    {
-        icon = icons[i]
-        icon.exp = icon.alt.replace(/\)/g, '\\)')
-        icon.exp = icon.exp.replace(/\(/g, '\\(')
-        icon.exp = icon.exp.replace(/\:/g, '\\:')
-        icon.exp = icon.exp.replace(/\|/g, '\\|')
-        icon.exp = icon.exp.replace(/\*/g, '\\*')
-        icon.exp = icon.exp.replace(/\^/g, '\\^')
-        icon.exp = new RegExp(icon.exp, 'g')
-    }
-    return {
-        icons: icons
-    };
-})
-
 .factory('chatStorage', 
-    function($api, $session, $dateutil, $rootScope, CONFIG, $filter) {
-        var cancel_upload_file, messages, read_messages, refresh_unreads_title, remove_message, search_messages, search_read, set_message, sound_alert, star_message, upload_file;
+    function($api, $session, $dateutil, $rootScope, CONFIG, $filter, chatizeService) {
+        var cancel_upload_file, messages, read_messages, refresh_unreads_title, remove_message, search_messages, search_read, set_message, sound_alert, star_message, upload_file, is_to_mine;
         save_cache_messages_to_storage = function () {
             if ($session.user_id) {
                 try {
@@ -345,7 +155,26 @@ angular.module('app.storage.chat', [])
             html += '           <span class="bold' + username_cls + '" onclick="onClickAvartar(\'' + message.avartar + '\')">' + message.user_name + '</span>';
             html += '           <span class="time"><i class="unread-mark fa fa-circle text-danger ' + message.read_class + '"></i><a href="javascript:;" class="star" ng-click="star(message)"><i class="fa fa-star text-warning' + star_cls + '"></i></a>' + date_label + '</span>';
             html += '       </div>';
-            html += '       <div class="message">' + $filter('chatize')(message.content) + '</div>';                
+            html += '       <div class="message">' + $filter('chatize')(message.content);
+            if (message.reacts && message.reacts.length > 0) {
+                html += '       <ul class="reacts">';
+                for (var i = 0; i < message.reacts.length; i ++) {
+                    react = message.reacts[i];
+                    rtitle = "";
+                    if (react[2]) {
+                        for(var j=0; j<react[2].length; j++) {
+                            u = react[2][j];
+                            if (rtitle != "")
+                                rtitle += ",";
+                            rtitle += u[1];
+                        }
+                        rtitle = ' title="' + rtitle + '"';
+                    }
+                    html += '       <li ng-click="react(' + message.cmsg_id + ', ' + react[0] + ')" ' + rtitle + '>' + chatizeService.emoticon(react[0]) + react[1] + '</li>';
+                }
+                html += '       </ul>';
+            }
+            html += '       </div>';
             html += '   </div>';
             html += '   <div class="cf"></div>';
             html += '</div>';
@@ -446,6 +275,16 @@ angular.module('app.storage.chat', [])
                 cmsg_ids: cmsg_ids
             };
             return $api.call("chat/read_messages", params).then(function(res) {
+                return res.data;
+            });
+        };
+        unread_messages = function(mission_id, cmsg_ids) {
+            var params;
+            params = {
+                mission_id: mission_id,
+                cmsg_ids: cmsg_ids
+            };
+            return $api.call("chat/unread_messages", params).then(function(res) {
                 return res.data;
             });
         };
@@ -588,41 +427,98 @@ angular.module('app.storage.chat', [])
         cancel_upload_file = function(file) {
             $api.cancel_upload(file.upload);
         };
-        refresh_unreads_title = function() {
-            var title, unread_missions;
-            unread_missions = 0;
+
+        get_unread = function(cmsg) {
+            mission_id = cmsg.mission_id;
+            unreads = $rootScope.unreads[mission_id];
+            if (unreads) {
+                for (i=0; i<unreads.length; i++) {
+                    if (u.cmsg_id == cmsg.cmsg_id)
+                        return u;
+                }
+            }
+
+            return null;
+        };
+
+        set_unread = function(cmsg) {
+            unread = get_unread(cmsg);
+            if (unread)
+                unread.to_flag = cmsg.to_flag;
+            else {
+                mission_id = cmsg.mission_id;
+                unreads = $rootScope.unreads[mission_id];
+                if (unreads == undefined) {
+                    $rootScope.unreads[mission_id] = [];
+                    unreads = $rootScope.unreads[mission_id];
+                }
+                unreads.push({
+                    cmsg_id: cmsg.cmsg_id,
+                    to_flag: cmsg.to_flag
+                });
+            }
+        };
+
+        remove_unread = function(cmsg) {
+            mission_id = cmsg.mission_id;
+            unreads = $rootScope.unreads[mission_id];
+            if (unreads) {
+                for (i=0; i<unreads.length; i ++) {
+                    if (u.cmsg_id == cmsg.cmsg_id) {
+                        unreads.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        };
+
+        refresh_unreads_title = function(refresh_home) {
+            if (refresh_home === void 0) {
+                refresh_home = true;
+            }
+
             unreads = 0;
+            to_unreads = 0;
+
             angular.forEach($rootScope.missions, function(mission) {
                 if (mission.unreads > 0) {
                     unreads += mission.unreads;
                 }
+                if (mission.to_unreads > 0) {
+                    to_unreads += mission.to_unreads;
+                }
             });
 
             if ($rootScope.homes) {
-                for (var i =0; i < $rootScope.homes.length; i ++)
-                {
-                    if ($rootScope.homes[i].home_id == $rootScope.cur_home.home_id) {
-                        $rootScope.homes[i].unreads = unreads
+                t_unreads = 0;
+                t_to_unreads = 0;
+                ref = $rootScope.homes;
+                for (i = 0, len = ref.length; i < len; i++) {
+                    home = ref[i];
+                    if ($rootScope.cur_home && home.home_id === $rootScope.cur_home.home_id) {
+                        home.unreads = unreads;
+                        home.to_unreads = to_unreads;
+                        if (refresh_home) {
+                            $rootScope.$broadcast('refresh-home', home);
+                        }
                     }
-                    unread_missions+=$rootScope.homes[i].unreads;
+                    t_unreads += home.unreads;
+                    t_to_unreads += home.to_unreads;
                 }
             }
+
             title = "";
-            try {
-                if (unread_missions > 0) {
-                    title = "[" + unread_missions + "]";
-                    cordova.plugins.notification.badge.set(unread_missions);
-                    $rootScope.unread_missions = unread_missions;
+
+            if (t_unreads > 0) {
+                title = "[" + t_unreads;
+                if (t_to_unreads > 0) {
+                    title += "(" + t_to_unreads + ")";
                 }
-                else {
-                    cordova.plugins.notification.badge.clear();
-                    $rootScope.unread_missions = null;
-                }
+                title += "]";
             }
-            catch(err) {
-                
-            }
+
             document.title = title + "ハンドクラウド";
+            return;
         };
 
         reorder_home_mission = function(last_home_id, last_mission_id) {
@@ -682,16 +578,21 @@ angular.module('app.storage.chat', [])
         return {
             save_cache_messages_to_storage: save_cache_messages_to_storage,
             cache_messages: cache_messages,
+            is_to_mine: is_to_mine,
             message_to_html: message_to_html,
             messages_to_html: messages_to_html,
             messages: messages,
             search_messages: search_messages,
             read_messages: read_messages,
+            unread_messages: unread_messages,
             set_message: set_message,
             remove_message: remove_message,
             star_message: star_message,
             upload_file: upload_file,
             cancel_upload_file: cancel_upload_file,
+            get_unread: get_unread,
+            set_unread: set_unread,
+            remove_unread: remove_unread,
             refresh_unreads_title: refresh_unreads_title,
             reorder_home_mission: reorder_home_mission,
             sound_alert: sound_alert,

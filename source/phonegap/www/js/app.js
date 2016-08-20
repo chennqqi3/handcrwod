@@ -50,6 +50,7 @@ angular.module('handcrowd', [
     'app.chat.list',
     'app.chatroom',
     'app.chat.star',
+    'app.chatroom.emoticon_add',
 
     // mission
     'app.mission.edit',
@@ -456,6 +457,18 @@ angular.module('handcrowd', [
                     'tab-chats@tab': {
                         templateUrl: 'templates/mission/mission_member_add.html' + ver,
                         controller: 'missionMemberAddCtrl'
+                    }
+                }
+            })
+
+            // add emoticion
+            .state('tab.chatroom.emoticon_add', {
+                url: '/emoticon_add',
+                data: { authorizedRoles: [USER_ROLES.user] },
+                views: {
+                    'tab-chats@tab': {
+                        templateUrl: 'templates/chatroom/emoticon_add.html' + ver,
+                        controller: 'emoticonAddCtrl'
                     }
                 }
             })

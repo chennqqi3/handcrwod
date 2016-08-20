@@ -39,37 +39,59 @@ angular.module('app.service.chat', [])
                 }, 3000);
             });
             $this.socket.$on('chat_message', function(cmsg) {
-                var found_mission;
-                found_mission = false;
-                if ($rootScope.cur_home.home_id === cmsg.home_id) {
-                    angular.forEach($rootScope.missions, function(mission) {
-                        if (mission.mission_id === cmsg.mission_id) {
-                            found_mission = true;
-                            if ($session.user_id !== cmsg.user_id) {
-                                mission.unreads++;
+                found_home = false;
+                found_mission_name　= null;
+                if ($session.user_id != cmsg.user_id) {
+                    unread = chatStorage.get_unread(cmsg);
+
+                    delta_unreads = 0;
+                    delta_to_unreads = 0;
+
+                    cmsg.to_flag = chatStorage.is_to_mine(cmsg);
+                    if (!unread)
+                        delta_unreads = 1;
+                    if (!unread || unread && !unread.to_flag)
+                        if (cmsg.to_flag)
+                            delta_to_unreads = 1;
+
+                    if ($rootScope.cur_home.home_id == cmsg.home_id && $rootScope.missions)
+                    {
+                        angular.forEach($rootScope.missions, function(mission) {
+                            if (mission.mission_id == cmsg.mission_id) {
+                                found_mission_name　= mission.mission_name;
+                                mission.unreads += delta_unreads;
+                                mission.to_unreads += delta_to_unreads;
+                                if (delta_unreads > 0 || delta_to_unreads > 0) {
+                                    chatStorage.set_unread(cmsg);
+                                }
                                 mission.visible = true;
-                                mission.last_text = cmsg.content;
-                                $rootScope.$apply();
-                                chatStorage.sound_alert();
                                 $rootScope.$broadcast('unread-message', mission);
                             }
-                        }
-                    });
-                }
-                angular.forEach($rootScope.homes, function(home) {
-                    if (home.home_id === cmsg.home_id) {
-                        if ($session.user_id !== cmsg.user_id) {
-                            home.unreads++;
-                            $rootScope.$apply();
-                            chatStorage.sound_alert();
-                        }
+                        });
                     }
-                });
+
+                    if (delta_unreads > 0 && $rootScope.homes && $rootScope.homes) {
+                        angular.forEach($rootScope.homes, function(home) {
+                            if (home.home_id == cmsg.home_id) {
+                                found_home = true;
+                                home.unreads += delta_unreads;
+                                home.to_unreads += delta_to_unreads;
+                                $rootScope.$apply();
+                                chatStorage.sound_alert();
+                                $rootScope.$broadcast('refresh-home', home);
+                            }
+                        });
+                    }
+                }
+                else
+                    found_home = true;
+
                 chatStorage.reorder_home_mission(cmsg.home_id, cmsg.mission_id);
-                if (!found_mission) {
+
+                if (!found_home) {
                     $rootScope.$broadcast('refresh-homes');
                 }
-                if (found_mission)
+                if (found_mission_name)
                 {
                     if ($state.current.name == 'tab.chatroom' && $rootScope.cur_mission != null 
                         && $rootScope.cur_mission.mission_id != cmsg.mission_id ||
@@ -83,6 +105,13 @@ angular.module('app.service.chat', [])
                 console.log('receive_message temp_cmsg_id:' + cmsg.temp_cmsg_id + ' cmsg_id:' + cmsg.cmsg_id);
                 return $rootScope.$broadcast('receive_message', cmsg);
             });
+
+            $this.socket.$on('react_message', function(cmsg) {
+                if ($rootScope.cur_mission.mission_id == cmsg.mission_id) {
+                    return $rootScope.$broadcast('react_message', cmsg);
+                }
+            });
+            
             $this.socket.$on('chat_messages', function(cmsg) {
                 messages = cmsg.messages;
                 user_id = null;
@@ -195,6 +224,17 @@ angular.module('app.service.chat', [])
                     home_name: $rootScope.cur_home.home_name
                 };
                 $this.emit('chat_message', msg);
+            }
+        };
+        $this.react = function(cmsg_id, mission_id, emoticon_id) {
+            var msg;
+            if ($this.socket !== null) {
+                msg = {
+                    cmsg_id: cmsg_id,
+                    mission_id: mission_id,
+                    emoticon_id: emoticon_id
+                };
+                return $this.emit('react_message', msg);
             }
         };
         $this.messages = function(mission_id, prev_id, next_id, star) {

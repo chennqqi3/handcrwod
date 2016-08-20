@@ -10,14 +10,15 @@
             <div class="hc-loader">Loading...</div>
         </div>
     </div>
-    <ion-content id="chat_view" has-bouncing="true" class="has-header transparent" ng-class="{'hide-footer': !canChat()}"
+    <ion-content id="chat_view" has-bouncing="true" class="has-header transparent"
       delegate-handle="userMessageScroll" on-scroll-complete="onScrollComplete()">
       <div id="messages"></div>
     </ion-content>
 
     <div id="emoticon_gallery" style="visibility: hidden;">
         <ul class="emoticonGallery clearfix">
-            <li ng-repeat="em in emoticons" class="emoticon {{em.class}}" title="{{em.title}} {{em.alt}}" alt={{e.alt}} ng-click="add_emoticon(em.alt)"></li>
+            <li ng-repeat="em in emoticons" class="emoticon {{em.class}}" title="{{em.title}} {{em.alt}}" alt={{e.alt}} ng-click="add_emoticon(em.emoticon_id, em.alt)" style="background-image: url({{em.image}})"></li>
+            <li class="emoticon icon-plus" ui-sref=".emoticon_add({mission_id:mission_id})"></li>
         </ul>         
     </div>
 
@@ -52,10 +53,10 @@
         </div>
     </div>   
 
-    <form id="input_bar" name="sendMessageForm" novalidate ng-show="canChat()">
+    <form id="input_bar" name="sendMessageForm" novalidate>
         <ion-footer-bar class="bar-stable item-input-inset message-footer" keyboard-attach>
             <div class="button-top-bar">
-                <button class="button button-icon icon icon-emoticon-smile btn-emoticon">
+                <button class="button button-icon icon icon-emoticon-smile btn-emoticon" ng-click="showEmoticons($event)">
                 </button>
                 <button type="button" class="button button-icon btn-to" ng-click="showTo()">TO</button>
                 <button class="button button-icon icon icon-paper-clip" multiple="true" ng-file-select="onUploadFiles($files)">

@@ -124,9 +124,10 @@ angular.module('app.storage.mission', [])
             if ($rootScope.missions !== null && $rootScope.missions.length > 0) {
                 for (i = j = 0, ref = $rootScope.missions.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
                     if ($rootScope.missions[i].mission_id === mission.mission_id) {
-                        $rootScope.missions[i] = mission;
-
-                        $rootScope.missions = reset_order($rootScope.missions);
+                        if ($rootScope.missions[i] != mission) {
+                            $rootScope.missions[i] = mission;
+                            $rootScope.missions = reset_order($rootScope.missions);   
+                        }
                         return;
                     }
                 }
@@ -176,6 +177,14 @@ angular.module('app.storage.mission', [])
             return $api.call("mission/get", params).then(function(res) {
                 if (res.data.err_code === 0) {
                     res.data.mission.complete_flag = res.data.mission.complete_flag === 1;
+                    if (res.data.mission.emoticons) {
+                        for (i = 0; i<res.data.mission.emoticons.length; i ++) {
+                            icon = res.data.mission.emoticons[i];
+                            $api.init_emoticon(icon);
+                        }
+
+                        $rootScope.emoticons = res.data.mission.emoticons;
+                    }
                 }
                 if (callback !== void 0) {
                     return callback(res.data);
@@ -547,6 +556,20 @@ angular.module('app.storage.mission', [])
                 });
         };
 
+        upload_emoticon = function(mission_id, file) {
+            return $api.upload_file('mission/upload_emoticon', file, {
+                mission_id: mission_id
+            });
+        };
+
+        add_emoticon = function(emoticon, callback) {
+            return $api.call("mission/add_emoticon", emoticon).then(function(res) {
+                if (callback !== void 0) {
+                    return callback(res.data);
+                }
+            });
+        };
+
         return {
             search: search,
             unpinned_missions: unpinned_missions,
@@ -586,7 +609,10 @@ angular.module('app.storage.mission', [])
             mission_unreads_to_html: mission_unreads_to_html,
             mission_to_html: mission_to_html,
             
-            priv: priv
+            priv: priv,
+
+            upload_emoticon: upload_emoticon,
+            add_emoticon: add_emoticon
         };
     }
 );

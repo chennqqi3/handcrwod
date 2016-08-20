@@ -4,13 +4,12 @@ angular.module('app.chatroom', [])
 
 .controller('chatroomCtrl', 
     function($scope, $rootScope, $state, $stateParams, 
-        $ionicActionSheet, $ionicModal, $emoticons, $session,
+        $ionicActionSheet, $ionicModal, $session,
         missionStorage, chatStorage, taskStorage, homeStorage, $chat, $ionicPopover, chatizeService,
-        $ionicPopup, $ionicScrollDelegate, $timeout, $interval, $api, logger, $dateutil, CONFIG) {
+        $ionicPopup, $ionicScrollDelegate, $timeout, $interval, $api, logger, $dateutil, CONFIG, $compile) {
         $rootScope.nav_id = "chatroom_" + $stateParams.mission_id;
         $scope.isAndroid = ionic.Platform.isAndroid(); 
 
-        $scope.emoticons = $emoticons.icons;
         $scope.last_cid = null;
         $scope.search_string = null;
         $scope.show_more = false;
@@ -83,6 +82,20 @@ angular.module('app.chatroom', [])
         };
 
         $scope.clear_cmsg();
+
+        $scope.get_message = function(cmsg_id) {
+            var i, len, msg, ref;
+            if ($scope.messages) {
+                ref = $scope.messages;
+                for (i = 0, len = ref.length; i < len; i++) {
+                    msg = ref[i];
+                    if (msg.cmsg_id === cmsg_id) {
+                        return msg;
+                    }
+                }
+            }
+            return null;
+        };
 
         $scope.load_messages = function(messages) {
             $timeout(function() {
@@ -167,6 +180,28 @@ angular.module('app.chatroom', [])
                 $scope.load_messages(messages);
             }
         });
+
+        $scope.react = function(cmsg_id, emoticon_id) {
+            $chat.react(cmsg_id, $scope.mission_id, emoticon_id);
+        };
+
+        $scope.$on('react_message', function(event, cmsg) {
+            var i, len, m, ref;
+            if (cmsg.mission_id === $scope.mission_id) {
+                console.log("receive cmsg_id:" + cmsg.cmsg_id);
+                ref = $scope.messages;
+                for (i = 0, len = ref.length; i < len; i++) {
+                    m = ref[i];
+                    if (m.cmsg_id === cmsg.cmsg_id) {
+                        m.reacts = cmsg.reacts;
+                        $scope.render_message(m);
+                        break;
+                    }
+                }
+                $scope.initEventHandler();
+            }
+        });
+
         $scope.$on('$ionicView.loaded', function() {
             angular.element(document.querySelector('body')).on('click', function(e) {
                 var elem = angular.element(document.querySelector('#input_bar .btn-emoticon'));
@@ -185,10 +220,11 @@ angular.module('app.chatroom', [])
             });
         });
 
-        angular.element(document.querySelector('#input_bar .btn-emoticon')).on('click', function(e) {
+        $scope.showEmoticons = function(e) {
             var btn_rect, elem, gheight, gwidth, isShowing, pos;
-            e.preventDefault();
-            elem = angular.element(this);
+            if (e)
+                e.preventDefault();
+            elem = angular.element(document.querySelector('#input_bar .btn-emoticon'));
             var emoticon_gallery = angular.element(document.querySelector('#emoticon_gallery'));            
             isShowing = elem.data('isShowing');
             elem.removeData('isShowing');
@@ -199,30 +235,35 @@ angular.module('app.chatroom', [])
                 elem.data('isShowing', "false");
                 emoticon_gallery.css('visibility', 'hidden');
             }
-        });
+        };
 
-        $scope.add_emoticon = function(emo_text) {
-            var start, str, strPrefix, strSuffix;
-            start = angular.element(document.querySelector('.item-input-wrapper textarea')).prop("selectionStart");
-            str = "";
-            if ($api.is_empty($scope.cmsg.content)) {
-                str = emo_text;
-                start = str.length;
-            } else {
-                strPrefix = $scope.cmsg.content.substring(0, start);
-                strSuffix = $scope.cmsg.content.substring(start);
-                start += emo_text.length;
-                str = strPrefix + emo_text + strSuffix;
+        $scope.add_emoticon = function(emoticon_id, emo_text) {
+            if ($scope.cmsg_id) {
+                $scope.react($scope.cmsg_id, emoticon_id);
+                $scope.cmsg_id = undefined;
             }
-            $scope.cmsg.content = str;
+            else {
+                var start, str, strPrefix, strSuffix;
+                start = angular.element(document.querySelector('.item-input-wrapper textarea')).prop("selectionStart");
+                str = "";
+                if ($api.is_empty($scope.cmsg.content)) {
+                    str = emo_text;
+                    start = str.length;
+                } else {
+                    strPrefix = $scope.cmsg.content.substring(0, start);
+                    strSuffix = $scope.cmsg.content.substring(start);
+                    start += emo_text.length;
+                    str = strPrefix + emo_text + strSuffix;
+                }
+                $scope.cmsg.content = str;
+                $timeout(function() {
+                    chat_ta = document.getElementById('chat_ta');
+                    chat_ta.focus();
+                    chat_ta.setSelectionRange(start, start);
+                });
+            }
             angular.element(document.querySelector('#input_bar .btn-emoticon')).data('isShowing', "false");
             angular.element(document.querySelector('#emoticon_gallery')).css('visibility', 'hidden');
-
-            $timeout(function() {
-                chat_ta = document.getElementById('chat_ta');
-                chat_ta.focus();
-                chat_ta.setSelectionRange(start, start);
-            });
         };
 
         $scope.showMore = function(show) {
@@ -697,10 +738,13 @@ angular.module('app.chatroom', [])
             if ($('#chat_' + message.cmsg_id).length > 0) {
                 message_html = chatStorage.message_to_html(message, $scope.chat_id, false);
                 $('#chat_' + message.cmsg_id).html(message_html);
+                $compile($('#chat_' + message.cmsg_id).contents())($scope);
             }
             else {
                 message_html = chatStorage.message_to_html(message, $scope.chat_id);
-                $('#messages').append(message_html);   
+                el = $(message_html);
+                $compile(el.contents())($scope);
+                $('#messages').append(el);
             }
 
         };
@@ -768,8 +812,7 @@ angular.module('app.chatroom', [])
 
         $scope.initEventHandler = function() {
             $timeout(function() {
-                $('.preview-image').off('click');
-                $('.preview-image').on('click', function() {
+                $('.preview-image').off('click').on('click', function() {
                     url = $(this).attr('preview-image');
                     $scope.modalPreviewImage.show();
                     $('#preview_view #board img').remove();
@@ -777,13 +820,12 @@ angular.module('app.chatroom', [])
                     $('#preview_view').css('height', window.screen.height - 44); // header height: 44px
                 });
 
-                $('.message-wrapper').off('hold');
-                $('.message-wrapper').on("hold", function() {
+                $('.message-wrapper').off('hold').on("hold", function(e) {
                     console.log('hold ');
                     cmsg_id = $(this).data('cmsg_id');
                     for (i = 0; i < $scope.messages.length; i ++) {
                         if ($scope.messages[i].cmsg_id == cmsg_id) {
-                            $scope.onMessageHold($scope.messages[i]);
+                            $scope.onMessageHold($scope.messages[i], e);
                             break;
                         }
                     } 
@@ -927,10 +969,18 @@ angular.module('app.chatroom', [])
         $scope.$on('remove_message', function(event, cmsg) {
             var length;
             if (cmsg.mission_id === $scope.mission_id) {
+                is_to_mine = chatStorage.is_to_mine(cmsg);
                 chatStorage.remove_message($scope.messages, cmsg);
                 if (cmsg.unread) {
-                    $rootScope.cur_mission.unreads--;
-                    homeStorage.set_unreads(-1);
+                    delta = -1;
+                    delta_to = 0;
+                    if (is_to_mine)
+                        delta_to = -1;
+                    $rootScope.cur_mission.unreads += delta;
+                    $rootScope.cur_mission.to_unreads += delta;
+                    $rootScope.cur_home.unreads += delta;
+                    $rootScope.cur_home.to_unreads += delta_to;
+                    chatStorage.remove_unread(cmsg);
                     chatStorage.refresh_unreads_title();
                 }
                 if (cmsg.cmsg_id === $scope.last_cid) {
@@ -966,6 +1016,37 @@ angular.module('app.chatroom', [])
             }
         });
 
+        $scope.unread = function(message) {
+            chatStorage.unread_messages($scope.mission_id, [message.cmsg_id]).then(function(data) {
+                var mission;
+                if (data.err_code === 0) {
+                    message.unread = true;
+                    message.set_unread = true;
+                    $scope.set_unread = true;
+                    message.read_class = "unread";
+                    if ($('#chat_' + message.cmsg_id).length > 0) {
+                        $('#chat_' + message.cmsg_id + ' i.unread-mark').addClass(message.read_class).removeClass("read");
+                    }
+                    delta = 1;
+                    delta_to = 0;
+                    message.to_flag = chatStorage.is_to_mine(message);
+                    if (message.to_flag)
+                        delta_to = 1;
+
+                    $rootScope.cur_mission.unreads += delta;
+                    $rootScope.cur_mission.to_unreads += delta_to;
+                    $rootScope.cur_home.unreads += delta;
+                    $rootScope.cur_home.unreads += delta_to;
+
+                    $rootScope.$broadcast('unread-message', $rootScope.cur_mission);
+                    missionStorage.set_mission($rootScope.cur_mission);
+                    return chatStorage.refresh_unreads_title();
+                } else {
+                    return logger.logError(data.err_msg);
+                }
+            });
+        };        
+
         $scope.copy = function(message) {
             var start, str, strPrefix, strSuffix, time;
             start = angular.element(document.querySelector('.item-input-wrapper textarea')).prop("selectionStart");
@@ -985,6 +1066,13 @@ angular.module('app.chatroom', [])
                 chat_ta.focus();
                 chat_ta.setSelectionRange(start + 1, start + 1);
             });
+        };
+
+        $scope.reaction = function(message, e) {
+            $scope.cmsg_id = message.cmsg_id;
+            $timeout(function() {
+                $scope.showEmoticons();
+            }, 500);
         };
 
         angular.element(document.querySelector('#chat_view')).on('scroll', function() {
@@ -1072,7 +1160,7 @@ angular.module('app.chatroom', [])
                         messageTop = elemRect.top;                
 
                         if (messageTop !== void 0) {
-                            if (messageTop >= parentRect.top && messageTop < parentRect.bottom && message.unread) {
+                            if (messageTop >= parentRect.top && messageTop < parentRect.bottom && message.unread && !message.set_unread) {
                                 readIds.push(message.cmsg_id);
                             }
                         }
@@ -1084,7 +1172,6 @@ angular.module('app.chatroom', [])
                     var k, len1, results;
                     if (data.err_code === 0) {
                         results = [];
-                        delta = 0;
                         for (k = 0, len1 = messages.length; k < len1; k++) {
                             message = messages[k];
                             if (readIds.indexOf(message.cmsg_id) !== -1) {
@@ -1093,14 +1180,19 @@ angular.module('app.chatroom', [])
                                 if ($('#chat_' + message.cmsg_id).length > 0) {
                                     $('#chat_' + message.cmsg_id + ' .unread-mark').addClass(message.read_class);
                                 }
-                                $rootScope.cur_mission.unreads--;
-                                delta--;   
+                                delta = -1;
+                                delta_to = 0;
+                                message.to_flag = chatStorage.is_to_mine(message);
+                                if (message.to_flag)
+                                    delta_to = -1;
+                                $rootScope.cur_mission.unreads += delta;
+                                $rootScope.cur_mission.to_unreads += delta_to;
+                                $rootScope.cur_home.unreads += delta;
+                                $rootScope.cur_home.to_unreads += delta_to;
                             }
                         }
 
-                        var mission = missionStorage.get_mission($rootScope.cur_mission.mission_id);
-                        if ($rootScope.cur_mission != mission)
-                            missionStorage.set_mission($rootScope.cur_mission);
+                        missionStorage.set_mission($rootScope.cur_mission);
                         chatStorage.refresh_unreads_title();
                     } else {
                         return logger.logError(data.err_msg);
@@ -1145,10 +1237,7 @@ angular.module('app.chatroom', [])
             });
         }
 
-        $scope.onMessageHold = function(message) {
-            if (!$rootScope.canChat())
-                return;
-            
+        $scope.onMessageHold = function(message, e) {
             var buttons = [
                 { text: '<i class="fa fa-check-square-o icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">タスク新規登録</i>' }, 
                 { text: '<i class="icon-link icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージリンク</i>' }, 
@@ -1156,9 +1245,11 @@ angular.module('app.chatroom', [])
                 { text: '<i class="ion-edit icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージ編集</i>' }, 
                 { text: '<i class="ion-trash-a icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージ削除</i>' }, 
                 { text: '<i class="fa ' + (message.star ? 'fa-star' : 'fa-star-o') + ' icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">スター付き</i>' },
-                { text: '<i class="ion-ios-copy-outline icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージコピー</i>' }
+                { text: '<i class="ion-ios-copy-outline icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージコピー</i>' },
+                { text: '<i class="icon-emoticon-smile icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">リアクション</i>' },
+                { text: '<span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">未読にする</i>' }
             ];
-            var indices = [0, 1, 2, 3, 4, 5, 6];
+            var indices = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
             if (message.user_id !== $session.user_id) {
                 buttons.splice(3, 2);
@@ -1195,6 +1286,11 @@ angular.module('app.chatroom', [])
                         case 6: // copy
                             $scope.copy(message);
                             break;
+                        case 7: // reaction
+                            $scope.reaction(message, e);
+                            break;
+                        case 8: // unread
+                            $scope.unread(message);
                     }
 
                     return true;
@@ -1264,12 +1360,14 @@ angular.module('app.chatroom', [])
             $scope.modalPreviewImage.remove();
 
             angular.forEach($rootScope.missions, function(mission) {
-                if (mission.mission_id == $scope.mission_id && mission.unreads > 0) {
+                if (mission.mission_id == $scope.mission_id && mission.unreads > 0 && !$scope.set_unread) {
                     chatStorage.read_messages($scope.mission_id)
                         .then(function(data) {
                             if (data.err_code == 0) {
                                 $timeout(function() {
                                     mission.unreads = 0;
+                                    mission.to_unreads = 0;
+                                    $rootScope.unreads[$scope.mission_id] = [];
                                     chatStorage.refresh_unreads_title();
                                 }, 1000);
                             }
