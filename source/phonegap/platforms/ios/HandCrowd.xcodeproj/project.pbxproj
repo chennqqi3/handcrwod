@@ -19,6 +19,12 @@
 		23DB83774ACF47258514889E /* CDVBarcodeScanner.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9D0B95D85A5E4F4BB7E78237 /* CDVBarcodeScanner.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		24F3C0E9802646F89B773170 /* CDVSplashScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = B3569909BA8E4834BD73B310 /* CDVSplashScreen.m */; };
 		25E3BE27FBD146459C778219 /* CDVPlugin+APPAppEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = D7CD96E005AF44A8B30FA02C /* CDVPlugin+APPAppEvent.m */; };
+		266DCDDA1D6AE65F004D2813 /* icon-167.png in Resources */ = {isa = PBXBuildFile; fileRef = 266DCDD91D6AE65F004D2813 /* icon-167.png */; };
+		266DCDDC1D6AE66D004D2813 /* icon-167@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 266DCDDB1D6AE66D004D2813 /* icon-167@2x.png */; };
+		266DCDE21D6AEAE6004D2813 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 266DCDE11D6AEAE6004D2813 /* Images.xcassets */; };
+		26A485D01D6AF1B200C8745D /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 26A485CF1D6AF1B200C8745D /* libiconv.tbd */; };
+		26A485D31D6AF1C000C8745D /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 26A485D11D6AF1C000C8745D /* libiconv.2.4.0.tbd */; };
+		26A485D41D6AF1C000C8745D /* libiconv.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 26A485D21D6AF1C000C8745D /* libiconv.2.tbd */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
 		2D8D6D4887B848BE8C882950 /* Toast.m in Sources */ = {isa = PBXBuildFile; fileRef = 1128B34C024844EEBA6FDC9F /* Toast.m */; };
 		2EB4CC751FE64100B46ADD93 /* CDVBarcodeScanner.bundle in Resources */ = {isa = PBXBuildFile; fileRef = C47DBDDB773743008D8EDFE2 /* CDVBarcodeScanner.bundle */; };
@@ -60,7 +66,6 @@
 		91254825F6E24AE8A2EEEB50 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B42250A105C4FBA87E4C4BD /* CoreVideo.framework */; };
 		9F130124D3ED4A0EAD0EDC6C /* CDVAssetLibraryFilesystem.m in Sources */ = {isa = PBXBuildFile; fileRef = B1C6813936EB412F83D66AAF /* CDVAssetLibraryFilesystem.m */; };
 		A5815F0995C84E9CAC50A10B /* UIApplication+APPBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = C172D713946D4E91B5378243 /* UIApplication+APPBadge.m */; };
-		A8D220E35D9848E3A719F6E4 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C224A99DE2948FC905D109B /* libiconv.dylib */; };
 		A9AA3582CE1C4B3CAC12E454 /* UIWebViewExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F135201CC3F44EEADCD6AD9 /* UIWebViewExtension.m */; };
 		AF3FB269423D4872A0EBD181 /* CDVFile.m in Sources */ = {isa = PBXBuildFile; fileRef = E0A2EC53DC574480A56862B3 /* CDVFile.m */; };
 		B204CFAB80F34BFB808AACE5 /* AppDelegate+notification.m in Sources */ = {isa = PBXBuildFile; fileRef = 2469DCBDF8DE4FA2BE94C236 /* AppDelegate+notification.m */; };
@@ -76,6 +81,7 @@
 		F2D49F4E038E4F92A92B9610 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EACD8789F0F940EC94AE0B1C /* CoreLocation.framework */; };
 		FBD3AF160FE441B0BAF5BCDD /* CDVLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = C51228FD904E453A9F48E92D /* CDVLogger.m */; };
 		FC169E1281FD473F89382D65 /* CDVCapture.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7DEF07623ACB4A4D92DE5D49 /* CDVCapture.bundle */; };
+		78127C83BEDC41C8A7B6DF30 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C49912112E845A3B59F4A57 /* libiconv.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +116,12 @@
 		1D754B981958403185CF469A /* APPBadge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APPBadge.m; path = "cordova-plugin-badge/APPBadge.m"; sourceTree = "<group>"; };
 		20A47C7A914844AE88DCF8D5 /* CDVCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDVCamera.h; path = "cordova-plugin-camera/CDVCamera.h"; sourceTree = "<group>"; };
 		2469DCBDF8DE4FA2BE94C236 /* AppDelegate+notification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "AppDelegate+notification.m"; path = "com.phonegap.plugins.PushPlugin/AppDelegate+notification.m"; sourceTree = "<group>"; };
+		266DCDD91D6AE65F004D2813 /* icon-167.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-167.png"; sourceTree = "<group>"; };
+		266DCDDB1D6AE66D004D2813 /* icon-167@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-167@2x.png"; sourceTree = "<group>"; };
+		266DCDE11D6AEAE6004D2813 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = HandCrowd/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		26A485CF1D6AF1B200C8745D /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		26A485D11D6AF1C000C8745D /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
+		26A485D21D6AF1C000C8745D /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
 		288765FC0DF74451002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2CD484ED58D043A1990B75AF /* CDVInAppBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDVInAppBrowser.h; path = "cordova-plugin-inappbrowser/CDVInAppBrowser.h"; sourceTree = "<group>"; };
@@ -169,7 +181,6 @@
 		90311B89789C4999849A790E /* UIWebViewExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UIWebViewExtension.h; path = com.ionic.keyboard/UIWebViewExtension.h; sourceTree = "<group>"; };
 		95EEE504EC4C4B5BA9F5400D /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Toast+UIView.m"; path = "cordova-plugin-x-toast/Toast+UIView.m"; sourceTree = "<group>"; };
 		9AB64031E3D1472A953C0233 /* CDVLocalFilesystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDVLocalFilesystem.h; path = "cordova-plugin-file/CDVLocalFilesystem.h"; sourceTree = "<group>"; };
-		9C224A99DE2948FC905D109B /* libiconv.dylib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		9D0B95D85A5E4F4BB7E78237 /* CDVBarcodeScanner.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = unknown; name = CDVBarcodeScanner.mm; path = "phonegap-plugin-barcodescanner/CDVBarcodeScanner.mm"; sourceTree = "<group>"; };
 		A0726FAE25A8458888430D88 /* CDVViewController+SplashScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CDVViewController+SplashScreen.m"; path = "cordova-plugin-splashscreen/CDVViewController+SplashScreen.m"; sourceTree = "<group>"; };
 		A2AAFE3861CE4AD895034F4D /* CDVExif.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDVExif.h; path = "cordova-plugin-camera/CDVExif.h"; sourceTree = "<group>"; };
@@ -203,6 +214,7 @@
 		F594BC14ACBB4BB8BC74A3BA /* PushPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PushPlugin.m; path = com.phonegap.plugins.PushPlugin/PushPlugin.m; sourceTree = "<group>"; };
 		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = HandCrowd/config.xml; sourceTree = "<group>"; };
 		FFF88DA04DCB46C7AEE7F3DA /* AppDelegate+notification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AppDelegate+notification.h"; path = "com.phonegap.plugins.PushPlugin/AppDelegate+notification.h"; sourceTree = "<group>"; };
+		5C49912112E845A3B59F4A57 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libiconv.dylib"; path = "usr/lib/libiconv.dylib"; sourceTree = SDKROOT; fileEncoding = 4; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,6 +222,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26A485D31D6AF1C000C8745D /* libiconv.2.4.0.tbd in Frameworks */,
+				26A485D41D6AF1C000C8745D /* libiconv.2.tbd in Frameworks */,
+				26A485D01D6AF1B200C8745D /* libiconv.tbd in Frameworks */,
 				5B1594DD16A7569C00FEF299 /* AssetsLibrary.framework in Frameworks */,
 				301BF552109A68D80062928A /* libCordova.a in Frameworks */,
 				288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */,
@@ -218,10 +233,10 @@
 				F2D49F4E038E4F92A92B9610 /* CoreLocation.framework in Frameworks */,
 				1038A16192FE44ECB646C465 /* AVFoundation.framework in Frameworks */,
 				469C549B2E4A47A0AF2B5D31 /* QuartzCore.framework in Frameworks */,
-				A8D220E35D9848E3A719F6E4 /* libiconv.dylib in Frameworks */,
 				91254825F6E24AE8A2EEEB50 /* CoreVideo.framework in Frameworks */,
 				E5774E3E7CCE4CA6A9B1D500 /* CoreImage.framework in Frameworks */,
 				1F1EB3304ADF4EDC95D36B3F /* AudioToolbox.framework in Frameworks */,
+				78127C83BEDC41C8A7B6DF30 /* libiconv.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,6 +295,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				266DCDE11D6AEAE6004D2813 /* Images.xcassets */,
 				308D052D1370CCF300D202BF /* icons */,
 				308D05311370CCF300D202BF /* splash */,
 				8D1107310486CEB800E47090 /* HandCrowd-Info.plist */,
@@ -294,6 +310,9 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26A485D11D6AF1C000C8745D /* libiconv.2.4.0.tbd */,
+				26A485D21D6AF1C000C8745D /* libiconv.2.tbd */,
+				26A485CF1D6AF1B200C8745D /* libiconv.tbd */,
 				5B1594DC16A7569C00FEF299 /* AssetsLibrary.framework */,
 				288765FC0DF74451002DB57D /* CoreGraphics.framework */,
 				305D5FD0115AB8F900A74A75 /* MobileCoreServices.framework */,
@@ -301,10 +320,10 @@
 				EACD8789F0F940EC94AE0B1C /* CoreLocation.framework */,
 				DAAC27E9CFF345C795148386 /* AVFoundation.framework */,
 				CA996A18BB4F4CD8B58B29D4 /* QuartzCore.framework */,
-				9C224A99DE2948FC905D109B /* libiconv.dylib */,
 				6B42250A105C4FBA87E4C4BD /* CoreVideo.framework */,
 				6C443C6279BC4B1CA5FF6F0A /* CoreImage.framework */,
 				BA02E31169AC4F80B8926AFD /* AudioToolbox.framework */,
+				5C49912112E845A3B59F4A57 /* libiconv.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -381,6 +400,8 @@
 		308D052D1370CCF300D202BF /* icons */ = {
 			isa = PBXGroup;
 			children = (
+				266DCDDB1D6AE66D004D2813 /* icon-167@2x.png */,
+				266DCDD91D6AE65F004D2813 /* icon-167.png */,
 				30C1856519D5FC0A00212699 /* icon-60@3x.png */,
 				7E7966D41810823500FA85AD /* icon-40.png */,
 				7E7966D51810823500FA85AD /* icon-40@2x.png */,
@@ -501,6 +522,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E7966E41810823500FA85AD /* icon-76.png in Resources */,
+				266DCDE21D6AEAE6004D2813 /* Images.xcassets in Resources */,
 				7E7966DF1810823500FA85AD /* icon-40@2x.png in Resources */,
 				308D05371370CCF300D202BF /* icon-72.png in Resources */,
 				30B4F30119D5E07200D9F7D8 /* Default-736h.png in Resources */,
@@ -516,6 +538,7 @@
 				7E7966E71810823500FA85AD /* icon-small@2x.png in Resources */,
 				3088BBC0154F3926009F9C59 /* Default-Portrait~ipad.png in Resources */,
 				30B4F30019D5E07200D9F7D8 /* Default-667h.png in Resources */,
+				266DCDDC1D6AE66D004D2813 /* icon-167@2x.png in Resources */,
 				7E7966DE1810823500FA85AD /* icon-40.png in Resources */,
 				3088BBC1154F3926009F9C59 /* Default@2x~iphone.png in Resources */,
 				7E7966E21810823500FA85AD /* icon-60.png in Resources */,
@@ -529,6 +552,7 @@
 				FC169E1281FD473F89382D65 /* CDVCapture.bundle in Resources */,
 				7EDB8DC6D44D4346A6A4F4D1 /* scannerOverlay.xib in Resources */,
 				2EB4CC751FE64100B46ADD93 /* CDVBarcodeScanner.bundle in Resources */,
+				266DCDDA1D6AE65F004D2813 /* icon-167.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -603,10 +627,12 @@
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Cuong Do-Vu (834M5AQYB9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Cuong Do-Vu (834M5AQYB9)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Noema LLC (7V596MEPKD)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Digital Noema LLC (7V596MEPKD)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -614,6 +640,12 @@
 				GCC_PREFIX_HEADER = "HandCrowd/HandCrowd-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"\"$(TARGET_BUILD_DIR)/usr/local/lib/include\"",
+					"\"$(OBJROOT)/UninstalledProducts/include\"",
+					"\"$(BUILT_PRODUCTS_DIR)\"",
+					"\"$(OBJROOT)/UninstalledProducts/$(PLATFORM_NAME)/include\"",
+				);
 				INFOPLIST_FILE = "HandCrowd/HandCrowd-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_LDFLAGS = (
@@ -629,22 +661,32 @@
 					"-ObjC",
 				);
 				PRODUCT_NAME = HandCrowd;
-				PROVISIONING_PROFILE = "78847ef6-161d-494e-965a-56a29a5235c2";
+				PROVISIONING_PROFILE = "82c6571e-fde8-4193-a478-6bde1efe3b66";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "\"$(TARGET_BUILD_DIR)/usr/local/lib/include\" \"$(OBJROOT)/UninstalledProducts/include\" \"$(BUILT_PRODUCTS_DIR)\" \"$(OBJROOT)/UninstalledProducts/$(PLATFORM_NAME)/include\"";
 			};
 			name = Debug;
 		};
 		1D6058950D05DD3E006BFB54 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Cuong Do-Vu (834M5AQYB9)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Digital Noema LLC (7V596MEPKD)";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HandCrowd/HandCrowd-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"\"$(TARGET_BUILD_DIR)/usr/local/lib/include\"",
+					"\"$(OBJROOT)/UninstalledProducts/include\"",
+					"\"$(BUILT_PRODUCTS_DIR)\"",
+					"\"$(OBJROOT)/UninstalledProducts/$(PLATFORM_NAME)/include\"",
+					"\"$(SRCROOT)/CordovaLib/Classes\"",
+				);
 				INFOPLIST_FILE = "HandCrowd/HandCrowd-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_LDFLAGS = (
@@ -660,8 +702,9 @@
 					"-ObjC",
 				);
 				PRODUCT_NAME = HandCrowd;
-				PROVISIONING_PROFILE = "78847ef6-161d-494e-965a-56a29a5235c2";
+				PROVISIONING_PROFILE = "82c6571e-fde8-4193-a478-6bde1efe3b66";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "\"$(TARGET_BUILD_DIR)/usr/local/lib/include\" \"$(OBJROOT)/UninstalledProducts/include\" \"$(BUILT_PRODUCTS_DIR)\" \"$(OBJROOT)/UninstalledProducts/$(PLATFORM_NAME)/include\" \"$(SRCROOT)/CordovaLib/Classes\"";
 			};
 			name = Release;
 		};
