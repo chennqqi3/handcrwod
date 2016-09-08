@@ -365,11 +365,14 @@ angular.module('app.storage.chat', [])
                         l_cmsg = messages[messages.length - 1];
                         if (l_cmsg.user_id === cmsg.user_id) {
                             cmsg.show_avartar = false;
+                            cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, l_cmsg.date);
                         } else {
                             cmsg.show_avartar = true;
+                            cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, null);
                         }
                     } else {
                         cmsg.show_avartar = true;
+                        cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, null);
                     }
                     messages.push(cmsg);
                     if (callback)

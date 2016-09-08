@@ -3,8 +3,8 @@
         <form name="form_emoticon" novalidate>
             <div class="list">
                 <label class="item item-input">
-                    <span class="input-label">コード</span>
-                    <input type="text" required="" ng-model="emoticon.alt">
+                    <span class="input-label">入力文字</span>
+                    <input type="text" required="" ng-model="emoticon.alt" placeholder="英数字でキーワード" ng-blur="change_alt()">
                 </label>
                 <label class="item item-input">
                     <span class="input-label">説明</span>

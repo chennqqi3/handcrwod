@@ -39,5 +39,17 @@ angular.module('app.chatroom.emoticon_add', [])
 		    };
 		};
 
+        $scope.change_alt = function() {
+            alt = $scope.emoticon.alt;
+            if (!$api.is_empty(alt) && alt.length > 0) {
+                if (alt[0] != ':')
+                    alt = ':' + alt;
+                if (alt[alt.length - 1] != ';')
+                    alt = alt + ';'
+
+                $scope.emoticon.alt = alt;
+            }
+        };
+
 		$scope.init();
 });    	
