@@ -89,6 +89,27 @@ angular.module('app.storage.home', [])
                 }
             });
         };
+
+        break_home = function(home_id, callback) {
+            params = {
+                home_id: home_id
+            }
+
+            $api.call("home/break_home", params)
+                .then(function(res) {
+                    if (callback != undefined)
+                        callback(res.data);
+                });
+        };
+
+        break_handcrowd = function(callback) {
+            $api.call("home/break_handcrowd")
+                .then(function(res) {
+                    if (callback != undefined)
+                        callback(res.data);
+                });
+        };
+
         get_name = function(home_id, callback) {
             var params = {
                 home_id: home_id
@@ -307,6 +328,9 @@ angular.module('app.storage.home', [])
             
             accept_invite: accept_invite,
             bot_messages: bot_messages,
+
+            break_home: break_home,
+            break_handcrowd: break_handcrowd,
 
             upload_logo: upload_logo,
             remove_logo: remove_logo,

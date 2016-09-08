@@ -432,36 +432,37 @@ angular.module('app.chat.list', [])
         var n = 0;
         var template = '';
 
-        template += '<ion-item id="room_divider" class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
-        template += '    <label ng-click="toggleGroup(0)"><i ng-class="groups[0] ? \'ion-minus\' : \'ion-plus\'"></i> ルーム</label>';
-        if ($rootScope.cur_home.priv == HPRIV.HMANAGER)        
-            template += '    <button class="button button-icon icon ion-ios-plus-empty text-gray" ng-click="addMission(1)"></button>';
-        template += '</ion-item>';
+        if ($rootScope.cur_home) {
+            template += '<ion-item id="room_divider" class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
+            template += '    <label ng-click="toggleGroup(0)"><i ng-class="groups[0] ? \'ion-minus\' : \'ion-plus\'"></i> ルーム</label>';
+            if ($rootScope.cur_home.priv == HPRIV.HMANAGER)        
+                template += '    <button class="button button-icon icon ion-ios-plus-empty text-gray" ng-click="addMission(1)"></button>';
+            template += '</ion-item>';
 
-        len = $rootScope.missions.length;
-        for (n = 0; n < len; n ++) {
-            mission = $rootScope.missions[n];
+            len = $rootScope.missions.length;
+            for (n = 0; n < len; n ++) {
+                mission = $rootScope.missions[n];
 
-            if (!(mission.private_flag == 0 || mission.private_flag == 1))
-                continue;
+                if (!(mission.private_flag == 0 || mission.private_flag == 1))
+                    continue;
 
-            template += missionStorage.mission_to_html(mission, scope.groups);
+                template += missionStorage.mission_to_html(mission, scope.groups);
+            }
+
+            template += '<ion-item id="member_divider" class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
+            template += '    <label ng-click="toggleGroup(2)"><i ng-class="groups[2] ? \'ion-minus\' : \'ion-plus\'"></i> メンバー</label>';
+            template += '</ion-item>';
+
+            len = $rootScope.missions.length;
+            for (n = 0; n < len; n ++) {
+                mission = $rootScope.missions[n];
+
+                if (!(mission.private_flag == 2 && mission.user_id != $session.user_id))
+                    continue;
+
+                template += missionStorage.mission_to_html(mission, scope.groups);
+            }
         }
-
-        template += '<ion-item id="member_divider" class="item-remove-animate item-icon-right item-divider" type="item-text-wrap">';
-        template += '    <label ng-click="toggleGroup(2)"><i ng-class="groups[2] ? \'ion-minus\' : \'ion-plus\'"></i> メンバー</label>';
-        template += '</ion-item>';
-
-        len = $rootScope.missions.length;
-        for (n = 0; n < len; n ++) {
-            mission = $rootScope.missions[n];
-
-            if (!(mission.private_flag == 2 && mission.user_id != $session.user_id))
-                continue;
-
-            template += missionStorage.mission_to_html(mission, scope.groups);
-        }
-
         return template;
     }; 
 

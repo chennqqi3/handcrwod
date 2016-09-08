@@ -347,10 +347,12 @@ angular.module('app.service.chat', [])
                 if (!pushed)
                     $this.out_queue.push(msg);
             }
-            $this.socket.$emit(evt, msg);
-            $timeout(function() {
-                $this.resend(msg);
-            }, 2000)
+            if ($this.socket) {
+                $this.socket.$emit(evt, msg);
+                $timeout(function() {
+                    $this.resend(msg);
+                }, 2000)
+            }
         };
 
         $this.resend = function(msg) {

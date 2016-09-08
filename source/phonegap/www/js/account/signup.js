@@ -1,7 +1,7 @@
 angular.module('app.signup', ['ionic'])
 
 .controller('signupCtrl', 
-    function($scope, $rootScope, CONFIG, $api, $auth, $location, $state, userStorage,
+    function($scope, $rootScope, CONFIG, $api, $auth, $location, $state, userStorage, $timeout,
         AUTH_EVENTS, $session, $routeParams, logger, $ionicModal, $http, $ionicSideMenuDelegate) {
         $ionicSideMenuDelegate.canDragContent(false);
         $scope.registered = 0;
@@ -56,16 +56,30 @@ angular.module('app.signup', ['ionic'])
         $scope.canSubmit = function(form) {
             return form.$valid;
         }
+        
+        $scope.paramsToStorage = function(params) {
+            try {
+                return localStorage.setItem('signin_params', JSON.stringify(params));
+            } catch (err) {
+                return {};
+            }
+        };
 
         $scope.submitForm = function() {
             $api.show_waiting();
             if ($scope.registered == 0) {
-                userStorage.signup($scope.user, function(res) {
+                $auth.signup($scope.user, function(res) {
                     $api.hide_waiting();
                     if (res.err_code == 0) {
-                        $scope.user.user_id = res.user_id;
-                        $scope.message = "ご登録いただいたメールアドレスへ、認証用メールが再送信されました。メール本文からURLをクリックして、登録を完了させてください。";
-                        $scope.registered = 1;
+                        //$scope.user.user_id = res.user_id;
+                        //$scope.message = "ご登録いただいたメールアドレスへ、認証用メールが再送信されました。メール本文からURLをクリックして、登録を完了させてください。";
+                        //$scope.registered = 1;
+                        $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
+                        $timeout(function() {
+                            $state.go('tab.chats');
+                            userStorage.register_push();
+                        }, 1000);
+                        $scope.paramsToStorage(null);
                     }
                     else 
                         $scope.message = res.err_msg;

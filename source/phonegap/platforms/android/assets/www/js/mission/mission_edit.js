@@ -33,7 +33,7 @@ angular.module('app.mission.edit', [])
         }
 
         $scope.$on('$ionicView.beforeLeave', function() {
-            if ($api.is_empty($scope.mission.mission_name))
+            if ($scope.mission && $api.is_empty($scope.mission.mission_name))
                 $scope.mission.mission_name = $scope.mission.org_mission_name;
 
             if ($scope.dirty) {

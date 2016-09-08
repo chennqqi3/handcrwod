@@ -223,6 +223,18 @@ angular.module('app.auth', [])
                 return res.data.err_code;
             });
         };
+
+        authService.signup = function(user, callback) {
+            return $api.call('user/signup', user).then(function(res) {
+                if (res.data.err_code == 0) {
+                    $session.create(res.data);
+                    homeStorage.set_cur_home(res.data.cur_home, false);
+                    missionStorage.set_cur_mission(res.data.cur_mission, false);
+                }
+                if (callback != undefined)
+                    callback(res.data)
+            });
+        };
         authService.activate = function(credentials) {
             return $api.call('user/activate', credentials).then(function(res) {
                 if (res.data.err_code == 0) {

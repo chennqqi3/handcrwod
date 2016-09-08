@@ -118,6 +118,12 @@
           <string>handcrowd</string>
         </array>
       </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>handcrowd</string>
+        </array>
+      </dict>
     </array>
     <key>CFBundleVersion</key>
     <string>2.3.16</string>

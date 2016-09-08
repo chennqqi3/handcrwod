@@ -1,8 +1,8 @@
 angular.module('app.settings', [])
 
 .controller('SettingsCtrl', 
-    function($scope, $api, $rootScope, logger, $session, $upload, 
-        CONFIG, $location, $numutil, $timeout, $ionicModal, userStorage, taskStorage) {
+    function($scope, $api, $rootScope, logger, $session, $upload, $state,
+        CONFIG, $location, $numutil, $timeout, $ionicModal, userStorage, taskStorage, $ionicPopup, homeStorage) {
         $scope.init = function() {
             var i, results;
             $scope.time_zones = moment.tz.names();
@@ -149,6 +149,47 @@ angular.module('app.settings', [])
             });
             $scope.user.skills = skills;
             $scope.modalSkill.hide();
+        }
+
+        $scope.breakHandcrowd = function() {
+            var confirmPopup = $ionicPopup.confirm({
+                title: '退会',
+                template: 'ハンドクラウドから退会します。よろしいでしょうか？',
+                buttons: [
+                    { text: 'キャンセル' },
+                    {
+                        text: '<b>確認</b>',
+                        type: 'button-positive',
+                        onTap: function(e) {
+                            $timeout(function() {
+                                var confirmPopup2 = $ionicPopup.confirm({
+                                    title: '退会',
+                                    template: '退会手続きをされますと、サービスがご利用できなくなります。本当に退会してよろしいでしょうか？',
+                                    buttons: [
+                                        { text: 'キャンセル' },
+                                        {
+                                            text: '<b>OK</b>',
+                                            type: 'button-positive',
+                                            onTap: function(e) {
+                                                homeStorage.break_handcrowd(function(res) {
+                                                    if (res.err_code == 0) {
+                                                        logger.logSuccess('ハンドクラウドから退会されました');
+                                                        $state.transitionTo("signin");
+                                                    }
+                                                    else
+                                                        logger.logError(res.err_msg);
+                                                });
+                                            }
+                                        }
+                                    ]
+                                });
+                                confirmPopup2.then();
+                            });
+                        }
+                    }
+                ]
+            });
+            confirmPopup.then();
         }
 
         $scope.$on('reload_session', function() {

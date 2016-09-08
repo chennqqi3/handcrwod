@@ -83,6 +83,7 @@
                 <div class="item text-center">
                     <div class="button button-block button-positive" ng-disabled="form_password.$invalid" ng-click="updatePassword()">保存</div>
                 </div>
+            </form>
             <label class="item item-divider">
                 アプリ情報
             </label>
@@ -92,6 +93,9 @@
                     v<span app-version></span>
                 </label>
             </form>
+            <div class="item text-center">
+                <div class="button button-block button-assertive" ng-click="breakHandcrowd()">退会</div>
+            </div>
         </ion-list>
     </ion-content>
 </ion-view>

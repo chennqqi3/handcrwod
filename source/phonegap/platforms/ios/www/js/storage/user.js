@@ -2,16 +2,7 @@ angular.module('app.storage.user', [])
 
 .factory('userStorage', 
     function($rootScope, $api, $session, $cordovaPush) {
-        var alerts, get_profile, resend_activate_mail, signup, update_profile;
-        signup = function(user, callback) {
-            $api.call("user/signup", user)
-                .then(function(res) {
-                    if (callback !== void 0) {
-                        callback(res.data);
-                    }
-                });
-        }
-
+        var alerts, get_profile, resend_activate_mail, update_profile;
         resend_activate_mail = function(user, callback) {
             $api.call("user/resend_activate_mail", user)
                 .then(function(res) {
@@ -144,7 +135,6 @@ angular.module('app.storage.user', [])
         };
 
         return {
-            signup: signup,
             resend_activate_mail: resend_activate_mail,
             activate: activate,
             register_push: register_push,
