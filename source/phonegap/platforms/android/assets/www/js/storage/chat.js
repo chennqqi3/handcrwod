@@ -426,6 +426,7 @@ angular.module('app.storage.chat', [])
         };
         cancel_upload_file = function(file) {
             $api.cancel_upload(file.upload);
+            file.canceled = true;
         };
 
         get_unread = function(cmsg) {

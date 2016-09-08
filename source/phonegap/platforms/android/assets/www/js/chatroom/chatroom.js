@@ -372,9 +372,11 @@ angular.module('app.chatroom', [])
 
                 file.onError = function(error) {
                     if (file.retry <= 4) {
-                        $timeout(function() {
-                            $scope.uploadOneFile(file);
-                        }, 1000);
+                        if (file.canceled != true) {
+                            $timeout(function() {
+                                $scope.uploadOneFile(file);
+                            }, 1000);
+                        }
                     }
                     else {
                         file.retry = 0;
@@ -419,9 +421,11 @@ angular.module('app.chatroom', [])
                     }
                 }).error(function() {
                     if (file.retry <= 4) {
-                        $timeout(function() {
-                            $scope.uploadOneFile(file);
-                        }, 1000);
+                        if (file.canceled != true) {
+                            $timeout(function() {
+                                $scope.uploadOneFile(file);
+                            }, 1000);
+                        }
                     }
                     else {
                         file.retry = 0;

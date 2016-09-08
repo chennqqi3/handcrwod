@@ -224,11 +224,10 @@ angular.module('app.chat.list', [])
 
         // An elaborate, custom popup
         var popNewMission = $ionicPopup.show({
-            template: '<ion-list><ion-radio ng-value="1" ng-model="mission.private_flag">特定メンバー用</ion-radio>' + 
-                '<ion-radio ng-value="0" ng-model="mission.private_flag">全メンバー用</ion-radio>' +
+            template: '<ion-list>' +
                 '<label class="item item-input"><input type="text" ng-model="mission.mission_name" required placeholder="ルーム名を入力してください。"></label>' + 
                 '</ion-list>',
-            title: 'チャットルームを新規作成します。',
+            title: 'チャットルームの新規作成',
             scope: $scope,
             buttons: [
                 { text: 'キャンセル' },
@@ -248,13 +247,39 @@ angular.module('app.chat.list', [])
 
         popNewMission.then(function(mission) {
             if (mission != undefined) {
-                missionStorage.add(mission, function(res) {
-                    if (res.err_code == 0) {
-                        $rootScope.$broadcast('refresh-missions', res.mission_id);
-                        logger.logSuccess('新しいチャットルームが作成されました。');
+                var popNewMissionPrivateFlag = $ionicPopup.show({
+                    template: '<ion-list><ion-radio ng-value="1" ng-model="mission.private_flag">特定メンバー用</ion-radio>' + 
+                        '<ion-radio ng-value="0" ng-model="mission.private_flag">全メンバー用</ion-radio>' +
+                        '</ion-list>',
+                    title: 'チャットルームのタイプ',
+                    scope: $scope,
+                    buttons: [
+                        { text: 'キャンセル' },
+                        {
+                            text: '<b>OK</b>',
+                            type: 'button-positive',
+                            onTap: function(e) {
+                                if (!$scope.mission.mission_name) {
+                                    e.preventDefault();
+                                } else {
+                                    return $scope.mission;
+                                }
+                            }
+                        }
+                    ]
+                });
+
+                popNewMissionPrivateFlag.then(function(mission) {
+                    if (mission != undefined) {
+                        missionStorage.add(mission, function(res) {
+                            if (res.err_code == 0) {
+                                $rootScope.$broadcast('refresh-missions', res.mission_id);
+                                logger.logSuccess('新しいチャットルームが作成されました。');
+                            }
+                            else
+                                logger.logError(res.err_msg);
+                        });
                     }
-                    else
-                        logger.logError(res.err_msg);
                 });
             }
         });

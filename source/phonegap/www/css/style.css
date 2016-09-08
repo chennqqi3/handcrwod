@@ -52,6 +52,8 @@ a:hover {
 
 .logo-banner {
     padding-top: 150px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .fa-stack .fa {
@@ -73,7 +75,7 @@ a:hover {
 
 .login-page h2,
 .login-page p {
-    color: white;
+    font-weight: bold;
 }
 
 .login-page .list {
@@ -88,9 +90,17 @@ a:hover {
     border: none;
 }
 
+.login-page .item-link {
+    background: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 3px;
+    border: none;
+}
+
 .login-page .item-agree {
-    background: none;
-    color: white;
+    background: rgba(255, 255, 255, 0.8);
     margin: 10px;
     border: none;
     text-overflow: clip;

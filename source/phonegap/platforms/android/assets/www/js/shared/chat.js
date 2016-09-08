@@ -41,6 +41,8 @@ angular.module('app.service.chat', [])
             $this.socket.$on('chat_message', function(cmsg) {
                 found_home = false;
                 found_mission_name　= null;
+                self_message = false;
+
                 if ($session.user_id != cmsg.user_id) {
                     unread = chatStorage.get_unread(cmsg);
 
@@ -83,27 +85,32 @@ angular.module('app.service.chat', [])
                         });
                     }
                 }
-                else
+                else {
                     found_home = true;
+                    self_message = true;
+                }
 
                 chatStorage.reorder_home_mission(cmsg.home_id, cmsg.mission_id);
 
                 if (!found_home) {
                     $rootScope.$broadcast('refresh-homes');
                 }
-                if (found_mission_name)
-                {
-                    if ($state.current.name == 'tab.chatroom' && $rootScope.cur_mission != null 
-                        && $rootScope.cur_mission.mission_id != cmsg.mission_id ||
-                        $state.current.name != 'tab.chats' && $state.current.name != 'tab.chatroom') {
-                        logger.logSuccess('「' + found_mission_name　+ '」からメッセージが届きました。');
+
+                if (!self_message) {
+                    if (found_mission_name)
+                    {
+                        if ($state.current.name == 'tab.chatroom' && $rootScope.cur_mission != null 
+                            && $rootScope.cur_mission.mission_id != cmsg.mission_id ||
+                            $state.current.name != 'tab.chats' && $state.current.name != 'tab.chatroom') {
+                            logger.logSuccess('「' + found_mission_name　+ '」からメッセージが届きました。');
+                        }
+                    }
+                    else {
+                        logger.logSuccess('他のグループからメッセージが届きました。');
                     }
                 }
-                else {
-                    logger.logSuccess('他のグループからメッセージが届きました。');
-                }
                 console.log('receive_message temp_cmsg_id:' + cmsg.temp_cmsg_id + ' cmsg_id:' + cmsg.cmsg_id);
-                return $rootScope.$broadcast('receive_message', cmsg);
+                $rootScope.$broadcast('receive_message', cmsg);
             });
 
             $this.socket.$on('react_message', function(cmsg) {
