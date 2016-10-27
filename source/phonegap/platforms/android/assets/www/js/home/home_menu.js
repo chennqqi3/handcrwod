@@ -201,5 +201,49 @@ angular.module('app.home.menu', [])
         $scope.logout = function(home) {
             $ionicSideMenuDelegate.toggleLeft();
         };
+
+        $scope.breakHome = function(home) {
+            var confirmPopup = $ionicPopup.confirm({
+                title: 'グループ退会',
+                template: 'このグループから退会します。よろしいでしょうか？',
+                buttons: [
+                    { text: 'キャンセル' },
+                    {
+                        text: '<b>確認</b>',
+                        type: 'button-positive',
+                        onTap: function(e) {
+                            $timeout(function() {
+                                var confirmPopup2 = $ionicPopup.confirm({
+                                    title: '退会',
+                                    template: 'グループから退会すると元に戻すことができなくなります。よろしいでしょうか？',
+                                    buttons: [
+                                        { text: 'キャンセル' },
+                                        {
+                                            text: '<b>OK</b>',
+                                            type: 'button-positive',
+                                            onTap: function(e) {
+                                                homeStorage.break_home(home.home_id, function(res) {
+                                                    if (res.err_code == 0) {
+                                                        logger.logSuccess('グループから退会しました。');
+                                                        $rootScope.$broadcast('refresh-homes');
+                                                        
+                                                        if ($rootScope.cur_home.home_id == home.home_id)
+                                                            homeStorage.set_cur_home(null);
+                                                    }
+                                                    else
+                                                        logger.logError(res.err_msg);
+                                                });
+                                            }
+                                        }
+                                    ]
+                                });
+                                confirmPopup2.then();
+                            });
+                        }
+                    }
+                ]
+            });
+            confirmPopup.then();
+        }
     }
 )

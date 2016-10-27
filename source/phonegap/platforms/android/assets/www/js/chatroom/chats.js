@@ -328,6 +328,59 @@ angular.module('app.chat.list', [])
         return;
     }
 
+    $scope.breakMission = function(mission_id) {
+        if (mission_id == null)
+            return;
+        for (var i = 0; i < $rootScope.missions.length; i ++) {
+            if ($rootScope.missions[i].mission_id == mission_id) {
+                mission = $rootScope.missions[i];
+
+                var confirmPopup = $ionicPopup.confirm({
+                    title: 'チャットルームから退室',
+                    template: '「' + mission.mission_name + '」から退室します。よろしいでしょうか？',
+                    buttons: [
+                        { text: 'キャンセル' },
+                        {
+                            text: '<b>確認</b>',
+                            type: 'button-positive',
+                            onTap: function(e) {
+                                $timeout(function() {
+                                    var confirmPopup2 = $ionicPopup.confirm({
+                                        title: 'チャットルームから退室',
+                                        template: 'チャットルームから退室すると元に戻すことができなくなります。よろしいでしょうか？',
+                                        buttons: [
+                                            { text: 'キャンセル' },
+                                            {
+                                                text: '<b>OK</b>',
+                                                type: 'button-positive',
+                                                onTap: function(e) {
+                                                    missionStorage.break_mission(mission_id, function(res) {
+                                                        if (res.err_code == 0) {
+                                                            logger.logSuccess('チャットルームから退室しました。');
+                                                            $rootScope.$broadcast('refresh-missions');
+                                                        }
+                                                        else
+                                                            logger.logError(res.err_msg);
+                                                    });
+                                                }
+                                            }
+                                        ]
+                                    });
+                                    confirmPopup2.then();
+                                });
+                            }
+                        }
+                    ]
+                });
+                confirmPopup.then();
+
+                $ionicListDelegate.closeOptionButtons();
+                break;
+            }
+        } 
+        return;
+    }
+
     // Refresh list of missions
     $scope.init = function(scroll_top) {
         if (scroll_top == undefined)

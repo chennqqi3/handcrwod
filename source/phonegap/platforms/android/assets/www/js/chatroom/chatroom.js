@@ -198,7 +198,7 @@ angular.module('app.chatroom', [])
                         break;
                     }
                 }
-                $scope.initEventHandler();
+                //$scope.initEventHandler();
             }
         });
 
@@ -751,6 +751,7 @@ angular.module('app.chatroom', [])
                 $('#messages').append(el);
             }
 
+            $scope.initEventHandler();
         };
         $scope.sendMessage = function() {
             if ($api.is_empty($scope.cmsg.content))

@@ -1260,3 +1260,11 @@ ul.rating li i {
     text-overflow: unset;
     white-space: normal !important;
 }
+
+.item-options .button {
+    display: inline-block;
+    padding-top: 4px;
+}
+.item-options .button .icon {
+    vertical-align: middle;
+}

@@ -345,7 +345,7 @@ angular.module('app.storage.mission', [])
                 }
             });
         };
-        break_mission = function(mission_id, complete_flag, callback) {
+        break_mission = function(mission_id, callback) {
             var params;
             params = {
                 mission_id: mission_id
@@ -484,6 +484,11 @@ angular.module('app.storage.mission', [])
                 html += '    <ion-option-button class="btn-unpin button-assertive' + pin_show + '" ng-click="pinMission(' + mission_id + ')">';
                 html += '        <i class="icon ion-ios-trash-outline"></i>';
                 html += '    </ion-option-button>';
+                if (mission.private_flag == 1) {
+                    html += '    <ion-option-button ng-click="breakMission(' + mission_id + ')">';
+                    html += '        <i class="icon ion-log-out"></i>';
+                    html += '    </ion-option-button>';
+                }
                 if (include_self)
                     html += '</ion-item>';
             }
@@ -533,6 +538,9 @@ angular.module('app.storage.mission', [])
                 html += '    </ion-option-button>';
                 html += '    <ion-option-button class="btn-unpin button-assertive' + pin_show + '" ng-click="pinMission(' + mission_id + ')">';
                 html += '        <i class="icon ion-ios-trash-outline"></i>';
+                html += '    </ion-option-button>';
+                html += '    <ion-option-button ng-click="breakMission(' + mission_id + ')">';
+                html += '        <i class="icon ion-log-out"></i>';
                 html += '    </ion-option-button>';
                 if (include_self)
                     html += '</ion-item>';
