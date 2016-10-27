@@ -1,5 +1,5 @@
 <div class="home-main" data-ng-controller="homeCtrl">
-    <header class="title-bar">
+    <header class="title-bar" ng-if="cur_home!=null">
         <ul class="button-group-left">
             <li dropdown>
                 <button type="button" class="btn btn-default btn-circle" dropdown-toggle><i class="icon-settings"></i></button>
@@ -12,20 +12,25 @@
             </li>
         </ul>
         <div class="title-wrapper">
-            <h2>{{home.home_name | home_label}}</h2>
+            <h2>{{cur_home.home_name | home_label}} <a href="javascript:;" ng-click="showInviteQR()" title="QRコード" ng-if="canEditHomeMember()"><img class="qr-code" ng-src="images/qr.png"></a></h2>
         </div>
         <ul class="button-group-right">
             <li class="search-wrapper">
                 <form id="search_bar" ng-submit="search()" novalidate>
                     <div class="input-group">
-                        <input type="text" class="search-input form-control" required ng-model="search_string" maxlength="50" placeholder="キーワードを入力">
                         <div class="input-group-btn">
-                            <button type="button" class="btn btn-default" ng-click="search()"><i class="icon-magnifier"></i></button>
+                            <button type="button" class="btn btn-info" ng-click="search()"><i class="icon-magnifier"></i></button>
                         </div>
+                        <input type="text" class="search-input form-control" maxlength="50" placeholder="キーワードを入力" ng-model="query.search_string">
                     </div>
                 </form>
             </li>
         </ul>
+    </header>
+    <header class="title-bar" ng-if="cur_home==null">
+        <div class="title-wrapper">
+            <h2>ホーム</h2>
+        </div>
     </header>
     <div class="page">
         <div class="row" ng-if="cur_home==null" ng-cloak>
@@ -39,7 +44,7 @@
         </div>
         <div ng-if="cur_home!=null">
             <div class="row">
-                <div class="col-sm-12 home-summary" ng-bind-html="home.summary | noHTML | htmlfy"></div>
+                <div class="col-sm-12 home-summary" ng-bind-html="cur_home.summary | noHTML | htmlfy"></div>
             </div>
             <div class="row">
                 <div class="col-sm-12">
@@ -49,7 +54,7 @@
                 </div>
             </div>
             <div class="row">
-                <div data-ng-repeat="mission in filteredPublics = (missions | filter:publicFilter | filter:{mission_name:search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
+                <div data-ng-repeat="mission in filteredPublics = (missions | filter:publicFilter | filter:{mission_name:query.search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
                     <div class="view">
                         <div class="info">
                             <span class="badge badge-danger" ng-if="mission.unreads>0">未読:{{mission.unreads}}</span>
@@ -71,7 +76,7 @@
                 </div>
             </div>
             <div class="row">
-                <div data-ng-repeat="mission in filteredPrivates = (missions | filter:privateFilter | filter:{mission_name:search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
+                <div data-ng-repeat="mission in filteredPrivates = (missions | filter:privateFilter | filter:{mission_name:query.search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
                     <div class="view">
                         <div class="info">
                             <span class="badge badge-danger" ng-if="mission.unreads>0">未読:{{mission.unreads}}</span>
@@ -92,7 +97,7 @@
                     <a href="javascript:;" class="btn btn-default btn-sm sub-right-button" title="グループへの招待" ng-click="inviteMember()" ng-if="canEditHomeMember()"><i class="icon-user-follow"></i> グループへの招待</a>
                     <h3>メンバー <span class="badge badge-primary">{{filteredMembers.length}}人</span></h3>
                 <div>
-                <div data-ng-repeat="member in filteredMembers = (missions | filter:memberFilter | filter:{user_name:search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
+                <div data-ng-repeat="member in filteredMembers = (missions | filter:memberFilter | filter:{user_name:query.search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
                     <div class="view">
                         <div class="info" ng-if="canEditHomeMember()">
                             <span class="badge badge-success" ng-class="{'show-priv': member.priv!=HPRIV.GUEST, 'hide-priv': member.priv==HPRIV.GUEST}" ng-click="selPriv(member)">{{member.priv | priv_label}}</span>

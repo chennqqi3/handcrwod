@@ -61,6 +61,7 @@
 
             $client->session("user_id", $user_id);
             $client->session("user_name", $u->user_name);
+            $client->set_last_time();
             return true;
         }
 
@@ -116,14 +117,14 @@
 
                 if ($this->checkAlreadyReceiveMessage($key, $client))
                 {
-                    // if alread received message, skip the message
+                    // if already received message, skip the message
                     return;
                 }
             }
 
             $actionName = 'on' . ucfirst($event);
             if(method_exists($this, $actionName))
-            {           
+            {
                 call_user_func(array($this, $actionName), $client, $data);
             }
         }
@@ -213,6 +214,8 @@
 
         private function onChat_message($client, $data)
         {
+            $client->set_last_time();
+
             $user_id_from = $client->session('user_id');    //sender id
             $cmsg_id = $data["cmsg_id"];
             if ($cmsg_id < 0) { // insert
@@ -221,7 +224,7 @@
             }
             else { // edit
                 $temp_cmsg_id = null;
-            } 
+            }
 
             $mission_id = $data["mission_id"];
             $home_id = isset($data["home_id"]) ? $data["home_id"] : null; //message text
@@ -259,6 +262,7 @@
                     'home_id'=> $home_id,
                     'home_name'=> $home_name,
                     'content'=> $content,
+                    'reacts'=> $cmsg->reacts,
                     'is_file'=> $is_file,
                     'date'=> _google_datetime()
                 );
@@ -269,6 +273,46 @@
                     $user_ids = mission_member::user_ids($mission_id);
                 
                 $this->send_message('chat_message', $msg, $user_id_from, $user_ids); //send data to self and to
+            }
+        }
+
+        private function onReact_message($client, $data)
+        {
+            $user_id_from = $client->session('user_id');    //sender id
+            $cmsg_id = $data["cmsg_id"];
+            $emoticon_id = $data["emoticon_id"];
+            $mission_id = $data["mission_id"];
+            $user_name = $client->session("user_name");
+
+            $mission = mission::getModel($mission_id);
+            if ($mission == null)
+            {
+                $client->log("[Error] Invalid mission_id:" . $mission_id);
+                break;
+            }
+            $home_id = $mission->home_id;
+
+            $client->log("[React message] ");
+
+            $this->start();
+            $cmsg = cmsg::react($cmsg_id, $emoticon_id, $user_id_from);
+            $this->commit();
+
+            if ($cmsg != null) {
+                //prepare data to be sent to client
+                $msg = array(
+                    'cmsg_id'=> $cmsg->cmsg_id,
+                    'user_id'=> $user_id_from, 
+                    'user_name'=> $user_name,
+                    'mission_id'=> $mission_id, 
+                    'mission_name'=> $mission->mission_name,
+                    'reacts'=> $cmsg->reacts,
+                    'date'=> _google_datetime()
+                );
+
+                $user_ids = mission_member::user_ids($mission_id);
+                
+                $this->send_message('react_message', $msg, $user_id_from, $user_ids); //send data to self and to
             }
         }
 
@@ -453,6 +497,8 @@
                         if ($to_client != null && $client != $to_client)
                             continue;
                         $ret = $client->send($encodedData);
+                        $client->set_last_time(); // set last time
+
                         if ($ret) {
                             if ($must_push)
                                 push_token::set_last($to_id, $client->session('device_type'), $client->session('device_token'));

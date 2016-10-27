@@ -3,7 +3,7 @@
 angular.module('app.controller.nav', [])
 
 .controller('NavCtrl', 
-    ($scope, $rootScope, $session, AUTH_EVENTS, $timeout, $location, $dialogs, $route, missionStorage, logger, $api) ->
+    ($scope, $rootScope, $session, AUTH_EVENTS, $timeout, $location, $dialogs, $route, missionStorage, logger, $api, $window) ->
         app = $('#app')
 
         $scope.init = ()->
@@ -31,7 +31,7 @@ angular.module('app.controller.nav', [])
             $scope.init()
         )
 
-        $scope.$on('refreshed-missions', (event) ->
+        $scope.$on('mission-search-post', (event) ->
             $scope.init()
         )
 
@@ -157,7 +157,16 @@ angular.module('app.controller.nav', [])
                 $(".list-mission").prepend($(id))
             else
                 $(".list-team-member").prepend($(id))
+
+            missionStorage.check_hidden_unreads()
         )
+
+        angular.element($window).bind('resize', ->
+            missionStorage.check_hidden_unreads()
+        )
+
+        $scope.onScroll = ->
+            missionStorage.check_hidden_unreads()
 
         $scope.open_member = (user_id) ->
             if $rootScope.missions
@@ -174,25 +183,48 @@ angular.module('app.controller.nav', [])
                                     )
                                 else
                                     logger.logError(res.err_msg)
-                            )
-
-        $scope.exist_unreads = () ->
-            return true
-
-        $scope.show_unreads = () ->
-            return            
+                            )   
 )
 
 
 .controller('NavHomeCtrl', 
-    ($scope, $rootScope, $session, AUTH_EVENTS, $route, homeStorage, logger, $dialogs, $location) ->
+    ($scope, $rootScope, $session, AUTH_EVENTS, $route, homeStorage, logger, $dialogs, $location, $timeout) ->
         app = $('#app')
 
-        $scope.open = (home) ->
-            homeStorage.select(home, ->
-                $location.path('/home')
+        $scope.init = ()->
+            $scope.session = $session
+            $scope.loaded = false
+            $timeout(() ->
+                $scope.loaded = true
             )
+
+        $scope.open = (home_id) ->
+            $location.path('/home/' + home_id)
             return
+           
+        $scope.init()
+
+        $scope.$on(AUTH_EVENTS.loginSuccess, (event, count) ->
+            $scope.init()
+        )
+
+        $scope.$on('reload_session', (event, count) ->
+            $scope.init()
+        )
+
+        $scope.$on('synced-server', (event, count) ->
+            $scope.init()
+        )
+
+        $scope.$on('refresh-home', (event, home) ->
+            id = "#" + homeStorage.home_html_id(home)
+            $(id).html(homeStorage.home_to_html(home, false))
+            $(".home-list").prepend($(id))
+        )
+
+        $scope.$on('home-search-post', (event) ->
+            $scope.init()
+        )
 
         # グループ追加  
         $scope.addHome = ->
@@ -200,8 +232,7 @@ angular.module('app.controller.nav', [])
 
         $scope.$on('added_home', (event, home) ->
             if $rootScope.cur_home == null
-                homeStorage.select(home)
-                $rootScope.$broadcast('refresh-missions')
+                $location.path('/home/' + home.home_id)
             else
                 $rootScope.$broadcast('refresh-homes')
                 
@@ -209,7 +240,7 @@ angular.module('app.controller.nav', [])
         )
 )
 
-.directive('chatRooms', ($rootScope, $compile, $filter, $session, missionStorage, HPRIV) ->
+.directive('chatRooms', ($rootScope, $compile, $filter, $session, $timeout, missionStorage, HPRIV) ->
     ###
     <li class="hc-bot" ng-class="{'active': nav_id=='chatroom_' + bot_mission.mission_id }">
         <a href="#/chats/{{bot_mission.mission_id}}">
@@ -292,7 +323,7 @@ angular.module('app.controller.nav', [])
                 t = 0
                 v = 0
                 for mission in $rootScope.missions
-                    if (!(mission.private_flag == 2 && mission.user_id != $session.user_id))
+                    if (!(mission.private_flag == 2 && mission.user_id != $session.user_id && mission.accepted == 1))
                         continue
 
                     t += 1
@@ -306,6 +337,42 @@ angular.module('app.controller.nav', [])
                 template += '    </li>'
             template += '    </ul>'
             template += '</li>'
+
+        return template
+
+    linker = (scope, element, attrs) ->
+        element.html(getTemplate(scope))
+        $compile(element.contents())(scope)
+
+        $timeout(->
+            missionStorage.check_hidden_unreads()
+        )
+
+    return {
+        restrict: "E"
+        replace: true
+        link: linker
+    }
+)
+
+.directive('homeList', ($rootScope, $compile, $filter, $session, homeStorage) ->
+    ###
+    <li ng-repeat="home in homes | orderBy:'order'" ng-class="{'active': cur_home.home_id==home.home_id }" title="{{home.home_name}}" ng-click="open(home)">
+        <span ng-if="home.logo_url == null">{{home.home_name | abbr}}</span>
+        <img ng-src="{{home.logo_url}}" class="img30_30 logo" ng-if="home.logo_url != null">
+        <i class="badge badge-danger" ng-show="home.unreads > 0">{{home.unreads}}</i>
+    </li>
+    ###
+    getTemplate = (scope) ->
+        template = ''
+
+        if $rootScope.homes != null
+            for home in $rootScope.homes
+                template += homeStorage.home_to_html(home)
+
+        template += '<li title="グループ新規作成" ng-click="addHome()">'
+        template += '    <span><i class="icon-plus"></i></span>'
+        template += '</li>'
 
         return template
 

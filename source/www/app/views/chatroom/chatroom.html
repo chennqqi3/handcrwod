@@ -24,12 +24,27 @@
         </ul>
         
 		<div class="title-wrapper">
-            <h2>{{cur_mission.mission_name}}</h2>
-            <span class="badge badge-danger" ng-if="cur_mission.end_date != null">期限:{{cur_mission.end_date | date_label}}</span> 
-            <span class="badge badge-primary" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">メンバー:{{cur_mission.members.length}}人</span> 
+            <h2 ng-class="{'with-info': cur_mission.private_flag==1 || cur_mission.private_flag==0}">{{cur_mission.mission_name}} <a href="javascript:;" ng-click="showInviteQR()" ng-if="canInviteChat()" title="QRコード"><img class="qr-code" ng-src="images/qr.png"></a></h2>
+            <div class="chat-info">
+                <span class="badge badge-danger" ng-if="cur_mission.end_date != null">期限:{{cur_mission.end_date | date_label}}</span> 
+                <span class="badge badge-primary" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">メンバー:{{cur_mission.members.length}}人</span> 
+            </div>
 		</div>
 
 		<ul class="button-group-right">
+            <li class="search-wrapper" ng-class="{'searching':searching}">
+                <form id="search_bar" ng-submit="search()" novalidate>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-info" ng-click="search()"><i class="icon-magnifier"></i></button>
+                        </div>
+                        <input type="text" class="search-input form-control" required ng-model="search_string" maxlength="50" placeholder="検索..." enter-submit="search()" esc="exitSearch()" ng-focus="startSearch()">
+                        <div class="input-group-btn" ng-show="searching">
+                            <button type="button" class="btn btn-default" ng-click="exitSearch()"><i class="icon-close"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </li>
             <li ng-show="cur_mission.private_flag==1">
                 <span data-ng-repeat="member in cur_mission.members | limitTo:5">
                     <img ng-src="{{member.avartar}}" class="avartar clickable img30_30" title="{{member.user_name}}" ng-click="showUserProfile(member.user_id)">
@@ -48,7 +63,7 @@
                 <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_star, 'btn-default': !show_star}" title="スター付き" ng-click="showStar()"><i class="icon-star"></i></button>
             </li>
             <li>
-                <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_summary, 'btn-default': !show_summary}" title="概要" ng-click="showSummary()"><i class="icon-doc"></i></button>
+                <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_summary, 'btn-default': !show_summary}" title="概要" ng-click="showSummary()"><i class="icon-info"></i></button>
             </li>
 		</ul>
 	</header>
@@ -76,14 +91,14 @@
                 </div>                
             </div>
         </div>
-        <form id="input_bar" class="bar bar-footer item-input-inset" novalidate ng-show="canChat()">
+        <form id="input_bar" class="bar bar-footer item-input-inset" novalidate>
             <div class="footer-btn-wrap">
                 <button class="btn btn-default btn-circle btn-smile"><i class="icon-emotsmile"></i></button>
             </div>
             <div class="footer-btn-wrap">
                 <button class="btn btn-default btn-circle btn-file" multiple ng-file-select="onUploadFiles($files)"><i class="icon-paper-clip"></i></button>
             </div>
-            <div class="footer-btn-wrap" ng-show="cur_mission.private_flag==0 || cur_mission.private_flag==1">
+            <div class="footer-btn-wrap">
                 <button class="btn btn-default btn-circle btn-to" >TO</button>
             </div>
             <label class="item-input-wrapper">
@@ -100,7 +115,7 @@
     <div class="right-panel">
         <section data-ng-include=" 'views/task/tasks.html' + ver " ng-if="show_tasks"></section>
         <section data-ng-include=" 'views/process/process.html' + ver " ng-if="show_process"></section>
-        <section data-ng-include=" 'views/mission/mission_attach.html' + ver " ng-show="show_attach"></section>
+        <section data-ng-include=" 'views/mission/mission_attach.html' + ver " ng-if="show_attach"></section>
         <section data-ng-include=" 'views/chatroom/chat_star.html' + ver " ng-if="show_star"></section>
         <section data-ng-include=" 'views/mission/mission_summary.html' + ver " ng-if="show_summary"></section>
     </div>
@@ -110,8 +125,35 @@
     <div id="emoticon_gallery" class="popover fade top in">
         <div class="arrow"></div>
         <h3 class="popover-title">
-            <ul id="_emoticonGallery" class="emoticonGallery clearfix">
-                <li ng-repeat="em in emoticons" class="emoticon {{em.class}}" title="{{em.title}} {{em.alt}}" alt={{e.alt}} ng-click="add_emoticon(em.alt)"></li>
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <input type="text" class="search-input form-control" required ng-model="search_emoticon" maxlength="50" placeholder="検索...">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                    </div>
+                </div>
+            </div>
+            <ul class="emoticon-list clearfix">
+                <li ng-repeat="em in emoticons | filter:{title:search_emoticon}" class="emoticon" title="{{em.title}} {{em.alt}}" ng-click="emoticon_message(em.alt)" style="background-image: url({{em.image}})"></li>
+                <li class="emoticon icon-plus" ng-click="manage_emoticon()"></li>
+            </ul>
+        </h3>
+    </div>
+
+    <div id="react_emoticons" class="popover fade in">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <input type="text" class="search-input form-control" required ng-model="search_emoticon" maxlength="50" placeholder="検索...">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                    </div>
+                </div>
+            </div>
+            <ul class="emoticon-list clearfix">
+                <li ng-repeat="em in emoticons | filter:{title:search_emoticon}" class="emoticon" title="{{em.title}} {{em.alt}}" ng-click="react(cmsg_id, em.emoticon_id)" style="background-image: url({{em.image}})"></li>
+                <li class="emoticon icon-plus" ng-click="manage_emoticon()"></li>
             </ul>
         </h3>
     </div>
@@ -133,7 +175,7 @@
                 </div>
             </div>
             <ul class="user-list">
-                <li data-ng-repeat="member in cur_mission.members | filter:{user_name:search_user}" ng-click="to_message(member)">
+                <li data-ng-repeat="member in cur_mission.members | filter:{user_name:search_user}" ng-click="to_message(member)" ng-if="member.user_id!=session.user_id">
                     <img ng-src="{{member.avartar}}" class="avartar img30_30">
                     {{member.user_name}}
                 </li>

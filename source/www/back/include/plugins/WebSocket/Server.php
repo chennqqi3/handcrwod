@@ -43,10 +43,11 @@ class Server extends Socket
 	 */
 	public function run()
 	{
+		$check_time = time();
 		while(true)
 		{
 			$changed_sockets = $this->allsockets;
-			@stream_select($changed_sockets, $write = null, $except = null, 0, 500);			
+			@stream_select($changed_sockets, $write = null, $except = null, 0, 500);
 			foreach($changed_sockets as $socket)
 			{
 				if($socket == $this->master)
@@ -121,6 +122,19 @@ class Server extends Socket
 					else
 					{						
 						$client->onData($data);
+					}
+				}
+			}
+
+			// １５分間隔に空のソケットをチェック
+			if (time() - $check_time > 15 * 60) {
+				$check_time = time();
+
+				foreach($this->clients as $client)
+				{
+					if ($client->is_idle_socket()) {
+						$client->log('Close Idle Socket');
+						$client->onDisconnect();
 					}
 				}
 			}

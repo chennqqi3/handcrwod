@@ -4,51 +4,18 @@ angular.module('app.home', [])
 
 .controller('homeCtrl', 
     ($scope, $api, $chat, missionStorage, homeStorage, $rootScope, $location, 
-        $routeParams, logger, $session, $timeout, $dialogs, HPRIV) ->        
-        $rootScope.nav_id = 'home'
-        missionStorage.select_mission_in_nav()
-        
-        $scope.sync = ->
-            if ($rootScope.cur_home != null)
-                if $rootScope.cur_home.include_completed == undefined
-                    $rootScope.cur_home.include_completed = false
-
-                homeStorage.get($rootScope.cur_home.home_id, 
-                    $rootScope.cur_home.include_completed, 
-                    $rootScope.cur_home.include_completed, 
-                    (res) ->
-                        if res.err_code == 0
-                            $scope.home = res.home
-                )
-
-        $scope.$on("synced-server", ->
-            $scope.sync()
-        ) 
+        $routeParams, logger, $session, $timeout, $dialogs, HPRIV, chatStorage) -> 
+        $scope.query =
+            search_string: ""
 
         # グループ編集
         $scope.editHome = ->
-            if $scope.home != null
-                $dialogs.editHome($scope.home)
+            if $rootScope.cur_home != null
+                $dialogs.editHome($rootScope.cur_home)
           
         # グループ追加  
         $scope.addHome = ->
             $dialogs.addHome()
-
-        $scope.$on('added_home', (event, home) ->
-            if $rootScope.cur_home == null
-                homeStorage.select(home)
-                $rootScope.$broadcast('refresh-missions')
-                $scope.sync()
-            else
-                $rootScope.$broadcast('refresh-homes')
-                
-            return
-        )
-
-        $scope.$on('select-home', (event, home) ->
-            $scope.sync()
-            return
-        )
 
         # Mission related
         $scope.addMission = () ->
@@ -63,31 +30,28 @@ angular.module('app.home', [])
         # Remove mission
         $scope.removeMission = (mission) ->
             message = mission.mission_name + "を削除してもよろしいでしょうか？"
-            $dialogs.confirm('チャットルーム削除', message, '削除', "remove-mission", mission)
-            return
-
-        $scope.$on('remove-mission', (event, mission) ->
-            missionStorage.remove(mission, (res) ->
-                if res.err_code == 0
-                    $rootScope.$broadcast('refresh-missions')
-                    logger.logSuccess('チャットルームが削除されました。')
-                else
-                    logger.logError(res.err_msg)
+            $dialogs.confirm('チャットルーム削除', message, '削除', ->
+                missionStorage.remove(mission, (res) ->
+                    if res.err_code == 0
+                        $rootScope.$broadcast('refresh-missions')
+                        logger.logSuccess('チャットルームが削除されました。')
+                    else
+                        logger.logError(res.err_msg)
+                )
             )
             return
-        )
 
         # 管理者権限設定
         $scope.selPriv = (member) ->
             $dialogs.selPriv(member.priv, (priv) ->
-                homeStorage.priv($scope.home.home_id, member.user_id, priv, (res) ->
+                homeStorage.priv($rootScope.cur_home.home_id, member.user_id, priv, (res) ->
                     if res.err_code == 0
                         member.priv = res.priv
                         member.priv_name = $rootScope.get_priv_name(res.priv)
 
                         if member.user_id == $session.user_id
                             $rootScope.cur_home.priv = res.priv
-                            $session.setCurHome($rootScope.cur_home)
+                            homeStorage.set_cur_home($rootScope.cur_home)
                     else
                         logger.logError(res.err_msg)
                 )
@@ -96,7 +60,7 @@ angular.module('app.home', [])
         # メンバー削除
         $scope.removeMember = (member) ->
             $dialogs.confirm('メンバー削除', '「' + member.user_name + '」をグループから削除します。よろしいでしょうか？', '確認', ->
-                homeStorage.remove_member($scope.home.home_id, member.user_id, (res) ->
+                homeStorage.remove_member($rootScope.cur_home.home_id, member.user_id, (res) ->
                     if res.err_code == 0
                         $rootScope.$broadcast('refresh-missions')
                         logger.logSuccess("メンバーをグループから削除しました。")
@@ -108,7 +72,7 @@ angular.module('app.home', [])
 
         # グループへの招待
         $scope.inviteMember = ->
-            $dialogs.inviteHome($scope.home)
+            $dialogs.inviteHome($rootScope.cur_home)
 
         # 検索
         $scope.onSelectSearchMessage = (message) ->
@@ -116,8 +80,8 @@ angular.module('app.home', [])
             return
 
         $scope.search = () ->
-            if !$api.is_empty($scope.search_string)
-                $dialogs.chatSearch(false, $scope.search_string, $scope.onSelectSearchMessage)
+            if !$api.is_empty($scope.query.search_string)
+                $dialogs.chatSearch(false, $scope.query.search_string, $scope.onSelectSearchMessage)
             return
 
         $scope.toggleCompleted = (private_flag) ->
@@ -152,7 +116,7 @@ angular.module('app.home', [])
         $scope.removeHome = ->
             $dialogs.confirm('グループ削除', 'このグループを削除してもよろしいでしょうか？', '確認', ->
                 $dialogs.confirm('グループ削除', 'グループを削除すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
-                    homeStorage.remove($scope.home.home_id, (res) ->
+                    homeStorage.remove($rootScope.cur_home.home_id, (res) ->
                         if res.err_code == 0
                             logger.logSuccess("グループを削除しました。")
                             $rootScope.$broadcast('removed_home')
@@ -165,10 +129,10 @@ angular.module('app.home', [])
         # グループの退会
         $scope.breakHome = ->
             $dialogs.confirm('グループ退会', 'このグループから退会します。よろしいでしょうか？', '確認', ->
-                $dialogs.confirm('グループ削除', 'グループから退会すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
-                    homeStorage.break_home($scope.home.home_id, (res) ->
+                $dialogs.confirm('グループ退会', 'グループから退会すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
+                    homeStorage.break_home($rootScope.cur_home.home_id, (res) ->
                         if res.err_code == 0
-                            logger.logSuccess("グループを退会しました。")
+                            logger.logSuccess("グループから退会しました。")
                             $rootScope.$broadcast('removed_home')
                         else
                             logger.logError(res.err_msg)
@@ -200,6 +164,47 @@ angular.module('app.home', [])
                             logger.logError(res.err_msg)
                     )
 
+        # Initialize
+        $scope.sync = ->
+            $rootScope.nav_id = 'home'
+            missionStorage.select_mission_in_nav()
+            if $session.user_id != null  
+                if $routeParams.home_id == undefined
+                    if $rootScope.cur_home
+                        $location.path("/home/" + $rootScope.cur_home.home_id)
+                        return
+                else
+                    home_id = parseInt($routeParams.home_id, 10)
+
+                    if $rootScope.cur_home && $rootScope.cur_home.home_id == home_id
+                        include_completed = $rootScope.cur_home.include_completed
+
+                    if include_completed == undefined
+                        include_completed = true
+
+                    homeStorage.get(home_id, include_completed, include_completed, (res) ->
+                        if res.err_code == 0
+                            homeStorage.set_cur_home(res.home)
+                        else
+                            logger.logError('ホーム情報を取得できません。')
+                    )
+
+                chatStorage.refresh_unreads_title()
+
+        $scope.$on("synced-server", ->
+            $scope.sync()
+        ) 
+
+        $scope.$on("reload_session", ->
+            $scope.sync()
+        )
+
         $scope.sync()
+
+        # 招待QRコード
+        $scope.showInviteQR = ->
+            if $rootScope.cur_home != null
+                $dialogs.showQR($api.base_url() + "#/qr/home/" + $rootScope.cur_home.home_id + "/" + $rootScope.cur_home.invite_key, "招待QRコード(" + $rootScope.cur_home.home_name + ")")
+            return
         return
 )

@@ -590,4 +590,22 @@ class Connection
 		else 
 			$this->_session[$name] = $value;
 	}
+
+	public function set_last_time()
+	{
+		$this->session('last_time', time());
+	}
+
+	public function is_idle_socket()
+	{
+		$last_time = $this->session('last_time');
+
+		if ($last_time == 0)
+			return false;
+
+		$passed = time() - $last_time;
+
+		// 30分間通信がない場合
+		return $passed > 30 * 60;
+	}
 }

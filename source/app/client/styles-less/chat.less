@@ -1,3 +1,15 @@
+.emoticon {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+
+    background-repeat: no-repeat;
+    background-color: rgba(0, 0, 0, 0);
+    background-position: center;
+
+    font-size: 20px !important;
+}
+
 .chat-main {
     overflow: hidden;
     position: absolute;
@@ -8,6 +20,18 @@
 
     .title-wrapper {
         margin: 0px 0px 0px 0px;
+
+        h2.with-info {
+            line-height: 20px;
+            margin: 6px 15px 0px;
+        }
+
+        .chat-info {
+            margin-left: 15px;
+            .badge {
+                font-size: 10px;
+            }
+        }
     }
 
     #loader {
@@ -85,6 +109,9 @@
 
 .chat-container {
     overflow-y: auto;
+    overflow-x: hidden;
+
+    word-break: break-all;
 
     &.transparent {
         opacity: 0;
@@ -283,6 +310,29 @@
             padding: 4px 3px 2px 3px;
             margin-right: 5px;
         }
+
+        .reacts {
+            list-style: none;
+            padding-left: 0px;
+            margin-bottom: 0px;
+
+            li {
+                display: inline-block;
+                margin: 3px 2px;
+                padding: 1px 4px;
+                border: solid 1px @brand-success;
+                border-radius: 3px;
+                background-color: lighten(@brand-success, 40%);
+                cursor: pointer; 
+                color: @brand-success;
+                &:first-child {
+                    margin-left: 0px;
+                }
+                .emoticon {
+                    margin-right: 5px;
+                }
+            }
+        }
     }
 
     .chat-message {
@@ -398,9 +448,19 @@
 
 .title-bar {
     .search-wrapper {
-        width: 300px;        
+        width: 250px;        
         vertical-align: middle;
         margin-right: 5px;
+
+        &.searching {
+            width: 300px;
+        }
+    }
+}
+
+.search_form {
+    .input-group-btn, input {
+        height: 32px;
     }
 }
 
@@ -570,58 +630,20 @@
         padding: 0px;
         border-bottom: none;
 
-        .emoticonGallery {
-            padding: 5px;
-            margin-bottom: 0px;
+        .emoticon-list {
             position: relative;
-            width: 236px;
-            list-style-type: none;
-
-            li {
-                float: left;
-                padding: 5px;
-                cursor: pointer;
-                border: 1px solid #ffffff;
-                -webkit-border-radius: 3px;
-                -moz-border-radius: 3px;
-                border-radius: 3px;
-                -webkit-transition: border 0.2s linear 0s;
-                -moz-transition: border 0.2s linear 0s;
-                -ms-transition: border 0.2s linear 0s;
-                -o-transition: border 0.2s linear 0s;
-                transition: border 0.2s linear 0s;
-
-                &:first-child {
-                    padding-top: 5px;
-                }
-
-                &:nth-child(7n) {
-                    padding-right: 5px;
-                }
-
-                &:nth-child(7n + 1) {
-                    clear: both;
-                }            
-
-                &:last-child {
-                    padding-bottom: 5px;
-                }   
-
-                &:hover {
-                    background-color: #dcf0fa;
-                    border-color: #b1d6ed;
-                }
-            }     
+            width: 251px;
+            height: 235px;
         }
 
         .search-wrapper {
-            width: 210px;
+            width: 236px;
             margin: 5px 5px;
         }
 
         .user-list {
             padding: 5px 10px;
-            width: 220px;
+            width: 236px;
             height: 215px;
             margin-bottom: 0px;
             list-style: none;
@@ -661,6 +683,53 @@
     .popover-content {
         background-color: @popover-title-bg;
     }
+}
+
+.emoticon-list {
+    padding: 5px;
+    margin-bottom: 0px;
+    list-style-type: none;
+    overflow-y: auto;
+
+    li {
+        float: left;
+        padding: 5px;
+        cursor: pointer;
+        border: 1px solid #ffffff;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        -webkit-transition: border 0.2s linear 0s;
+        -moz-transition: border 0.2s linear 0s;
+        -ms-transition: border 0.2s linear 0s;
+        -o-transition: border 0.2s linear 0s;
+        transition: border 0.2s linear 0s;
+
+        &:first-child {
+            padding-top: 5px;
+        }
+
+        &:nth-child(7n) {
+            padding-right: 5px;
+        }
+
+        &:nth-child(7n + 1) {
+            clear: both;
+        }            
+
+        &:last-child {
+            padding-bottom: 5px;
+        }   
+
+        &:hover {
+            background-color: #dcf0fa;
+            border-color: #b1d6ed;
+        }
+
+        &.selected {
+            border-color: #b1d6ed;
+        }
+    }     
 }
 
 #selection_menu {

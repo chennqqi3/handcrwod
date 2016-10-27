@@ -194,10 +194,10 @@
             $homes = array();
             $home = new home;
 
-            $sql = "SELECT h.home_id, h.home_name, h.summary, h.client_id, hm.last_date, hm.priv, hu.unreads, h.logo
+            $sql = "SELECT h.home_id, h.home_name, h.summary, h.client_id, hm.last_date, hm.priv, hu.unreads, hu.to_unreads, h.logo
                 FROM t_home h 
                 LEFT JOIN t_home_member hm ON h.home_id=hm.home_id
-                LEFT JOIN (SELECT m.home_id, SUM(mm.unreads) unreads
+                LEFT JOIN (SELECT m.home_id, SUM(mm.unreads) unreads, SUM(mm.to_unreads) to_unreads
                     FROM t_mission m
                     INNER JOIN t_mission_member mm ON m.mission_id=mm.mission_id
                     WHERE mm.user_id=" . _sql($my_id) . " AND m.del_flag=0
@@ -214,7 +214,7 @@
                 $order = $params->sort_field . " " . $params->sort_order;
             else 
             */
-            $order = "hm.last_date DESC";
+            $order = "hu.unreads DESC, hm.last_date DESC";
 
             $err = $home->query($sql,
                 array("order" => $order));
@@ -230,7 +230,8 @@
                     "logo_url" => $home->logo_url(),
                     "last_date" => $home->last_date,
                     "priv" => $home->priv,
-                    "unreads" => $home->unreads
+                    "unreads" => _if_null($home->unreads),
+                    "to_unreads" => _if_null($home->to_unreads)
                 ); 
 
                 array_push($homes, $m);
@@ -239,6 +240,21 @@
             }
 
             $this->finish(array("homes" => $homes), ERR_OK);
+        }
+
+        public function get_name() 
+        {
+            $param_names = array("home_id");
+            $this->setApiParams($param_names);
+            $this->checkRequired($param_names);
+            $params = $this->api_params;
+
+            $home_name = "";
+            $home = home::getModel($params->home_id);
+            if ($home)
+                $home_name = $home->home_name;
+
+            $this->finish(array("home_name" => $home_name), ERR_OK);
         }
 
         public function get()
@@ -270,7 +286,7 @@
 
             $mission = new mission;
             $sql = "SELECT m.*, 
-                    mm.pinned, mm.unreads
+                    mm.pinned, mm.unreads, mm.to_unreads
                 FROM t_mission m 
                 LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
                 WHERE m.home_id=" . _sql($params->home_id) . " AND 
@@ -279,16 +295,21 @@
                 ORDER BY m.complete_flag ASC, m.mission_name ASC";
 
             $err = $mission->query($sql);
+            $unreads = 0;
+            $to_unreads = 0;
             while ($err == ERR_OK)
             {
                 $m = array(
                     "mission_id" => $mission->mission_id,
                     "mission_name" => $mission->mission_name,
                     "pinned" => $mission->pinned,
-                    "unreads" => $mission->unreads,
+                    "unreads" => _if_null($mission->unreads),
+                    "to_unreads" => _if_null($mission->to_unreads),
                     "last_date" => $mission->last_date,
                     "complete_flag" => $mission->complete_flag
                 );
+                $unreads += $mission->unreads;
+                $to_unreads += $mission->to_unreads;
                 if ($mission->private_flag == CHAT_PUBLIC)
                     array_push($publics, $m);
                 else
@@ -296,16 +317,26 @@
 
                 $err = $mission->fetch();
             }
+            $home->unreads = $unreads;
+            $home->to_unreads = $to_unreads;
             $home->publics = $publics;
             $home->privates = $privates;
             
             $home->members = home_member::members($params->home_id);
 
+            $found = false;
             foreach ($home->members as $member) {
                 if ($member["user_id"] == $my_id) {
                     $home->priv = $member["priv"];
+                    $found = true;
                 }
             }
+
+            if ($found == false)
+                $this->checkError(ERR_NOPRIV);
+
+            // set last home
+            home::last_home($home->home_id);
 
             $this->finish(array("home" => $home->props), ERR_OK);
         }
@@ -394,6 +425,36 @@
             }
 
             $this->finish(null, $err);
+        }
+
+        public function self_invite()
+        {   
+            $param_names = array("home_id", "invite_key");
+            $this->setApiParams($param_names);
+            $this->checkRequired($param_names);
+            $params = $this->api_params;
+
+            $user_id = _user_id();
+            $user = _user();
+            if ($user == null)
+                $this->checkError(ERR_NOTFOUND_USER);
+
+            $home = home::getModel($params->home_id);
+            if ($home == null)
+                $this->checkError(ERR_NOTFOUND_HOME);
+
+            if ($home->invite_key != $home->invite_key)
+                $this->checkError(ERR_INVALID_INVITE_KEY); 
+            
+            // start transaction
+            $this->start();
+
+            if (!$home->is_member($user_id)) {
+                $err = $home->add_member($user_id, 1);
+                $this->checkError($err);
+            }
+            
+            $this->finish(array("home_id" => $params->home_id), ERR_OK);
         }
 
         public function members()
@@ -529,11 +590,9 @@
                 $err = $home->fetch();
             }
 
-            if ($err == ERR_OK) {
-                $user = _user();
-                if ($user)
-                    $err = $user->remove();
-            }
+            $user = _user();
+            if ($user)
+                $err = $user->remove();
 
             $this->finish(null, $err);
         }
@@ -653,6 +712,16 @@
             $home->save();
 
             $this->finish(array("logo_url" => $home->logo_url()), ERR_OK);
+        }
+
+        public function emoticons()
+        {
+            $param_names = array("home_id");
+            $this->setApiParams($param_names);
+            $this->checkRequired($param_names);
+            $params = $this->api_params;
+            
+            $this->finish(array("emoticons" => emoticon::all($mission->home_id)), ERR_OK);
         }
     }
 ?>

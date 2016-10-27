@@ -17,6 +17,7 @@
 					"user_id",
 					"pinned",
 					"unreads",
+					"to_unreads",
 					"opp_user_id",
 					"last_date",
 					"push_flag",
@@ -24,14 +25,21 @@
 				array("auto_inc" => true));
 		}
 
-		public static function user_ids($mission_id, $except_user_id=null)
+		public static function user_ids($mission_id, $except_user_id=null, $only_accepted=true)
 		{
 			$user_ids = array();
 			$mission_member = new model;
-			$err = $mission_member->query("SELECT mm.user_id 
+			$accepted_join = "";
+			$accepted_where = "";
+			if ($only_accepted) {
+				$accepted_join = "INNER JOIN t_mission m ON mm.mission_id=m.mission_id
+				LEFT JOIN t_home_member hm ON m.home_id=hm.home_id AND mm.user_id=hm.user_id";
+				$accepted_where = " AND (m.home_id IS NULL OR m.home_id IS NOT NULL AND hm.accepted=1)";
+			}
+			$err = $mission_member->query("SELECT DISTINCT mm.user_id 
 				FROM t_mission_member mm 
-				INNER JOIN m_user u ON mm.user_id=u.user_id AND u.del_flag=0
-				WHERE mm.mission_id=" . _sql($mission_id) . " AND mm.del_flag=0
+				INNER JOIN m_user u ON mm.user_id=u.user_id AND u.del_flag=0 " . $accepted_join . " 
+				WHERE mm.mission_id=" . _sql($mission_id) . " AND mm.del_flag=0 " . $accepted_where . "
 				ORDER BY mm.create_time ASC");
 
 			while ($err == ERR_OK)

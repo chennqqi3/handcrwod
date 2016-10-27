@@ -1,7 +1,16 @@
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
     <h4 class="modal-title">メッセージ検索</h4>
-    <label class="ui-checkbox"><input type="checkbox" ng-model="req.search_this_room" ng-change="search(true)"><span>このチャットルームだけを検索</span></label>
+
+    <form id="search_form" class="form-inline" ng-submit="search(true)" novalidate>
+        <div class="input-group" style="min-width: 400px; max-width:450px;">
+            <input type="text" placeholder="キーワードを入力" class="form-control" ng-model="req.search_string" maxlength="50" auto-focus=true>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-info" ng-click="search(true)"><i class="icon-magnifier"></i> 検索</button>
+            </div>
+        </div>
+        <label class="ui-checkbox"><input type="checkbox" ng-model="req.search_this_room" ng-change="search(true)"><span>このチャットルームだけを検索</span></label>
+    </form>
 </div>
 <div class="modal-body">
     <div id="chat_search_view" class="row chat-container" scroll-top="prev()" scroll-bottom="next()">
@@ -38,13 +47,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <form id="search_form" ng-submit="search(true)" novalidate>
-        <div class="input-group pull-left" style="max-width:450px">
-            <input type="text" placeholder="キーワードを入力" class="form-control" ng-model="req.search_string" maxlength="50" auto-focus=true>
-            <div class="input-group-btn">
-                <button type="button" class="btn btn-default" ng-click="search(true)"><i class="icon-magnifier"></i> 検索</button>
-            </div>
-        </div>
-    </form>
     <button type="button" class="btn btn-default" ng-click="cancel()">閉じる</button>
 </div>

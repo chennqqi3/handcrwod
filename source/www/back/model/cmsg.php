@@ -18,9 +18,23 @@
                     "to_id",
                     "cmsg_type",
                     "content",
+                    "reacts",
                     "attach",
                     "file_size"),
                 array("auto_inc" => true));
+        }
+
+        public function save()
+        {
+            if (is_array($this->reacts)) {
+                $this->reacts = json_encode($this->reacts);
+            }
+
+            $err = parent::save();
+
+            $this->reacts = json_decode($this->reacts);
+
+            return $err;
         }
 
         public static function message($cmsg_id, $mission_id, $from_id, $to_id, $content) 
@@ -37,17 +51,23 @@
 
             $cmsg->mission_id = $mission_id;
             $cmsg->from_id = $from_id;
-            $cmsg->to_id = $to_id;
+            $cmsg->to_id = $to_id; // unuse
             $cmsg->cmsg_type = CMSG_TEXT;
             $cmsg->content = $content;
 
             $err = $cmsg->save();
 
+            $to_ids = null;
+            if (preg_match_all("/\[to\:(all)\]/", $content, $matches) ||
+                preg_match_all("/\[to\:([0-9]+)\]/", $content, $matches)) {
+                $to_ids = $matches[1];
+            }
+
             // set last date of mission
             mission::set_last_date($mission_id, $cmsg_id);
 
             if ($to_id == null)
-                cunread::unread($cmsg->cmsg_id, $mission_id, $from_id);
+                cunread::unread($cmsg->cmsg_id, $mission_id, $from_id, $to_ids);
             else
                 cunread::refresh_unreads($mission_id);
 
@@ -58,6 +78,52 @@
             else {
                 return null;
             }
+        }
+
+        public static function react($cmsg_id, $emoticon_id, $user_id)
+        {
+            $cmsg = static::getModel($cmsg_id);
+
+            if ($cmsg) {
+                $amount = react_user::set_react($cmsg_id, $emoticon_id, $user_id);
+                $users = react_user::get_users($cmsg_id, $emoticon_id);
+
+                if (!_is_empty($cmsg->reacts)) {
+                    $reacts = json_decode($cmsg->reacts, true);
+                }
+                else {
+                    $reacts = array();
+                }
+
+                // [[emoticon_id, amount],[emoticon_id, amount]]
+                $found = false;
+                for ($i = 0; $i < count($reacts); $i ++) {
+                    if (is_array($reacts[$i])) {
+                        $i_emoticon_id = $reacts[$i][0];
+                        if ($i_emoticon_id == $emoticon_id) {
+                            if ($amount > 0) {
+                                $found = true;
+                                $reacts[$i][1] = $amount;
+                                $reacts[$i][2] = $users;
+                            }
+                            else {
+                                array_splice($reacts, $i, 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!$found && $amount > 0) {
+                    array_push($reacts, array($emoticon_id, $amount, $users));
+                }
+
+                $cmsg->reacts = $reacts;
+
+                $err = $cmsg->save();
+            }
+
+            return $cmsg;
         }
 
         public static function remove_message($cmsg_id)
@@ -71,6 +137,7 @@
                     if ($err == ERR_OK) {
                         cunread::read($cmsg_id);
                         $err = cunread::refresh_unreads($cmsg->mission_id);
+                        react_user::remove_all($cmsg_id);
                     }
                 }
 
@@ -98,7 +165,7 @@
                     " . ($star ? "INNER" : "LEFT") . " JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
                     LEFT JOIN m_user f ON m.from_id=f.user_id
                     LEFT JOIN t_cunread u ON m.cmsg_id=u.cmsg_id AND u.user_id=" . _sql($user_id) . "
-                    WHERE m.mission_id=" . _sql($mission_id) . " AND m.del_flag=0
+                    WHERE m.mission_id=" . _sql($mission_id) . " AND m.del_flag=0 AND ms.hidden IS NULL
                         AND (mi.private_flag=" . CHAT_BOT . " AND m.to_id=" . _sql($user_id) ." OR mi.private_flag!=" . CHAT_BOT . ")";
             }
             else {
@@ -109,7 +176,7 @@
                     " . ($star ? "INNER" : "LEFT") . " JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
                     LEFT JOIN m_user f ON m.from_id=f.user_id
                     LEFT JOIN t_cunread u ON m.cmsg_id=u.cmsg_id AND u.user_id=" . _sql($user_id) . "
-                    WHERE h.home_id=" . _sql($home_id) . " AND m.del_flag=0
+                    WHERE h.home_id=" . _sql($home_id) . " AND m.del_flag=0 AND ms.hidden IS NULL
                         AND (mi.private_flag=" . CHAT_BOT . " AND m.to_id=" . _sql($user_id) ." OR mi.private_flag!=" . CHAT_BOT . ")";    
             }
 
@@ -137,7 +204,8 @@
                     "user_name" => $cmsg->from_name,
                     "date" => $cmsg->create_time,
                     "unread" => $cmsg->cunread_id != null,
-                    "star" => $cmsg->cmsg_star_id != null
+                    "star" => $cmsg->cmsg_star_id != null,
+                    "reacts" => json_decode($cmsg->reacts)
                 );
 
                 if ($mission_id == null) {
@@ -171,15 +239,18 @@
                 FROM t_cmsg m 
                 INNER JOIN t_mission mi ON m.mission_id=mi.mission_id
                 INNER JOIN t_mission_member mm ON mm.mission_id=m.mission_id AND user_id=" . _sql($user_id) . "
+                LEFT JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
                 LEFT JOIN m_user f ON m.from_id=f.user_id 
-                WHERE m.del_flag=0 AND mi.del_flag=0 AND 
-                    mi.home_id=" . _sql($home_id) . " AND
+                WHERE m.del_flag=0 AND mi.del_flag=0 AND ms.hidden IS NULL AND
                     m.content LIKE " . _sql("%" . $search_string . "%") . "
                     AND (mi.private_flag=" . CHAT_BOT . " AND m.to_id=" . _sql($user_id) ." OR mi.private_flag!=" . CHAT_BOT . ")";
 
             if (!_is_empty($mission_id))
             {
-                $sql .= " AND m.mission_id=" . _sql($mission_id);
+                $sql .= " AND mi.mission_id=" . _sql($mission_id);
+            }
+            else if (!_is_empty($home_id)) {
+                $sql .= " AND mi.home_id=" . _sql($home_id);
             }
 
             $order = "DESC";

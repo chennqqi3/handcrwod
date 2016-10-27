@@ -178,7 +178,7 @@
 			$mission = new mission;
 
 			$sql = "SELECT m.*, 
-					mm.pinned, mm.unreads, ou.user_name opp_user_name, mm.opp_user_id, 
+					mm.pinned, mm.unreads, mm.to_unreads, ou.user_name opp_user_name, mm.opp_user_id, 
 					DATEDIFF(NOW(), m.last_date) pass_date,
 					mm.last_date mm_last_date
 				FROM t_mission m 
@@ -203,7 +203,7 @@
 			else 
 				$order = "mm.pinned DESC";
 			*/
-			$order = "m.last_date DESC, mm.pinned DESC";
+			$order = "mm.unreads DESC, m.last_date DESC, mm.pinned DESC";
 			$err = $mission->query($sql,
 				array("order" => $order));
 			if ($err != ERR_NODATA)
@@ -226,6 +226,7 @@
 					"private_flag" => $mission->private_flag,
 					"pinned" => $mission->pinned,
 					"unreads" => $mission->unreads,
+					"to_unreads" => $mission->to_unreads,
 					"last_date" => $mission->last_date,
 					"last_text" => $mission->last_text,
 					"client_id" => $mission->client_id,
@@ -246,9 +247,10 @@
                         WHERE mm.mission_id IN (
                             SELECT DISTINCT mm.mission_id FROM t_mission_member mm
                             LEFT JOIN t_mission m ON mm.mission_id=m.mission_id
-                            WHERE mm.del_flag=0 AND m.home_id=" . _sql($home_id) . " 
+                            WHERE mm.del_flag=0 AND m.del_flag=0 AND m.complete_flag!=1 
+                            	AND m.home_id=" . _sql($home_id) . " 
                                 AND mm.user_id=" . _sql($my_id) . " 
-                                AND m.private_flag IN (" . CHAT_PUBLIC . "," . CHAT_PRIVATE . ")
+                                AND m.private_flag=" . CHAT_PRIVATE . "
                                 )
                         )";
             }
@@ -258,9 +260,9 @@
 					hm.user_id, u.user_name, u.email, u.login_id, hm.priv, hm.accepted
                 FROM t_home_member hm 
                 INNER JOIN m_user u ON hm.user_id=u.user_id 
-                LEFT JOIN (SELECT m.*, mm.pinned, mm.unreads, mm.opp_user_id FROM t_mission m 
+                LEFT JOIN (SELECT m.*, mm.pinned, mm.unreads, mm.to_unreads, mm.opp_user_id FROM t_mission m 
 					LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
-					WHERE m.private_flag=" . CHAT_MEMBER . " AND mm.user_id=" . _sql($my_id) . ") m ON m.opp_user_id=u.user_id
+					WHERE m.del_flag=0 AND m.private_flag=" . CHAT_MEMBER . " AND mm.user_id=" . _sql($my_id) . ") m ON m.opp_user_id=u.user_id
                 WHERE hm.home_id=" . _sql($home_id) . " AND hm.del_flag=0 " . $where . "
                 ORDER BY m.last_date DESC, hm.priv DESC";
 
@@ -285,6 +287,7 @@
 					"private_flag" => CHAT_MEMBER,
 					"pinned" => $mission->pinned,
 					"unreads" => $mission->unreads,
+					"to_unreads" => $mission->to_unreads,
 					"last_date" => $mission->last_date,
 					"last_text" => $mission->last_text,
 					"client_id" => $mission->client_id,
@@ -484,6 +487,47 @@
 			}
 		}
 
+		public function self_invite()
+		{
+			$param_names = array("mission_id", "invite_key");
+			$this->setApiParams($param_names);
+            $this->checkRequired($param_names);
+			$params = $this->api_params;
+
+			$user_id = _user_id();
+     		$user = _user();
+     		if ($user == null)
+            	$this->checkError(ERR_NOTFOUND_USER);
+
+            $mission = mission::getModel($params->mission_id);
+            if ($mission == null)
+                $this->checkError(ERR_NOTFOUND_MISSION);
+
+            if ($mission->private_flag != CHAT_PRIVATE)
+                $this->checkError(ERR_NOPRIV);
+
+            if ($mission->invite_key != $params->invite_key)
+				$this->checkError(ERR_INVALID_INVITE_KEY);            	
+
+			$home = home::getModel($mission->home_id);
+			if ($home == null)
+				$this->checkError(ERR_NOTFOUND_HOME);
+			
+			// start transaction
+			$this->start();
+
+            if (!$mission->is_member($user->user_id)) {
+				$is_home_member = $home->is_member($user_id);
+
+				$err = $mission->add_member($user_id, 1);
+				$this->checkError($err);
+			}
+
+			$this->finish(array(
+				"mission_id" => $mission->mission_id, 
+				"home_id" => $mission->home_id), ERR_OK);
+		}
+
 		public function remove_member()
 		{
 			$param_names = array("mission_id", "user_id");
@@ -509,6 +553,21 @@
 			$this->finish(array("mission_id" => $mission->mission_id, "home_id" => $mission->home_id), $err);
 		}
 
+        public function get_name() 
+        {
+            $param_names = array("mission_id");
+            $this->setApiParams($param_names);
+            $this->checkRequired($param_names);
+            $params = $this->api_params;
+
+            $mission_name = "";
+            $mission = mission::getModel($params->mission_id);
+            if ($mission)
+                $mission_name = $mission->mission_name;
+
+            $this->finish(array("mission_name" => $mission_name), ERR_OK);
+        }
+
 		public function get()
 		{
 			$param_names = array("mission_id");
@@ -527,9 +586,9 @@
 			$mission = new mission;
 
 			$sql = "SELECT m.*, 
-					mm.pinned, mm.unreads, ou.user_name opp_user_name, mm.opp_user_id, 
+					mm.pinned, mm.unreads, mm.to_unreads, ou.user_name opp_user_name, mm.opp_user_id, 
 					DATEDIFF(NOW(), m.last_date) pass_date,
-					mm.last_date mm_last_date, mm.push_flag, mm.priv
+					mm.last_date mm_last_date, mm.push_flag, mm.priv, ou.email, ou.login_id
 				FROM t_mission m 
 				LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
 				LEFT JOIN m_user ou ON mm.opp_user_id=ou.user_id
@@ -541,7 +600,10 @@
 			if ($err == ERR_NODATA)
 				$this->checkError(ERR_NOTFOUND_MISSION);
 			
-			$mission->load_other_info();			
+			$mission->load_other_info();	
+
+			$mission->user_id = $mission->opp_user_id;
+			$mission->user_name = $mission->opp_user_name;
 
 			$mission_member = new model;
 			$err = $mission_member->query("SELECT mm.user_id, u.user_name, u.email, u.login_id, mm.push_flag, mm.priv
@@ -572,6 +634,8 @@
 
 			$sql = "SELECT MAX(plan_end_date) FROM t_task WHERE mission_id=" . _sql($params->mission_id) . " AND del_flag=0";
 			$mission->end_date = $db->scalar($sql);
+
+            $mission->emoticons = emoticon::all($mission->home_id);
 
 			$this->finish(array("mission" => $mission->props), ERR_OK);
 		}
@@ -1093,5 +1157,133 @@
 
             $this->finish(array("priv" => $mission_member->priv), ERR_OK);
         }
+
+		public function upload_emoticon()
+		{
+			$param_names = array("mission_id");
+			$this->setApiParams($param_names);
+			$this->checkRequired($param_names);
+			$params = $this->api_params;
+
+			// start transaction
+			$this->start();
+
+			$mission = mission::getModel($params->mission_id);
+			if ($mission == null)
+				$this->checkError(ERR_NOTFOUND_MISSION);	
+
+			$home = home::getModel($mission->home_id);
+			if ($home == null)
+				$this->checkError(ERR_NOTFOUND_HOME);	
+
+			$image = emoticon::upload('file');
+			if ($image == null)
+				$this->checkError(ERR_FAIL_UPLOAD);
+
+			$this->finish(array(
+				"image" => $image), ERR_OK);
+		}
+
+		public function add_emoticon()
+		{
+			$param_names = array("mission_id", "title", "alt", "image");
+			$this->setApiParams($param_names);
+			$this->checkRequired($param_names);
+			$params = $this->api_params;
+
+			// start transaction
+			$this->start();
+
+			$mission = mission::getModel($params->mission_id);
+			if ($mission == null)
+				$this->checkError(ERR_NOTFOUND_MISSION);
+
+			$home = home::getModel($mission->home_id);
+			if ($home == null)
+				$this->checkError(ERR_NOTFOUND_HOME);
+
+			$emoticon = new emoticon;
+			$emoticon->home_id = $home->home_id;
+			$emoticon->title = $params->title;
+			$emoticon->alt = $params->alt;
+			$emoticon->image = basename($params->image);
+
+			if (emoticon::is_exist_by_alt($home->home_id, $emoticon->alt))
+				$this->checkError(ERR_ALREADY_USING_EMOTICON);
+
+			$tmppath = TMP_PATH . $emoticon->image;
+			$emoticonpath = emoticon_PATH . $emoticon->image;
+
+			if (!file_exists($tmppath))
+				$this->checkError(ERR_FAIL_UPLOAD);
+
+			rename(TMP_PATH . $emoticon->image, EMOTICON_PATH . $emoticon->image);
+
+			$err = $emoticon->save();
+
+			$emoticon->image = EMOTICON_URL . $emoticon->image;
+
+			$this->finish(array("emoticon" => $emoticon->props), $err);
+		}
+
+		public function save_emoticon()
+		{
+			$param_names = array("emoticon_id", "mission_id", "title", "alt", "image");
+			$this->setApiParams($param_names);
+			$this->checkRequired($param_names);
+			$params = $this->api_params;
+
+			// start transaction
+			$this->start();
+
+			$mission = mission::getModel($params->mission_id);
+			if ($mission == null)
+				$this->checkError(ERR_NOTFOUND_MISSION);
+
+			$home = home::getModel($mission->home_id);
+			if ($home == null)
+				$this->checkError(ERR_NOTFOUND_HOME);
+
+			$emoticon = emoticon::getModel($params->emoticon_id);
+			if ($emoticon == null)
+				$this->checkError(ERR_NOTFOUND_EMOTICON);
+
+			$emoticon->home_id = $home->home_id;
+			$emoticon->title = $params->title;
+			$emoticon->alt = $params->alt;
+			$emoticon->image = basename($params->image);
+
+			if (emoticon::is_exist_by_alt($home->home_id, $emoticon->alt, $emoticon->emoticon_id))
+				$this->checkError(ERR_ALREADY_USING_EMOTICON);
+
+			$tmppath = TMP_PATH . $emoticon->image;
+			$emoticonpath = emoticon_PATH . $emoticon->image;
+
+			if (file_exists($tmppath)) {
+				rename(TMP_PATH . $emoticon->image, EMOTICON_PATH . $emoticon->image);
+			}
+
+			$err = $emoticon->save();
+
+			$emoticon->image = EMOTICON_URL . $emoticon->image;
+
+			$this->finish(array("emoticon" => $emoticon->props), $err);
+		}
+
+		public function remove_emoticon()
+		{
+			$param_names = array("emoticon_id");
+			$this->setApiParams($param_names);
+			$this->checkRequired($param_names);
+			$params = $this->api_params;
+
+			$emoticon = emoticon::getModel($params->emoticon_id);
+			if ($emoticon == null)
+				$this->checkError(ERR_NOTFOUND_EMOTICON);
+
+			$emoticon->remove();
+
+			$this->finish(null, ERR_OK);
+		}
 	}
 ?>

@@ -390,6 +390,16 @@ No.157 タスクの詳細画面を出すのに、タスクを選んで右上の�
 -プッシュ通知が失敗すると、３回まで再送信する。
 "),
 			"2.5" => array("func" => "patch2_5", "description" => "パッチ(2016/07/22)
+"),
+			"2.6" => array("func" => "patch2_6", "description" => "パッチ(2016/8/7)
+"),
+			"2.7" => array("func" => "patch2_7", "description" => "パッチ(2016/8/12)
+- 絵文字追加
+- リアクション				
+"),
+			"2.8" => array("func" => "patch2_8", "description" => "
+- #17 修正
+新規にグループを作って既存のユーザーを招待をしました。しかし、まだ招待したユーザーが承認を押していないのに、メンバーリストに表示されていて、メッセージが出来るように思えてしまい混乱します。また、Web版の場合は、承認前なのにメッセージを送ることができて、通知までされます。
 ")
 			);
 
@@ -1131,9 +1141,85 @@ WHERE m.private_flag IN (0, 1) AND mm.priv IS NULL) a
 SET mm.priv=1;
 
 UPDATE t_mission_member SET priv=0 WHERE priv IS NULL;
+
+ALTER TABLE `t_cunread`
+ADD COLUMN `to_flag`  int(1) NULL AFTER `mail_flag`;
+
+ALTER TABLE `t_mission_member`
+MODIFY COLUMN `unreads`  int NULL DEFAULT NULL AFTER `pinned`,
+ADD COLUMN `to_unreads`  int NULL AFTER `unreads`;
+
+
 ";
 
 			$this->db->execute_batch($sql);
+			return ERR_OK;
+		}
+
+		public function patch2_6() {
+			$sql = "ALTER TABLE `t_home`
+ADD COLUMN `invite_key`  varchar(32) NULL AFTER `logo`;
+UPDATE t_home SET invite_key=md5(concat(home_id, create_time));
+ALTER TABLE `t_mission`
+ADD COLUMN `invite_key`  varchar(32) NULL AFTER `last_cmsg_id`;
+UPDATE t_mission SET invite_key=md5(concat(mission_id, create_time));
+";
+			$this->db->execute_batch($sql);
+
+			return ERR_OK;
+		}
+
+		public function patch2_7() {
+			$sql = "
+
+CREATE TABLE `t_emoticon` (
+`emoticon_id`  int(11) NOT NULL AUTO_INCREMENT ,
+`home_id`  int(11) NULL DEFAULT NULL ,
+`title`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`alt`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`image`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`create_time`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+`update_time`  datetime NULL DEFAULT NULL ,
+`del_flag`  tinyint(1) NOT NULL ,
+PRIMARY KEY (`emoticon_id`),
+INDEX `home_id` (`home_id`) USING BTREE ,
+INDEX `del_flag` (`del_flag`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=43
+;
+
+INSERT INTO `t_emoticon` VALUES ('1', null, '笑顔', ':)', 'emo_smile.gif', '2016-08-11 11:00:10', null, '0'), ('2', null, '悲しい', ':(', 'emo_sad.gif', '2016-08-11 11:00:10', null, '0'), ('3', null, 'もっとスマイル', ':D', 'emo_more_smile.gif', '2016-08-11 11:00:10', null, '0'), ('4', null, 'やったね', '8-)', 'emo_lucky.gif', '2016-08-11 11:00:10', null, '0'), ('5', null, 'びっくり', ':o', 'emo_surprise.gif', '2016-08-11 11:00:10', null, '0'), ('6', null, 'ウィンク', ';)', 'emo_wink.gif', '2016-08-11 11:00:10', null, '0'), ('7', null, 'ウェ～ん', ';(', 'emo_tears.gif', '2016-08-11 11:00:10', null, '0'), ('8', null, '汗', '(sweat)', 'emo_sweat.gif', '2016-08-11 11:00:11', null, '0'), ('9', null, 'むむ', ':|', 'emo_mumu.gif', '2016-08-11 11:00:11', null, '0'), ('10', null, 'チュ！', ':*', 'emo_kiss.gif', '2016-08-11 11:00:11', null, '0'), ('11', null, 'べー', ':p', 'emo_tongueout.gif', '2016-08-11 11:00:11', null, '0'), ('12', null, '恥ずかしい', '(blush)', 'emo_blush.gif', '2016-08-11 11:00:11', null, '0'), ('13', null, '何なに', ':^)', 'emo_wonder.gif', '2016-08-11 11:00:11', null, '0'), ('14', null, '眠い', '|-)', 'emo_snooze.gif', '2016-08-11 11:00:11', null, '0'), ('15', null, '恋してます', '(inlove)', 'emo_love.gif', '2016-08-11 11:00:11', null, '0'), ('16', null, 'ニヤッ', ']:)', 'emo_grin.gif', '2016-08-11 11:00:11', null, '0'), ('17', null, '話す', '(talk)', 'emo_talk.gif', '2016-08-11 11:00:11', null, '0'), ('18', null, 'あくび', '(yawn)', 'emo_yawn.gif', '2016-08-11 11:00:11', null, '0'), ('19', null, 'ゲーッ', '(puke)', 'emo_puke.gif', '2016-08-11 11:00:11', null, '0'), ('20', null, 'イケメン', '(emo)', 'emo_ikemen.gif', '2016-08-11 11:00:11', null, '0'), ('21', null, 'オタク', '8-|', 'emo_otaku.gif', '2016-08-11 11:00:11', null, '0'), ('22', null, 'ニンマリ', ':#)', 'emo_ninmari.gif', '2016-08-11 11:00:11', null, '0'), ('23', null, 'うんうん', '(nod)', 'emo_nod.gif', '2016-08-11 11:00:11', null, '0'), ('24', null, 'いやいや', '(shake)', 'emo_shake.gif', '2016-08-11 11:00:11', null, '0'), ('25', null, '苦笑い', '(^^;)', 'emo_wry_smile.gif', '2016-08-11 11:00:12', null, '0'), ('26', null, 'やれやれ', '(whew)', 'emo_whew.gif', '2016-08-11 11:00:12', null, '0'), ('27', null, '拍手', '(clap)', 'emo_clap.gif', '2016-08-11 11:00:12', null, '0'), ('28', null, 'おじぎ', '(bow)', 'emo_bow.gif', '2016-08-11 11:00:12', null, '0'), ('29', null, '了解！', '(roger)', 'emo_roger.gif', '2016-08-11 11:00:12', null, '0'), ('30', null, '筋肉モリモリ', '(flex)', 'emo_muscle.gif', '2016-08-11 11:00:12', null, '0'), ('31', null, 'ダンス', '(dance)', 'emo_dance.gif', '2016-08-11 11:00:12', null, '0'), ('32', null, 'コマネチ', '(:/)', 'emo_komanechi.gif', '2016-08-11 11:00:12', null, '0'), ('33', null, '悪魔', '(devil)', 'emo_devil.gif', '2016-08-11 11:00:12', null, '0'), ('34', null, '星', '(*)', 'emo_star.gif', '2016-08-11 11:00:12', null, '0'), ('35', null, 'ハート', '(h)', 'emo_heart.gif', '2016-08-11 11:00:12', null, '0'), ('36', null, '花', '(F)', 'emo_flower.gif', '2016-08-11 11:00:12', null, '0'), ('37', null, 'クラッカー', '(cracker)', 'emo_cracker.gif', '2016-08-11 11:00:12', null, '0'), ('38', null, 'ケーキ', '(^)', 'emo_cake.gif', '2016-08-11 11:00:12', null, '0'), ('39', null, 'コーヒー', '(coffee)', 'emo_coffee.gif', '2016-08-11 11:00:12', null, '0'), ('40', null, 'ビール', '(beer)', 'emo_beer.gif', '2016-08-11 11:00:12', null, '0'), ('41', null, '握手', '(handshake)', 'emo_handshake.gif', '2016-08-11 11:00:13', null, '0'), ('42', null, 'はい', '(y)', 'emo_yes.gif', '2016-08-11 11:00:13', null, '0');
+
+CREATE TABLE `t_react_user` (
+`react_user_id`  int NOT NULL AUTO_INCREMENT ,
+`cmsg_id`  int NOT NULL ,
+`emoticon_id`  int NOT NULL ,
+`user_id`  int NOT NULL ,
+`create_time`  datetime NOT NULL DEFAULT now() ,
+`update_time`  datetime NULL ,
+`del_flag`  tinyint(1) NOT NULL DEFAULT 0 ,
+PRIMARY KEY (`react_user_id`),
+INDEX `react_user` (`cmsg_id`, `emoticon_id`, `user_id`) ,
+INDEX `del_flag` (`del_flag`) 
+)
+;
+
+ALTER TABLE `t_cmsg`
+ADD COLUMN `reacts`  mediumtext NULL AFTER `content`;
+";
+			$this->db->execute_batch($sql);
+
+			return ERR_OK;
+		}
+
+		public function patch2_8()
+		{
+			$sql = "ALTER TABLE `t_home_member`
+ADD INDEX `accepted` (`accepted`) ;";
+			$this->db->execute_batch($sql);
+
 			return ERR_OK;
 		}
 	};

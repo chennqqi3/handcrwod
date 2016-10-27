@@ -20,37 +20,16 @@
 
 		public function signin()
 		{
-			$this->setApiParams(array("email", "password"));
+			$this->setApiParams(array("login_id", "email", "password"));
 			
 			$user = new user;
 			$user->load($this->api_params);
 
 			$err = $user->login();
 
-			$ret = null;
-			if ($err == ERR_OK) {
-				$planconfig = new planconfig($user->plan_type);	
-
-				$last_home = home::last_home();
-
-				$ret = array(
-					"session_id" => session_id(),
-					"user_id" => $user->user_id, 
-					"user_name" => $user->user_name,
-					"email" => $user->email,
-					"avartar" => _avartar_full_url($user->user_id),
-					"language" => $user->language,
-					"time_zone" => $user->time_zone,
-					"priority_tasks" => task_user::getPriorityTasks($user->user_id),
-                	"inbox_tasks" => task::getInboxTasks($user->user_id),
-					"plan" => $planconfig->props,
-					"plan_end_date" => $user->plan_end_date,
-					"cur_home" => $last_home,
-					"alerts" => user::get_alerts($user->user_id),
-					"chat_uri" => _chat_uri()
-				);
-			}
-
+			// post login success
+			if ($err == ERR_OK)
+				$ret = $user->post_login();
 			$this->finish($ret, $err);
 		}
 
@@ -67,23 +46,21 @@
 
 		public function signup()
 		{
-			$param_names = array("user_name", "email", "password", "activate_url", "invite_mission_id", "invite_home_id", "key");
+			$param_names = array("login_id", "user_name", "email", "password", "activate_url", "invite_mission_id", "invite_home_id", "key");
 			$this->setApiParams($param_names);
-			$this->checkRequired(array("user_name", "email", "password"));
+			$this->checkRequired(array("login_id", "user_name", "password"));
 			$params = $this->api_params;
 
 			// start transaction
 			$this->start();
 
-			$other = new user;
-			$where = "email=" . _sql($params->email) . " AND user_type!=" . UTYPE_ADMIN;
-			$err = $other->select($where);
-			if ($err == ERR_OK) {
-				if ($other->activate_flag == 1)
+			if (!_is_empty($params->email)) {
+				if (user::is_exist_by_email($params->email))
 					$this->checkError(ERR_ALREADY_USING_EMAIL);
-				else {
-					$other->remove(true);
-				}
+			}
+
+			if (user::is_exist_by_login_id($params->login_id)) {
+				$this->checkError(ERR_ALREADY_USING_LOGIN_ID);	
 			}
 
 			$err = ERR_OK;
@@ -93,13 +70,19 @@
 			$user->user_type = UTYPE_USER;
 			$user->language = DEFAULT_LANGUAGE;
 			$user->time_zone = TIME_ZONE;
-			$user->activate_flag = UNACTIVATED;
-			$user->activate_key = _newId();
-			$user->activate_until = "##DATE_ADD(NOW(),INTERVAL 1 DAY)";
+			$user->activate_flag = ACTIVATED; // メール認証はしない
+			$user->activate_key = null; // _newId();
+			$user->activate_until = null; // "##DATE_ADD(NOW(),INTERVAL 1 DAY)";
 			$user->plan_type = PLAN_FREE;
 
-			$same_email_user = new user;
-			$same_email_user->remove_where("email=" . _sql($params->email) . " AND activate_flag=0", true);
+			if (!_is_empty($params->email)) {
+				$same_user = new user;
+				$same_user->remove_where("email=" . _sql($params->email) . " AND activate_flag=0", true);
+			}
+			if (!_is_empty($params->login_id)) {
+				$same_user = new user;
+				$same_user->remove_where("login_id=" . _sql($params->login_id) . " AND activate_flag=0", true);
+			}
 
 			$user->password = md5($user->password);
 
@@ -107,7 +90,8 @@
 
 			if ($err == ERR_OK)
 			{
-				$user->send_activate_mail($params->activate_url, $params->app_mode);
+				// メール認証はしない
+				// $user->send_activate_mail($params->activate_url, $params->app_mode);
 
 				if ($params->invite_mission_id != null)
 				{
@@ -131,7 +115,20 @@
 				}
 			}
 
-			$this->finish(array("user_id" => $user->user_id), $err);
+
+			if (!_is_empty($params->login_id)) {
+				// login
+				$user->password = $params->password;
+				$err = $user->login();
+
+				// post login success
+				if ($err == ERR_OK)
+					$ret = $user->post_login();
+				$this->finish($ret, $err);
+			}
+			else {
+				$this->finish(array("user_id" => $user->user_id), $err);
+			}
 		}
 
 		public function resend_activate_mail()
@@ -206,26 +203,9 @@
 					// login
 					user::init_session_data($user);
 
-					$planconfig = new planconfig($user->plan_type);	
-
-					$last_home = home::last_home();
-
-					$ret = array(
-						"session_id" => session_id(),
-						"user_id" => $user->user_id, 
-						"user_name" => $user->user_name,
-						"email" => $user->email,
-						"avartar" => _avartar_full_url($user->user_id),
-						"language" => $user->language,
-						"time_zone" => $user->time_zone,
-						"priority_tasks" => task_user::getPriorityTasks($user->user_id),
-	                	"inbox_tasks" => task::getInboxTasks($user->user_id),
-						"plan" => $planconfig->props,
-						"plan_end_date" => $user->plan_end_date,
-						"cur_home" => $last_home,
-						"alerts" => user::get_alerts($user->user_id),
-						"chat_uri" => _chat_uri()
-					);		
+					// post login success
+					$ret = $user->post_login();
+					$this->finish($ret, ERR_OK);	
 				}
 
 				$this->finish($ret, $err);
@@ -276,7 +256,7 @@
 				$this->checkError(ERR_USER_UNACTIVATED);
 
 			$user->activate_key = _newId();
-			$user->activate_until = "##DATE_ADD(NOW(),INTERVAL 5 MINUTE)";
+			$user->activate_until = "##DATE_ADD(NOW(),INTERVAL 20 MINUTE)";
 
 			$err = $user->save();
 
@@ -288,7 +268,7 @@
 下記のURLにアクセスして、パスワードをリセットしてください。
 " . $params->reset_url . "?user_id=" .  $user->user_id . "&activate_key=" . $user->activate_key . "
 
-※URLの有効期限は発行から5分間です。 \n";
+※URLの有効期限は発行から20分間です。 \n";
 				$body .= MAIL_FOOTER;
 
 				_send_mail($user->email, $user->user_name, $title, $body);
@@ -442,32 +422,22 @@
 			$planconfig = new planconfig($user->plan_type);
 
 			if ($user_id == $my_id) {
-				if ($params->cur_home_id != null)
-					$last_home = home::last_home($params->cur_home_id);
-				else
-					$last_home = null;
+				$ret = $user->post_login();
 
-				$alerts = user::get_alerts($user_id);	
+				$ret["hourly_amount"] = $user->hourly_amount;
+				$ret["skills"] = $skills;
+				$ret["alarm_mail_flag"] = $user->alarm_mail_flag;
+				$ret["alarm_time"] = $user->alarm_time;
+			}
+			else {
+				$ret["avartar"] = $user->avartar;
+				$ret["user_name"] = $user->user_name;
+				$ret["login_id"] = $user->login_id;
+				$ret["skills"] = $skills;
+
 			}
 
-			$this->finish(array("user" => array(
-				"user_id" => $user->user_id,
-				"user_name" => $user->user_name, 
-				"login_id" => $user->login_id, 
-				"email" => $user->email, 
-				"hourly_amount" => $user->hourly_amount,
-				"language" => $user->language,
-				"time_zone" => $user->time_zone,
-				"avartar" => $user->avartar,
-				"skills" => $skills,
-				"alarm_mail_flag" => $user->alarm_mail_flag,
-				"alarm_time" => $user->alarm_time,
-				"plan" => $planconfig->props,
-				"plan_end_date" => $user->plan_end_date,
-				"cur_home" => $last_home,
-				"alerts" => $alerts,
-				"chat_uri" => _chat_uri())
-			), ERR_OK);
+			$this->finish(array("user" => $ret), ERR_OK);
 		}
 
 		public function upload_avartar()
@@ -552,6 +522,15 @@
 
 			$my_id = _user_id();
 			$this->finish(array("alerts" => user::get_alerts($my_id)), ERR_OK);
+		}
+
+		public function unreads()
+		{
+			$this->setApiParams(array());
+			$params = $this->api_params;
+
+			$my_id = _user_id();
+			$this->finish(array("unreads" => cunread::all($my_id)), ERR_OK);
 		}
 	}
 ?>

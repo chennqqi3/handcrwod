@@ -3,23 +3,31 @@ read_timer = 2000
 angular.module('app.chatroom', [])
 
 .controller('chatroomCtrl', 
-    ($scope, $api, $chat, missionStorage, chatStorage, taskStorage, homeStorage, CONFIG, filterFilter, $rootScope, $routeParams, logger, $session, $dateutil, $timeout, $dialogs, $emoticons, $location, $window, $compile, $filter) ->
+    ($scope, $api, $chat, missionStorage, chatStorage, taskStorage, homeStorage, CONFIG, filterFilter, $rootScope, $routeParams, logger, $session, $dateutil, $timeout, $dialogs, $location, $window, $compile, $filter) ->
         $rootScope.nav_id = "chatroom_" + $routeParams.mission_id
         $scope.show_tasks = false
         $scope.show_process = false
         $scope.show_attach = false
         $scope.show_star = false
         $scope.show_summary = false
-        $scope.emoticons = $emoticons.icons
         $scope.last_cid = null
         $scope.loaded_messages = false
         $scope.max_right_panel = false
         $scope.old_sideWidth = 0
         $scope.all_avartar = CONFIG.AVARTAR_URL + "all.jpg"
+        $scope.session = $session
+
+        $scope.mission_id = parseInt($routeParams.mission_id, 10)
+        $scope.chat_id = parseInt($routeParams.chat_id, 10)
 
         MAX_MSG_LENGTH = 100
 
         $rootScope.taskMode = 2
+
+        # 招待QRコード
+        $scope.showInviteQR = ->
+            $dialogs.showQR($api.base_url() + "#/qr/chat/" + $rootScope.cur_mission.mission_id + "/" + $rootScope.cur_mission.invite_key, "招待QRコード(" + $rootScope.cur_mission.mission_name + ")")
+            return
 
         if $rootScope.cmsg_sn == undefined
             $rootScope.cmsg_sn = -1
@@ -99,18 +107,20 @@ angular.module('app.chatroom', [])
                 , 1000)
             else
                 $scope.loaded_messages = true
-                $scope.scrollToBottom(false)
+                $timeout(->
+                    $scope.scrollToBottom(false)
+                )
             $scope.startReadTimer()
-            taskStorage.search($scope.mission_id).then((tasks) ->
-                ##if tasks.length > 0 && !$scope.show_process
-                ##    $scope.showProcess()
-            )
 
         # Emoticon
         $rootScope.$on('$viewContentLoaded', ->
             if ($('.chat-main #emoticon_gallery').length > 0)
                 $('body > #emoticon_gallery').remove()
                 $('.chat-main #emoticon_gallery').appendTo($('body'))
+
+            if ($('.chat-main #react_emoticons').length > 0)
+                $('body > #react_emoticons').remove()
+                $('.chat-main #react_emoticons').appendTo($('body'))
 
             if ($('.chat-main #to_users').length > 0)
                 $('body > #to_users').remove()
@@ -131,17 +141,16 @@ angular.module('app.chatroom', [])
 
             $('body').on('mouseup', (e) ->
                 if $('.chat-main').length > 0
-                    if $rootScope.canChat()
-                        sel = window.getSelection()
-                        if (!sel.isCollapsed)
-                            r = sel.getRangeAt(0).getBoundingClientRect()
-                            #rb1 = rel1.getBoundingClientRect()
-                            #rb2 = rel2.getBoundingClientRect()
-                            #top = (r.bottom - rb2.top)*100/(rb1.top-rb2.top) + 'px'
-                            #left = (r.left - rb2.left)*100/(rb1.left-rb2.left) + 'px'
-                            $('#selection_menu').css('left', r.left + 20).css('top', r.bottom).show()
-                        else
-                            $('#selection_menu').hide()
+                    sel = window.getSelection()
+                    if (!sel.isCollapsed)
+                        r = sel.getRangeAt(0).getBoundingClientRect()
+                        #rb1 = rel1.getBoundingClientRect()
+                        #rb2 = rel2.getBoundingClientRect()
+                        #top = (r.bottom - rb2.top)*100/(rb1.top-rb2.top) + 'px'
+                        #left = (r.left - rb2.left)*100/(rb1.left-rb2.left) + 'px'
+                        $('#selection_menu').css('left', r.left + 20).css('top', r.bottom).show()
+                    else
+                        $('#selection_menu').hide()
                 else
                     $('body').off('mouseup')
                     $('#selection_menu').remove()
@@ -163,6 +172,11 @@ angular.module('app.chatroom', [])
                 if $('#file_drop').has(e.target).length == 0
                     $('#file_drop').removeClass("dragover")
                     $('#file_drop').hide()
+
+                $('.btn-react').each(() ->
+                    if !$(this).is(e.target) && $(this).has(e.target).length == 0 && $('.popover').has(e.target).length == 0
+                        $('#react_emoticons').hide()
+                )
             )
 
             $.fn.dndhover = (options) ->
@@ -272,7 +286,6 @@ angular.module('app.chatroom', [])
             stopWatchingLocation = $scope.$on("$locationChangeStart", handleLocationChangeStartEvent)
         $timeout( startWatchingForLocationChanges, 0, false )
 
-
         angular.element('#input_bar .footer-btn-wrap .btn-smile').on('click', (e) ->
             e.preventDefault()
             ele = $(this)
@@ -286,14 +299,13 @@ angular.module('app.chatroom', [])
                 gheight = Math.abs($('#emoticon_gallery').height())
                 pos.x = Math.round((btn_rect.left + btn_rect.right - gwidth) / 2)
                 pos.y = btn_rect.top - gheight - 4
-                $('#emoticon_gallery').css('left', pos.x).css('top', pos.y)
-                $('#emoticon_gallery').show()
+                $('#emoticon_gallery').css('left', pos.x).css('top', pos.y).show()
             else
                 ele.data('isShowing', "false")
                 $('#emoticon_gallery').hide()            
         )
 
-        $scope.add_emoticon = (emo_text) ->
+        $scope.emoticon_message = (emo_text) ->
             txta = $('.item-input-wrapper textarea')
             start = txta.prop("selectionStart")
             str = ""
@@ -307,7 +319,7 @@ angular.module('app.chatroom', [])
                 str = strPrefix + emo_text + strSuffix
             $scope.cmsg.content = str
             angular.element('#input_bar .footer-btn-wrap .btn-smile').data('isShowing', "false")
-            angular.element('#emoticon_gallery').hide()
+            $('#emoticon_gallery').hide()
 
             $timeout(->
                 chat_ta = document.getElementById('chat_ta')
@@ -315,6 +327,9 @@ angular.module('app.chatroom', [])
                 chat_ta.setSelectionRange(start, start)
             )
             return
+
+        $scope.manage_emoticon = () ->
+            $dialogs.missionEmoticon()
 
         angular.element('#input_bar .footer-btn-wrap .btn-to').on('click', (e) ->
             e.preventDefault()
@@ -718,11 +733,47 @@ angular.module('app.chatroom', [])
                             cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, l_msg.date)
                             $scope.scrollToBottom()
                     else if cmsg.cmsg_id > $scope.last_cid # in the case of replace temp id to correct id
-                            $scope.last_cid = cmsg.cmsg_id
+                        $scope.last_cid = cmsg.cmsg_id
                 else if length == 1
                     $scope.last_cid = cmsg.cmsg_id
 
                 $scope.$apply()
+
+                $scope.initEventHandler()
+                return
+        )
+
+        $scope.add_react = (cmsg_id, e) ->
+            e.stopPropagation()
+            if (e.pageY)
+              y = e.pageY
+            else
+              y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop
+            pos = (x: 0, y: 0)
+            gwidth = Math.abs($('#react_emoticons').width())
+            gheight = Math.abs($('#react_emoticons').height())
+            pos.x = screen.width - gwidth - 30
+            if y + gheight > screen.height 
+                pos.y = y - gheight - 20
+            else
+                pos.y = y + 20
+            $('#react_emoticons').css('left', pos.x).css('top', pos.y).show()
+            $scope.cmsg_id = cmsg_id
+            return
+
+        $scope.react = (cmsg_id, emoticon_id) ->
+            $chat.react(cmsg_id, $scope.mission_id, emoticon_id)
+            $('#react_emoticons').hide()
+            return
+
+        $scope.$on('react_message', (event, cmsg) ->
+            if cmsg.mission_id == $scope.mission_id
+                console.log("receive cmsg_id:" + cmsg.cmsg_id)
+                for m in $scope.messages
+                    if m.cmsg_id == cmsg.cmsg_id
+                        m.reacts = cmsg.reacts
+                        $scope.render_message(m)
+                        break
 
                 $scope.initEventHandler()
                 return
@@ -767,6 +818,7 @@ angular.module('app.chatroom', [])
                 text = message.content
                 time = new Date(message.date).getTime() / 1000
                 str = "[引用 id=" + message.user_id + " name='" + message.user_name + "' time=" + time + "]" + text + "[/引用 time=" + time + "]"
+            str = str + "\n"
 
             start = $('.item-input-wrapper textarea').prop("selectionStart")
             if !$api.is_empty($scope.cmsg.content)
@@ -776,11 +828,11 @@ angular.module('app.chatroom', [])
                 str = strPrefix + str + strSuffix
             else
                 start = str.length
-            $scope.cmsg.content = str + "\n"
+            $scope.cmsg.content = str
             $timeout(->
                 chat_ta = document.getElementById('chat_ta')
                 chat_ta.focus()
-                chat_ta.setSelectionRange(start + 1, start + 1)
+                chat_ta.setSelectionRange(start, start)
             )
             return
 
@@ -833,10 +885,18 @@ angular.module('app.chatroom', [])
 
         $scope.$on('remove_message', (event, cmsg) ->
             if cmsg.mission_id == $scope.mission_id
+                is_to_mine = chatStorage.is_to_mine(cmsg)
                 chatStorage.remove_message($scope.messages, cmsg)
                 if cmsg.unread
-                    $rootScope.cur_mission.unreads--
-                    homeStorage.set_unreads(-1)
+                    delta = -1
+                    delta_to = 0
+                    if is_to_mine
+                        delta_to = -1
+                    $rootScope.cur_mission.unreads += delta
+                    $rootScope.cur_mission.to_unreads += delta_to
+                    $rootScope.cur_home.unreads += delta
+                    $rootScope.cur_home.to_unreads += delta_to
+                    chatStorage.remove_unread(cmsg)
                     chatStorage.refresh_unreads_title()
                     $rootScope.$broadcast('unread-message', $rootScope.cur_mission)
 
@@ -869,6 +929,40 @@ angular.module('app.chatroom', [])
                     msg.star = false
         )
 
+        $scope.unread = (cmsg_id) ->
+            message = $scope.get_message(cmsg_id)
+            return if message == null
+
+            chatStorage.unread_messages($scope.mission_id, [cmsg_id])
+                .then((data) ->
+                    if data.err_code == 0
+                        message.unread = true
+                        message.set_unread = true
+                        $scope.set_unread = true
+
+                        message.read_class = "unread"
+                        if $('#chat_' + message.cmsg_id).length > 0
+                            $('#chat_' + message.cmsg_id + ' .unread-mark i').addClass(message.read_class).removeClass("read")
+
+                        delta = 1
+                        delta_to = 0
+                        message.to_flag = chatStorage.is_to_mine(message)
+                        if (message.to_flag)
+                            delta_to = 1
+
+                        $rootScope.cur_mission.unreads += delta
+                        $rootScope.cur_mission.to_unreads += delta_to
+                        $rootScope.cur_home.unreads += delta
+                        $rootScope.cur_home.unreads += delta_to
+
+                        $rootScope.$broadcast('unread-message', $rootScope.cur_mission)
+                        missionStorage.set_mission($rootScope.cur_mission)
+                        chatStorage.refresh_unreads_title()
+                    else
+                        logger.logError(data.err_msg)
+                )
+            return
+
         $scope.$on('elastic:resize', (event, ta)->
             chat_view = angular.element('#chat_view')
             curScrollHeight = chat_view[0].scrollHeight - chat_view.outerHeight()
@@ -885,13 +979,12 @@ angular.module('app.chatroom', [])
             else
                 fh = 0
 
-            fileBar = angular.element('#file_bar');
-            if $rootScope.canChat()
-                if(fh > 0)
-                    fileBar.css('bottom', h + 10 + "px")
-                    chat_view.css('bottom', h + 10 + fh + 10 + "px")
-                else
-                    chat_view.css('bottom', h + 10 + "px")
+            fileBar = angular.element('#file_bar')
+            if(fh > 0)
+                fileBar.css('bottom', h + 10 + "px")
+                chat_view.css('bottom', h + 10 + fh + 10 + "px")
+            else
+                chat_view.css('bottom', h + 10 + "px")
 
             if mustScrollToBottom
                 $scope.scrollToBottom()
@@ -936,29 +1029,35 @@ angular.module('app.chatroom', [])
                         offset = angular.element('#chat_' + message.cmsg_id).offset()
                         if offset != undefined
                             messageTop = offset.top
-                            if messageTop >= parentRect.top && messageTop < parentRect.bottom && message.unread
+                            if messageTop >= parentRect.top && messageTop < parentRect.bottom && message.unread && !message.set_unread
                                 readIds.push(message.cmsg_id)
 
                 if(readIds.length > 0)
                     chatStorage.read_messages($scope.mission_id, readIds)
                         .then((data) ->
                             if data.err_code == 0
-                                delta = 0
                                 for message in messages
                                     if readIds.indexOf(message.cmsg_id) != -1
                                         message.unread = false
                                         message.read_class = "unread read"
                                         if $('#chat_' + message.cmsg_id).length > 0
                                             $('#chat_' + message.cmsg_id + ' .unread-mark i').addClass(message.read_class)
-                                        $rootScope.cur_mission.unreads--
+                                        delta = -1
+                                        delta_to = 0
+                                        message.to_flag = chatStorage.is_to_mine(message)
+                                        if message.to_flag
+                                            delta_to = -1
+                                        $rootScope.cur_mission.unreads += delta
+                                        $rootScope.cur_mission.to_unreads += delta_to
+                                        $rootScope.cur_home.unreads += delta
+                                        $rootScope.cur_home.to_unreads += delta_to
                                         $rootScope.$broadcast('unread-message', $rootScope.cur_mission)
+                                        ###
                                         if $rootScope.cur_mission.private_flag == 3
                                             $rootScope.bot_mission.unreads--
-                                        delta--
+                                        ###
 
-                                mission = missionStorage.get_mission($rootScope.cur_mission.mission_id)
-                                if $rootScope.cur_mission != mission
-                                    missionStorage.set_mission($rootScope.cur_mission)
+                                missionStorage.set_mission($rootScope.cur_mission)
                                 chatStorage.refresh_unreads_title()
                             else
                                 logger.logError(data.err_msg)
@@ -1099,10 +1198,6 @@ angular.module('app.chatroom', [])
             $dialogs.showUserProfile(user_id)
             return
 
-        $scope.$on('refreshed-missions', (event) ->
-            $scope.sync(false)
-        )
-
         # チャットルームの管理
         $scope.canComplete = ->
             return $rootScope.cur_mission && $rootScope.canEditMission() && $rootScope.cur_mission.complete_flag == false && $rootScope.cur_mission.private_flag != 3
@@ -1119,7 +1214,7 @@ angular.module('app.chatroom', [])
             $dialogs.confirm('チャットルーム', message, 'アーカイブ', () ->
                 missionStorage.complete($rootScope.cur_mission.mission_id, 1, (data) ->
                     if data.err_code == 0
-                        $rootScope.cur_mission = null
+                        missionStorage.set_cur_mission(null)
                         logger.logSuccess('チャットルームがアーカイブされました。')
                         $location.path('/home')
 
@@ -1159,12 +1254,12 @@ angular.module('app.chatroom', [])
         $scope.breakMissionConfirm = ->
             message = $rootScope.cur_mission.mission_name + "から退室します。よろしいでしょうか？"
             $dialogs.confirm('チャットルームから退室', message, '退室', () ->
-                $dialogs.confirm('チャットルームから退室', 'チャットルームから退会すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
+                $dialogs.confirm('チャットルームから退室', 'チャットルームから退室すると元に戻すことができなくなります。よろしいでしょうか？', 'OK', ->
                     missionStorage.break_mission($rootScope.cur_mission.mission_id, (data) ->
                         if data.err_code == 0
                             $rootScope.$broadcast('refresh-missions')
                             $rootScope.$broadcast('refresh-tasks')
-                            logger.logSuccess('チャットルームから外れました。')
+                            logger.logSuccess('チャットルームから退室しました。')
                             $location.path('/home')
                         else
                             logger.logError(data.err_msg)
@@ -1175,12 +1270,14 @@ angular.module('app.chatroom', [])
 
         $scope.$on('$destroy', () ->
             angular.forEach $rootScope.missions, (mission) ->
-                if mission.mission_id == $scope.mission_id && mission.unreads > 0         
+                if mission.mission_id == $scope.mission_id && mission.unreads > 0 && !$scope.set_unread
                     chatStorage.read_messages($scope.mission_id)
                         .then((data) ->
                             if data.err_code == 0
                                 $timeout(() ->
                                     mission.unreads = 0
+                                    mission.to_unreads = 0
+                                    $rootScope.unreads[$scope.mission_id] = []
                                     $rootScope.$broadcast('unread-message', mission)
                                     chatStorage.refresh_unreads_title()
                                 , 1000)
@@ -1222,58 +1319,60 @@ angular.module('app.chatroom', [])
         # Initialize
         $scope.sync = (load_chat_message) ->
             $scope.session = $session
-            $scope.mission_id = parseInt($routeParams.mission_id, 10)
-            $scope.chat_id = parseInt($routeParams.chat_id, 10)
 
-            $scope.load_messages(chatStorage.cache_messages($scope.mission_id))
-
-            mission = missionStorage.get_mission($scope.mission_id)
             if $session.user_id != null 
-                $rootScope.cur_mission = mission
-                missionStorage.select_mission_in_nav()
-                $scope.refreshBackImage()
-                if $api.is_empty(mission) || ((mission.private_flag==0 || mission.private_flag==1) && $api.is_empty(mission.members))
-                    missionStorage.get($scope.mission_id, (res) ->
-                        if (res.err_code == 0) 
-                            if $rootScope.cur_home.home_id != res.mission.home_id
-                                home = homeStorage.get_home(res.mission.home_id)
-                                if home == null
-                                    $location.path('/home')
-                                homeStorage.select(home, () ->
-                                )
+                missionStorage.get($scope.mission_id, (res) ->
+                    if (res.err_code == 0) 
+                        if res.mission.private_flag != 2 && $rootScope.cur_home.home_id != res.mission.home_id
+                            home = homeStorage.get_home(res.mission.home_id)
+                            if home == null
+                                $location.path('/home')
                                 return
+                            homeStorage.set_cur_home(home)
+                        else if res.mission.private_flag == 2 && $rootScope.cur_home
+                            res.mission.home_id = $rootScope.cur_home.home_id
 
-                            $rootScope.cur_mission = res.mission
-                            $scope.refreshBackImage()
-                            $rootScope.cur_mission.visible = true
-                            missionStorage.select_mission_in_nav()
-                            missionStorage.set_mission($rootScope.cur_mission)
-                        else 
-                            logger.logError(res.err_msg)
-                            $location.path('/home')
-                    )
-                else if $rootScope.cur_home.home_id != mission.home_id
-                    home = homeStorage.get_home(mission.home_id)
-                    if home == null
-                        $location.path('/home')
-                    homeStorage.select(home, () ->
-                    )
-                    return
-                else
-                    $rootScope.cur_mission.visible = true
+                        missionStorage.set_cur_mission(res.mission)
+                        $scope.refreshBackImage()
 
-                if !$rootScope.canChat()
-                    angular.element('#chat_view').css('bottom', "0px")
+                        if load_chat_message != false
+                            $scope.init_cmsg()
+                            chatStorage.messages($scope.mission_id, $scope.chat_id)
+                                .then((messages) ->
+                                    chatStorage.cache_messages($scope.mission_id, messages)
+                                    $scope.load_messages(messages)
+                                )
 
-                if load_chat_message != false
-                    $scope.init_cmsg()
-                    chatStorage.messages($scope.mission_id)
-                        .then((messages) ->
-                            chatStorage.cache_messages($scope.mission_id, messages)
-                            $scope.load_messages(messages)
+                        taskStorage.search($scope.mission_id).then((tasks) ->
+                            ##if tasks.length > 0 && !$scope.show_process
+                            ##    $scope.showProcess()
                         )
+                    else 
+                        logger.logError(res.err_msg)
+                        $location.path('/home')
+                )
         
         $scope.sync()
+
+        $scope.searching = false
+        $scope.search_string = ""
+        $scope.startSearch = ->
+            $scope.searching = true
+        $scope.exitSearch = ->
+            $scope.search_string = ""
+            $scope.searching = false
+        $scope.search = () ->
+            if !$api.is_empty($scope.search_string)
+                $dialogs.chatSearch(false, $scope.search_string, $scope.onSelectSearchMessage)
+                $scope.exitSearch()
+            return
+        $scope.onSelectSearchMessage = (message) ->
+            if !$api.is_empty($scope.cur_mission) && message.mission_id == $scope.cur_mission.mission_id
+                $scope.chat_id = message.cmsg_id
+                $scope.scrollToMessage($scope.chat_id)
+            else
+                $location.path("/chats/" + message.mission_id + "/" + message.cmsg_id)
+            return
 
         return
 )
