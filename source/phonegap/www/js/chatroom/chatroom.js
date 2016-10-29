@@ -29,7 +29,7 @@ angular.module('app.chatroom', [])
         if ($rootScope.cmsg_sn == undefined)
             $rootScope.cmsg_sn = -1;
 
-        $scope.init_cmsg = function() {
+        $scope.set_last_msg = function() {
             try {
                 msg = localStorage.getItem('r' + $scope.mission_id + '_' + $session.user_id);
             }
@@ -40,11 +40,14 @@ angular.module('app.chatroom', [])
             if (msg == undefined || msg == 'undefined')
                 msg = '';
 
+            $scope.cmsg.content = msg;
+        }
+        $scope.init_cmsg = function() {
             $scope.cmsg = {
                 cmsg_id: $rootScope.cmsg_sn,
                 user_id: $session.user_id,
                 user_name: $session.user_name,
-                content: msg,
+                content: '',
                 read_class: 'read'
             };
 
@@ -368,9 +371,11 @@ angular.module('app.chatroom', [])
                     }
 
                     $scope.$apply();
+                    $('#btn_upload input').val('');
                 };
 
                 file.onError = function(error) {
+                    $('#btn_upload input').val('');
                     if (file.retry <= 4) {
                         if (file.canceled != true) {
                             $timeout(function() {
@@ -412,14 +417,16 @@ angular.module('app.chatroom', [])
                     var i, str;
                     i = $scope.files.indexOf(file);
                     $scope.files.splice(i, 1);
+                    $('#btn_upload input').val('');
                     if (data.err_code === 0) {
                         str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']" + file.name + "[/file]";
-                        return $chat.send(null, $rootScope.cur_home.home_id, $scope.mission_id, str, null, 1);
+                        $chat.send(null, $rootScope.cur_home.home_id, $scope.mission_id, str, null, 1);
                     } else {
                         console.log(data.err_msg);
-                        return logger.logError(data.err_msg);
+                        logger.logError(data.err_msg);
                     }
                 }).error(function() {
+                    $('#btn_upload input').val('');
                     if (file.retry <= 4) {
                         if (file.canceled != true) {
                             $timeout(function() {
@@ -1479,6 +1486,10 @@ angular.module('app.chatroom', [])
                     $scope.initEventHandler()
                 });
                 */
+
+                $timeout(function() {
+                    $scope.set_last_msg();
+                }, 1500);
             }
         };
 
