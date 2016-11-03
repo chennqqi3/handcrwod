@@ -10,7 +10,7 @@
 		1B701028177A61CF00AE11F4 /* CDVShared.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B701026177A61CF00AE11F4 /* CDVShared.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F92F4A01314023E0046367C /* CDVPluginResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F92F49E1314023E0046367C /* CDVPluginResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F92F4A11314023E0046367C /* CDVPluginResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F92F49F1314023E0046367C /* CDVPluginResult.m */; };
-		266DCDDE1D6AE936004D2813 /* CDVViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 266DCDDD1D6AE936004D2813 /* CDVViewController.h */; };
+		266DCDDE1D6AE936004D2813 /* CDVViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 266DCDDD1D6AE936004D2813 /* CDVViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		301F2F2A14F3C9CA003FE9FC /* CDV.h in Headers */ = {isa = PBXBuildFile; fileRef = 301F2F2914F3C9CA003FE9FC /* CDV.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		302965BC13A94E9D007046C5 /* CDVDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = 302965BB13A94E9D007046C5 /* CDVDebug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3034979C1513D56A0090E688 /* CDVLocalStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 3034979A1513D56A0090E688 /* CDVLocalStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
