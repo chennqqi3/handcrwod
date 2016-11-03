@@ -293,7 +293,7 @@ angular.module('app.directives', [])
             };
             text = text + '';
             text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>');
-            t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, function(url) {
+            t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\(\)\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, function(url) {
                 return '<a href="#" onclick="window.open(\'' + url + '\', \'_system\', \'location=yes\'); return false;">' + url + '</a>';
             });
 

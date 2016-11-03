@@ -1,0 +1,14 @@
+<ion-view view-title="概要" cache-view="false">
+    <ion-content>
+        <form name="form">
+            <div class="list">
+                <label class="item item-input item-floating-label" ng-if="editable">
+                    <textarea placeholder="チャットルームの概要を入力してください。" ng-model="mission.summary" rows=20 ng-change="onChange()"></textarea>
+                </label>
+                <label class="item item-input" ng-if="!editable && mission.summary != null && mission.summary != ''">
+                    <p ng-bind-html="mission.summary | noHTML | htmlfy"></p>
+                </label>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

@@ -59,7 +59,7 @@
                 <button class="button button-icon icon icon-emoticon-smile btn-emoticon" ng-click="showEmoticons($event)">
                 </button>
                 <button type="button" class="button button-icon btn-to" ng-click="showTo()">TO</button>
-                <button class="button button-icon icon icon-paper-clip" multiple="true" ng-file-select="onUploadFiles($files)">
+                <button class="button button-icon icon icon-paper-clip" multiple="true" ng-file-select="onUploadFiles($files)" id="btn_upload">
                 </button>
                 <button class="button button-icon icon icon-camera" ng-click="onCapture(false)" ng-if="isAndroid">
                 </button>
@@ -68,7 +68,7 @@
             </div>
 
             <label class="item-input-wrapper">
-                <textarea ng-model="cmsg.content" value="" placeholder="メッセージ" required minlength="1" maxlength="5000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()"></textarea>
+                <textarea ng-model="cmsg.content" value="" placeholder="メッセージ" required minlength="1" maxlength="5000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()" ng-trim="false"></textarea>
             </label>
             <div class="footer-btn-wrap">
                 <button class="button button-icon icon icon-paper-plane footer-btn" type="submit" ng-click="sendMessage()">
@@ -83,6 +83,7 @@
     <ion-popover-view style="height:340px">
         <ion-content>
             <ion-list>
+                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".summary({mission_id:mission_id})"><i class="icon icon-notebook"></i>概要</ion-item>
                 <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".task({mission_id:mission_id})"><i class="icon fa fa-check-square-o"></i>タスク</ion-item>
                 <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".process({mission_id:mission_id})"><i class="icon icon-share"></i>プロセス</ion-item>
                 <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".attach({mission_id:mission_id})"><i class="icon icon-paper-clip"></i>添付ファイル</ion-item>
