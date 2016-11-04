@@ -39,7 +39,10 @@
 	define('HOMELOGO_URL',		'homelogo/');
 	define('HOMELOGO_PATH',		DATA_PATH . HOMELOGO_URL);
 
-	define('LANG_PATH',			SITE_ROOT . '/lang/');
+	define('EMOTICON_URL',		'emoticon/');
+	define('EMOTICON_PATH',		DATA_PATH . EMOTICON_URL);
+
+	define('LANG_PATH',			SITE_ROOT . 'lang/');
 
 	define('CAT_ABOUTSITE',		1);
 		
@@ -55,6 +58,7 @@
 	define('ISIE6',				(isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], "MSIE 6.0")) ? true : false);
 	define('ISIE7',				(isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], "MSIE 7.0")) ? true : false);
 	define('ISIE8',				(isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], "MSIE 8.0")) ? true : false);
+	define('ISEDGE',				(isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], "Edge")) ? true : false);
 
 	define("BATCH_TIME_LIMIT", 30);
 	define("UNREAD_PUSH_LIMIT", 10); // 10 seconds
@@ -71,10 +75,7 @@
 
 	include_once("resource/lang/" . _lang() . ".php");
 
-	if (_request("TOKEN") != null)
-		_load_session_from_token(_request("TOKEN"));
-	else
-		session_start();
+	_load_session_from_token(_request("TOKEN"));
 
 	if (defined('OB_DISABLE'))
     	ob_implicit_flush();
@@ -273,6 +274,7 @@
 			}
 		}
 
+		session_start();
 		return false;
 	}
 	
@@ -330,6 +332,11 @@
 		return SITE_BASEURL . $url;
 	}
 
+	function _app_url($url)
+	{
+		return DEFAULT_APP_URL . $url;
+	}
+
 	function _page_url($page)
 	{
 		$utype = _utype();
@@ -348,6 +355,11 @@
 	function _is_empty($str)
 	{
 		return $str == null || $str == "";
+	}
+	
+	function _if_null($val)
+	{
+		return $val == null ? 0 : $val;
 	}
 
 	// generate sql safe string
@@ -613,7 +625,7 @@
 			return null;
 
 		$ext = _get_uploaded_ext($field);
-		if ($ext == 'jpg')
+		if ($ext == 'jpg' || $ext == 'jpeg')
 		{
 			$exif = exif_read_data($dest_path);
 			if ($exif !== FALSE) {
@@ -687,7 +699,7 @@
 			$_FILES[$field]["type"] == "image/png" ||
 			$_FILES[$field]["type"] == "image/x-png")
 			return "png";
-		if ($ext == "jpg" || 
+		if ($ext == "jpg" || $ext == "jpeg" || 
 			$_FILES[$field]["type"] == "image/jpeg" ||
 			$_FILES[$field]["type"] == "image/pjpeg")
 			return "jpg";
@@ -703,6 +715,44 @@
 		$parts = pathinfo($path);
 		$ext = strtolower($parts['extension']);
 		return $ext;
+	}
+
+	function _mime($ext)
+	{
+		switch ($ext) {
+			case 'mov':
+			case 'mp4':
+				$mime = "video/mp4";
+				break;
+			case 'png':
+				$mime = "image/png";
+				break;
+			case 'jpg':
+			case 'jpeg':
+				$mime = "image/jpg";
+				break;
+			case 'gif':
+				$mime = "image/gif";
+				break;
+			case 'bmp':
+				$mime = "image/bmp";
+				break;
+			case 'pdf':
+				$mime = "application/pdf";
+				break;
+			case 'htm':
+			case 'html':
+				$mime = "text/html";
+				break;
+			case 'txt':
+				$mime = "text/plan";
+				break;
+			default:
+				$mime = "application/octet-stream";
+				break;
+		}
+
+		return $mime;
 	}
 
 	function _full_url($url, $renew=false)
@@ -769,43 +819,70 @@
 	}
 
 	function _resize_photo($path, $dst_ext, $maxw, $maxh){
-		$path_parts = pathinfo($path);
-		
-		$src_img = imagecreatefromstring(file_get_contents($path));
-		/*	
-		$ext = strtolower($path_parts['extension']);
-		if ($ext == "png")
-			$src_img = imagecreatefrompng($path); 
-		else if ($ext == "jpg")
-			$src_img = imagecreatefromjpeg($path); 
-		else if ($ext == "gif")
-			$src_img = imagecreatefromgif($path);  
-		*/
+		if (strtoupper(substr(PHP_OS, 0, 5)) === 'LINUX') { 
+			# use imagick
+			$image = new Imagick($path);
 
-		$ow = imagesx($src_img);
-		$oh = imagesy($src_img);
+			$ow = $image->getImageWidth();
+			$oh = $image->getImageHeight();
 
-		if ($ow < $maxw && $oh < $maxh)
-			return;
-		
-		$w = $maxw;
-		$h = intval($oh * $maxw / $ow);
-		if ($h > $maxh) {
-			$h = $maxh;
-			$w = intval($ow * $maxh / $oh);
+			if ($ow < $maxw && $oh < $maxh)
+				return;
+			
+			$w = $maxw;
+			$h = intval($oh * $maxw / $ow);
+			if ($h > $maxh) {
+				$h = $maxh;
+				$w = intval($ow * $maxh / $oh);
+			}
+
+			$image->resizeImage($w, $h,Imagick::FILTER_LANCZOS,1);
+
+			$image->setImageCompression(Imagick::COMPRESSION_JPEG);
+			$image->setImageCompressionQuality(75);
+			$image->stripImage();
+			$image->writeImage($path);
+			$image->destroy();
 		}
+		else {			
+			$path_parts = pathinfo($path);
 
-		$dst_img = imagecreatetruecolor($w, $h); 
-		imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $w, $h, $ow, $oh); 
-		if ($dst_ext == "png")
-			imagepng($dst_img, $path); 
-		else if ($dst_ext == "jpg")
-			imagejpeg($dst_img, $path);  
-		else if ($dst_ext == "gif")
-			imagegif($dst_img, $path);
+			$src_img = @imagecreatefromstring(file_get_contents($path));
+			/*	
+			$ext = strtolower($path_parts['extension']);
+			if ($ext == "png")
+				$src_img = imagecreatefrompng($path); 
+			else if ($ext == "jpg")
+				$src_img = imagecreatefromjpeg($path); 
+			else if ($ext == "gif")
+				$src_img = imagecreatefromgif($path);  
+			*/
 
-		imagedestroy($src_img);
-		imagedestroy($dst_img);
+			$ow = imagesx($src_img);
+			$oh = imagesy($src_img);
+
+			if ($ow < $maxw && $oh < $maxh)
+				return;
+			
+			$w = $maxw;
+			$h = intval($oh * $maxw / $ow);
+			if ($h > $maxh) {
+				$h = $maxh;
+				$w = intval($ow * $maxh / $oh);
+			}
+
+			$dst_img = imagecreatetruecolor($w, $h); 
+			imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $w, $h, $ow, $oh); 
+			if ($dst_ext == "png")
+				imagepng($dst_img, $path); 
+			else if ($dst_ext == "jpg")
+				imagejpeg($dst_img, $path);  
+			else if ($dst_ext == "gif")
+				imagegif($dst_img, $path);
+
+			imagedestroy($src_img);
+			imagedestroy($dst_img);
+		}
 	}
 
 	function _resize_thumb($path, $source_ext, $maxw=PHOTO_MAX_WIDTH, $maxh=PHOTO_MAX_HEIGHT){
@@ -1457,7 +1534,7 @@
 
 			if (is_string($a))
 			{
-				static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "", "\b", "\f", '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '', '\\b', '\\f', '\"'));
+				static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "", "", "\b", "\f", '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '', '', '\\b', '\\f', '\"'));
 				return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $a) . '"';
 			}
 			else
