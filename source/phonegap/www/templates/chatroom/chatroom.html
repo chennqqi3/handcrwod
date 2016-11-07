@@ -68,7 +68,7 @@
             </div>
 
             <label class="item-input-wrapper">
-                <textarea ng-model="cmsg.content" value="" placeholder="メッセージ" required minlength="1" maxlength="5000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()" ng-trim="false"></textarea>
+                <textarea ng-model="cmsg.content" value="" placeholder="メッセージ" required minlength="1" maxlength="5000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()" ng-trim="false" rows='1'></textarea>
             </label>
             <div class="footer-btn-wrap">
                 <button class="button button-icon icon icon-paper-plane footer-btn" type="submit" ng-click="sendMessage()">

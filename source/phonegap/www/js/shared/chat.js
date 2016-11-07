@@ -117,6 +117,8 @@ angular.module('app.service.chat', [])
                 }
                 console.log('receive_message temp_cmsg_id:' + cmsg.temp_cmsg_id + ' cmsg_id:' + cmsg.cmsg_id);
                 $rootScope.$broadcast('receive_message', cmsg);
+
+                chatStorage.refresh_badge();
             });
 
             $this.socket.$on('react_message', function(cmsg) {

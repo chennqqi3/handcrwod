@@ -42,6 +42,7 @@ angular.module('app.service.chat', [])
                 found_home = false;
                 found_mission_name　= null;
                 self_message = false;
+                sound = false;
 
                 if ($session.user_id != cmsg.user_id) {
                     unread = chatStorage.get_unread(cmsg);
@@ -72,14 +73,14 @@ angular.module('app.service.chat', [])
                         });
                     }
 
-                    if (delta_unreads > 0 && $rootScope.homes && $rootScope.homes) {
+                    if (delta_unreads > 0 && $rootScope.homes) {
                         angular.forEach($rootScope.homes, function(home) {
                             if (home.home_id == cmsg.home_id) {
                                 found_home = true;
                                 home.unreads += delta_unreads;
                                 home.to_unreads += delta_to_unreads;
                                 $rootScope.$apply();
-                                chatStorage.sound_alert();
+                                sound = true;
                                 $rootScope.$broadcast('refresh-home', home);
                             }
                         });
@@ -88,6 +89,11 @@ angular.module('app.service.chat', [])
                 else {
                     found_home = true;
                     self_message = true;
+                }
+                
+                if (sound) {
+                    chatStorage.sound_alert();
+                    console.log('sound');
                 }
 
                 chatStorage.reorder_home_mission(cmsg.home_id, cmsg.mission_id);
@@ -111,6 +117,8 @@ angular.module('app.service.chat', [])
                 }
                 console.log('receive_message temp_cmsg_id:' + cmsg.temp_cmsg_id + ' cmsg_id:' + cmsg.cmsg_id);
                 $rootScope.$broadcast('receive_message', cmsg);
+
+                chatStorage.refresh_badge();
             });
 
             $this.socket.$on('react_message', function(cmsg) {

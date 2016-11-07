@@ -14,10 +14,16 @@
         <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
         <!-- end needs images -->
 
-        <link rel="stylesheet" href="styles/main.css?v=2.3.2">
+        <link rel="stylesheet" href="styles/main.css?v=2.8.4">
         <link rel="apple-touch-icon" href="images/webapp.png">
         <link rel="apple-touch-icon-precompsed" href="images/webapp.png">
         <link rel="apple-touch-startup-image" href="images/webapp.png">
+
+        <meta name="thumbnail" content="https://www.handcrowd.com/app/images/logo_1024.png">
+        <meta property="og:title" content="ハンドクラウド">
+        <meta property="og:image" content="https://www.handcrowd.com/app/images/logo_1024.png">
+        <meta property="og:description" content="ハンドクラウド(HandCrowd）は、仕事を分解しフローにすることで個人やチームの業務改善をサポートするクラウド型ToDoリスト">
+        <meta property="og:url" content="https://www.handcrowd.com/app">
 
     </head>
     <body data-ng-app="app" id="app" data-custom-background>
@@ -41,12 +47,12 @@
             <div class="error-connection" ng-class="{'show': error_disconnected}"><i class="fa fa-warning"></i> サーバーに接続できません。</div>
         </div>
 
-        <script src="scripts/vendor.js?v=2.3.2"></script>
+        <script src="scripts/vendor.js?v=2.8.4"></script>
 
-        <script src="scripts/ui.js?v=2.3.2"></script>
+        <script src="scripts/ui.js?v=2.8.4"></script>
 
-        <script src="scripts/config.js?v=2.3.2"></script>
+        <script src="scripts/config.js?v=2.8.4"></script>
 
-        <script src="scripts/app.js?v=2.3.2"></script>
+        <script src="scripts/app.js?v=2.8.4"></script>
     </body>
 </html>

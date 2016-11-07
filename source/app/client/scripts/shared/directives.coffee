@@ -142,7 +142,7 @@ angular.module('app.directives', [])
 .filter('htmlfy', ($sce)->
     return (text) ->
         text = text + ''
-        t = text.replace(/(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \?\=\&\;\#\%\.-]*)*\/?/g, (url) ->
+        t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\:][\d]+)?([\(\)\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, (url) ->
             return '<a href="' + url + '" target="_blank">' + url + '</a>'
         )
         t = t.replace(/\n/g, '<br/>')
@@ -151,7 +151,7 @@ angular.module('app.directives', [])
         return html
 )
 
-.service('chatizeService', ($api) ->
+.service('chatizeService', ($rootScope, $api) ->
     this.stripAttachString = (str) ->
         if $api.is_empty(str)
             return ''
@@ -210,10 +210,17 @@ angular.module('app.directives', [])
             str = str.replace(/\n*/, '')
         return str
 
+    this.emoticon = (emoticon_id) ->
+        if $rootScope.emoticons && $rootScope.emoticons.length > 0
+            for e in $rootScope.emoticons
+                if e.emoticon_id == emoticon_id
+                    return '<i class="emoticon" style="background-image:url(' + e.image + ')"></i>'
+        return ''
+
     return this
 )
 
-.filter('chatize', ($api, $sce, $emoticons, $dateutil, CONFIG, $compile, $session)->
+.filter('chatize', ($rootScope, $api, $sce, $dateutil, CONFIG, $compile, $session)->
     return (text, hideThumb) ->
         if ($api.is_empty(text))
             return ''
@@ -237,7 +244,7 @@ angular.module('app.directives', [])
             return str.replace(/\[file id=(\d+) url=\'([^\]]*)\'\]([^\]]*)\[\/file\]/g, (item, id, url, name) ->                
                 rep_str = "<div class='attach-name'>"
                 if (hideThumb != true && isImage(name))
-                    rep_str += "<a href='javascript:;' class='preview-image' preview-image='" + CONFIG.BASE + url + "'><img src='" + CONFIG.BASE + url + "/150'></a><br/>"
+                    rep_str += "<a href='javascript:;' class='preview-image' preview-image='" + CONFIG.BASE + url + "'><img src='" + CONFIG.BASE + url + "/150' style='max-width:150px'></a><br/>"
                 rep_str += "<i class='icon-paper-clip'></i>&nbsp;"
                 if (hideThumb != true && isVideo(name))
                     rep_str += "<a href='javascript:;' class='preview-video' preview-video='" + CONFIG.BASE + url + "'>" + name + "</a>"
@@ -386,14 +393,15 @@ angular.module('app.directives', [])
             .replace(/&amp;&amp;&lt;\;\;/g, '<')
             .replace(/&amp;&amp;&gt;\;\;/g, '>')
             .replace(/\n/g, '<br/>')
-        t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, (url) ->
+        t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\:][\d]+)?([\(\)\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, (url) ->
             return '<a href="' + url + '" target="_blank">' + url + '</a>'
         )
 
-        l = $emoticons.icons.length
-        for i in [0..(l-1)] # fix bug for ]:) (^^;)
-            e = $emoticons.icons[l - i - 1]
-            t = t.replace(e.exp, '<i class="emoticon ' + e.class + '"></i>')
+        if $rootScope.emoticons && $rootScope.emoticons.length > 0
+            l = $rootScope.emoticons.length
+            for i in [0..(l-1)] # fix bug for ]:) (^^;)
+                e = $rootScope.emoticons[l - i - 1]
+                t = t.replace(e.exp, '<i class="emoticon" style="background-image:url(' + e.image + ')"></i>')
 
         t = getFileAttachString(t)
         t = getLinkString(t)

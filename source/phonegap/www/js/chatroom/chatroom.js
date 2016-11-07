@@ -1,4 +1,4 @@
-var read_timer = 2000;
+var read_timer = 500;
 
 angular.module('app.chatroom', [])
 
@@ -21,6 +21,7 @@ angular.module('app.chatroom', [])
         var footerBar; // gets set in $ionicView.enter
         var scroller;
         var txtInput; // ^^^
+        var keyboardHeight = 0, footerHeight = 0;
 
         var MAX_MSG_LENGTH = 1000;
 
@@ -1088,17 +1089,17 @@ angular.module('app.chatroom', [])
         };
 
         angular.element(document.querySelector('#chat_view')).on('scroll', function() {
-            return $scope.startReadTimer(read_timer);
+            return $scope.startReadTimer();
         });
 
         $scope.readTimer = null;
-        $scope.startReadTimer = function(duration) {
+        $scope.startReadTimer = function() {
             if ($scope.readTimer !== null) {
                 $scope.stopReadTimer();
             }
             return $scope.readTimer = $timeout(function() {
                 return $scope.readInScroll();
-            }, duration);
+            }, read_timer);
         };
         $scope.stopReadTimer = function() {
             if ($scope.readTimer !== null) {
@@ -1106,50 +1107,6 @@ angular.module('app.chatroom', [])
                 return $scope.readTimer = null;
             }
         };
-        $scope.onchange = function(evt) {
-            var evtMap, h, v, visible;
-            v = "visible";
-            h = "hidden";
-            evtMap = {
-                focus: v,
-                focusin: v,
-                pageshow: v,
-                blur: h,
-                focusout: h,
-                pagehide: h
-            };
-            evt = evt || window.event;
-            visible = "";
-            if (evt.type in evtMap) {
-                visible = evtMap[evt.type];
-            } else {
-                visible = (this[hidden] ? "hidden" : "visible");
-            }
-            if (visible === "visible") {
-                return $scope.startReadTimer(read_timer);
-            } else {
-                return $scope.stopReadTimer();
-            }
-        };
-        var hidden = "hidden";
-        if (hidden in document) {
-            document.addEventListener("visibilitychange", $scope.onchange);
-        } else if ((hidden = "mozHidden") in document) {
-            document.addEventListener("mozvisibilitychange", $scope.onchange);
-        } else if ((hidden = "webkitHidden") in document) {
-            document.addEventListener("webkitvisibilitychange", $scope.onchange);
-        } else if ((hidden = "msHidden") in document) {
-            document.addEventListener("msvisibilitychange", $scope.onchange);
-        } else if ("onfocusin" in document) {
-            document.onfocusin = document.onfocusout = $scope.onchange;
-        } else {
-            window.onpageshow = window.onpagehide = window.onfocus = window.onblur = $scope.onchange;
-        }
-        if (document[hidden] !== undefined) {
-            $scope.onchange({
-                type: (document[hidden] ? "blur" : "focus")
-            });
-        }
         $scope.readInScroll = function() {
             var j, len, message, messageTop, messages, parentRect, readIds;
             messages = $scope.messages;
@@ -1232,9 +1189,12 @@ angular.module('app.chatroom', [])
             messageCheckTimer = $interval(function() {
                 // here you could check for new messages if your app doesn't use push notifications or user disabled them
             }, 20000);
+
+            $scope.startReadTimer();
         });
 
         $scope.$on('$ionicView.leave', function() {
+            $scope.stopReadTimer();
         });
 
         $scope.$on('$ionicView.beforeLeave', function() {
@@ -1309,48 +1269,6 @@ angular.module('app.chatroom', [])
                 }
             });
         };
-
-        // I emit this event from the monospaced.elastic directive, read line 480
-        $scope.$on('taResize', function(e, ta) {
-            if (!ta) return;
-
-            var taHeight = ta[0].offsetHeight;
-            //console.log('taHeight: ' + taHeight);
-
-            if (!footerBar) return;
-
-            var newFooterHeight = taHeight + 50;
-            newFooterHeight = (newFooterHeight > 74) ? newFooterHeight : 74;
-
-            footerBar.style.height = newFooterHeight + 'px';
-
-            $('#emoticon_gallery').css('bottom', newFooterHeight + "px");
-            $('#to_users').css('bottom', newFooterHeight + "px");
-            $('#file_bar').css('bottom', newFooterHeight + "px");
-
-            if ($scope.files) {
-                fh = $scope.files.length * 25;
-            } else {
-                fh = 0;
-            }
-
-            scroller.style.bottom = newFooterHeight + fh + 'px';
-
-            try {
-                var elem = angular.element(document.querySelector('#chat_view'));
-                var scrollTop = viewScroll.getScrollPosition().top;
-                var scrollHeight = elem[0].scrollHeight;
-                var viewHeight = elem[0].offsetHeight;
-
-                //console.log(scrollTop + "+" + viewHeight + "=" + (scrollTop + viewHeight) + "=" + scrollHeight);
-                if(scrollTop + viewHeight >= scrollHeight-400)
-                    $scope.scrollToBottom();
-
-            }
-            catch(err) {
-                
-            }
-        });
 
         // menu
         $ionicPopover.fromTemplateUrl('chatroom-menu.html', {
@@ -1504,8 +1422,92 @@ angular.module('app.chatroom', [])
                 $scope.sync();
             }
         };
+        
+        $scope.sync();
 
-        $scope.sync();        
+        function resizeLayout() {
+            var bottom = keyboardHeight + footerHeight;
+            var old_bottom = parseInt(scroller.style.bottom , 10);
+            if (isNaN(old_bottom))
+                old_bottom = 0;
+
+            if ($scope.files) {
+                filesHeight = $scope.files.length * 25;
+            } else {
+                filesHeight = 0;
+            }
+            bottom += filesHeight;
+
+            scroller.style.bottom = bottom + "px";
+
+            $('#emoticon_gallery').css('bottom', footerHeight + "px");
+            $('#to_users').css('bottom', footerHeight + "px");
+            $('#file_bar').css('bottom', footerHeight + "px");
+
+            var pos = viewScroll.getScrollPosition();
+            pos.top += (bottom - old_bottom);
+
+            if (pos.top < 0)
+                pos.top = 0;
+
+            viewScroll.scrollTo(pos.left, pos.top);
+        }
+
+        // I emit this event from the monospaced.elastic directive, read line 480
+        $scope.$on('taResize', function(e, ta) {
+            if (!ta) return;
+            var taHeight = ta[0].offsetHeight;
+
+            if (!footerBar) return;
+            footerHeight = taHeight + 50;
+            footerHeight = (footerHeight > 74) ? footerHeight : 74;
+            
+            footerBar.style.height = footerHeight + 'px';
+
+            resizeLayout();
+
+            try {
+                var elem = angular.element(document.querySelector('#chat_view'));
+                var scrollTop = viewScroll.getScrollPosition().top;
+                var scrollHeight = elem[0].scrollHeight;
+                var viewHeight = elem[0].offsetHeight;
+
+                //console.log(scrollTop + "+" + viewHeight + "=" + (scrollTop + viewHeight) + "=" + scrollHeight);
+                //if(scrollTop + viewHeight >= scrollHeight-400)
+                //    $scope.scrollToBottom();
+
+            }
+            catch(err) {
+                
+            }
+        });
+
+        // keyboard processiong
+        ionic.on('native.keyboardshow', onShowKeyboard, window);
+        ionic.on('native.keyboardhide', onHideKeyboard, window);
+
+        function onShowKeyboard(e) {
+            if (ionic.Platform.isAndroid() && !ionic.Platform.isFullScreen) {
+                return;
+            }
+
+            keyboardHeight = e.keyboardHeight || e.detail.keyboardHeight;
+            resizeLayout();
+        }
+
+        function onHideKeyboard() {
+            if (ionic.Platform.isAndroid() && !ionic.Platform.isFullScreen) {
+                return;
+            }
+
+            keyboardHeight = 0;
+            resizeLayout();
+        }
+
+        $scope.$on('$destroy', function() {
+            ionic.off('native.keyboardshow', onShowKeyboard, window);
+            ionic.off('native.keyboardhide', onHideKeyboard, window);
+        });
     }
 )
 

@@ -502,11 +502,17 @@ img.profile-pic.right {
 
 #input_bar .bar-stable {
     flex-wrap: wrap;
+    display: block;
     height: 74px;
     padding-top: 5px;
 }
 
 #input_bar .footer-btn-wrap{
+    display: block;
+    position: absolute;
+    right: 3px;
+    top: 50px;
+    width: 40px;
     height: 20px;
 }
 #input_bar .item-input-inset {
@@ -525,8 +531,10 @@ img.profile-pic.right {
     margin-left: 0px;
 }
 
-#input_bar .footer-btn-wrap {
-    width: 40px;
+#input_bar .item-input-wrapper {
+    position: absolute;
+    right: 45px;
+    left: 5px;
 }
 
 #input_bar .button-top-bar {
@@ -1259,4 +1267,12 @@ ul.rating li i {
 #bot_view p {
     text-overflow: unset;
     white-space: normal !important;
+}
+
+.item-options .button {
+    display: inline-block;
+    padding-top: 4px;
+}
+.item-options .button .icon {
+    vertical-align: middle;
 }

@@ -25,7 +25,7 @@ angular.module('app.directives', [])
 .filter('htmlfy', function($sce) {
     return function(text) {
         text = text + '';
-        t = text.replace(/(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\:][\d]+)?([\/\w \?\=\&\;\#\%\.-]*)*\/?/g, 
+        t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\:][\d]+)?([\(\)\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, 
             function(url) {
                 return '<a href="#" onclick="window.open(\'' + url + '\', \'_system\', \'location=yes\'); return false;">' + url + '</a>';
             }
@@ -293,7 +293,7 @@ angular.module('app.directives', [])
             };
             text = text + '';
             text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>');
-            t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, function(url) {
+            t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\:][\d]+)?([\(\)\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, function(url) {
                 return '<a href="#" onclick="window.open(\'' + url + '\', \'_system\', \'location=yes\'); return false;">' + url + '</a>';
             });
 

@@ -26,6 +26,7 @@
                 <i class="badge badge-danger" ng-show="home.unreads > 0">{{home.unreads}}</i>
                 <ion-option-button ng-if="canEditHome(home)" class="button-assertive" ng-click="removeHome(home)"><i class="icon ion-ios-trash-outline"></i></ion-option-button>
                 <ion-option-button ng-if="canEditHome(home)" class="button-stable" ng-click="edit(home)"><i class="icon ion-ios-more-outline"></i></ion-option-button>
+                <ion-option-button class="button-stable" ng-click="breakHome(home)"><i class="icon ion-log-out"></i></ion-option-button>
             </ion-item>
         </ion-list>
     </ion-content>

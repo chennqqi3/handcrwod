@@ -579,6 +579,18 @@ angular.module('app.storage.chat', [])
             params.offset = $rootScope.read_message_offset;
             return params.limit = 10;
         };
+
+        refresh_badge = function() {
+            unreads = 0;
+            angular.forEach($rootScope.homes, function(home) {
+                unreads += home.unreads;
+            });
+            if (ionic.Platform.isIOS())
+            {
+                cordova.plugins.notification.badge.set(unreads);
+            }
+        };
+
         return {
             save_cache_messages_to_storage: save_cache_messages_to_storage,
             cache_messages: cache_messages,
@@ -600,7 +612,8 @@ angular.module('app.storage.chat', [])
             refresh_unreads_title: refresh_unreads_title,
             reorder_home_mission: reorder_home_mission,
             sound_alert: sound_alert,
-            search_read: search_read
+            search_read: search_read,
+            refresh_badge: refresh_badge
         };
     }
 );

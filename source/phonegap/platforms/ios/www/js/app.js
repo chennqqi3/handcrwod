@@ -54,6 +54,7 @@ angular.module('handcrowd', [
 
     // mission
     'app.mission.edit',
+    'app.mission.summary',
     'app.mission.attach',
     'app.mission.member',
 
@@ -389,6 +390,18 @@ angular.module('handcrowd', [
                     'tab-chats@tab': {
                         templateUrl: 'templates/mission/mission_edit.html' + ver,
                         controller: 'missionEditCtrl'
+                    }
+                }
+            })
+
+            // summary of chatroom
+            .state('tab.chatroom.summary', {
+                url: '/summary',
+                data: { authorizedRoles: [USER_ROLES.user] },
+                views: {
+                    'tab-chats@tab': {
+                        templateUrl: 'templates/mission/mission_summary.html' + ver,
+                        controller: 'missionSummaryCtrl'
                     }
                 }
             })
