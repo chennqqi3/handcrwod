@@ -29,6 +29,12 @@
     <key>CFBundleVersion</key>
     <string>2.3.22</string>
     <key>LSRequiresIPhoneOS</key>
+	<key>NSCameraUsageDescription</key>
+	<string>撮影した画像をアップロードするためにカメラにアクセスします。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>画像をアップロードするために、カメラロールにアクセスします。</string>
     <true/>
     <key>NSMainNibFile~ipad</key>
     <string/>
