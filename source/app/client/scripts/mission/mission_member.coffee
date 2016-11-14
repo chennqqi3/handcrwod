@@ -17,9 +17,6 @@ angular.module('app.mission.member', [])
         $scope.init()
 
         # Check privilege
-        $scope.canInvite = ->
-            return $rootScope.canEditMissionMember()
-
         $scope.canRemoveUser = (member)->
             return $rootScope.canEditMissionMember()
 
@@ -60,7 +57,6 @@ angular.module('app.mission.member', [])
             $dialogs.showUserProfile(user_id)
             return
 
-
         # 管理者権限設定
         $scope.selPriv = (member) ->
             $dialogs.selRoomPriv(member.priv, (priv) ->
@@ -71,11 +67,19 @@ angular.module('app.mission.member', [])
 
                         if member.user_id == $session.user_id
                             $rootScope.cur_mission.priv = res.priv
-                            missionStorage.set_mission($rootScope.cur_mission)
-                            $session.setCurMission($rootScope.cur_mission)
+                            missionStorage.set_cur_mission($rootScope.cur_mission)
                     else
                         logger.logError(res.err_msg)
                 )
             )
+
+        # 招待QRコード
+        $scope.showInviteQR = (mission) ->
+            $scope.cancel()
+            $dialogs.showQR($api.base_url() + "#/qr/chat/" + mission.mission_id + "/" + mission.invite_key, 
+                "handcrowd://invite_chat?id=" + mission.mission_id + "&key=" + mission.invite_key, 
+                "招待QRコード(" + mission.mission_name + ")")
+            return
+
         return
 )

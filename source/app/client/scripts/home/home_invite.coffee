@@ -2,7 +2,7 @@ angular.module('app.home.invite', [])
 
 .controller('homeInviteCtrl', 
     ($scope, $rootScope, $modalInstance, $api, home, email, 
-        logger, $timeout, $session, homeStorage, $chat, ALERT_TYPE) ->
+        logger, $timeout, $session, homeStorage, $chat, ALERT_TYPE, $dialogs) ->
         content = $session.user_name + "( " + $session.email + " )様より、「ハンドクラウド」へ招待されました。\n" + 
             "招待されたグループは、下記の通りです。\n" +
             "グループ名:" + home.home_name + "\n"
@@ -37,5 +37,13 @@ angular.module('app.home.invite', [])
         
         $scope.canSubmit = ->
             return $scope.form_home_invite.$valid && !$scope.posting
+
+        # 招待QRコード
+        $scope.showInviteQR = () ->
+            $scope.cancel()
+            $dialogs.showQR($api.base_url() + "#/qr/home/" + home.home_id + "/" + home.invite_key, 
+                "handcrowd://invite_home?id=" + home.home_id + "&key=" + home.invite_key,
+                "招待QRコード(" + home.home_name + ")")
+            return
 
 )

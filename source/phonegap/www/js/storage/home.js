@@ -1,7 +1,7 @@
 angular.module('app.storage.home', [])
 .factory('homeStorage', 
-    function($rootScope, $api, $session, $chat) {
-        var accept_invite, add, bot_messages, edit, get, get_home, invite, open, priv, remove, remove_member, search, select;
+    function($rootScope, $api, $session, $chat, $ionicPopup) {
+        var accept_invite, add, bot_messages, edit, get, get_home, invite, open, priv, remove, remove_member, search, select, invite_from_qr;
         search = function() {
             return $api.call("home/search").then(function(res) {
                 var homes;
@@ -306,7 +306,43 @@ angular.module('app.storage.home', [])
                     }
                 });
             return;
-        }
+        };
+
+        invite_from_qr = function(home_id, invite_key, callback) {
+            home = get_home(home_id);
+            if (home != null)
+                select(home);
+            else {
+                get_name(home_id, function(res) {
+                    if (res.err_code == 0 && !$api.is_empty(res.home_name)) {
+                        $ionicPopup.confirm({
+                            title: 'グループ招待',
+                            template: 'グループ「' + res.home_name + '」に参加します。よろしいでしょうか？',
+                            buttons: [
+                                { text: 'キャンセル' },
+                                {
+                                    text: '<b>OK</b>',
+                                    type: 'button-positive',
+                                    onTap: function(e) {
+                                        self_invite(home_id, invite_key, function(res) {
+                                            if (res.err_code == 0) {
+                                                search().then(function() {
+                                                    home = get_home(home_id);
+                                                    if (home != null)
+                                                        select(home);
+                                                });
+                                            }
+                                            else
+                                                logger.logError(res.err_msg);
+                                        });
+                                    }
+                                }
+                            ]
+                        });
+                    }
+                });
+            }
+        };
 
         return {
             search: search,
@@ -336,7 +372,9 @@ angular.module('app.storage.home', [])
             remove_logo: remove_logo,
             refresh_logo: refresh_logo,
 
-            emoticons: emoticons
+            emoticons: emoticons,
+
+            invite_from_qr: invite_from_qr
         };
     }
 );

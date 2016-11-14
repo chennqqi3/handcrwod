@@ -204,7 +204,9 @@ angular.module('app.home', [])
         # 招待QRコード
         $scope.showInviteQR = ->
             if $rootScope.cur_home != null
-                $dialogs.showQR($api.base_url() + "#/qr/home/" + $rootScope.cur_home.home_id + "/" + $rootScope.cur_home.invite_key, "招待QRコード(" + $rootScope.cur_home.home_name + ")")
+                $dialogs.showQR($api.base_url() + "#/qr/home/" + $rootScope.cur_home.home_id + "/" + $rootScope.cur_home.invite_key, 
+                    "handcrowd://invite_home?id=" + $rootScope.cur_home.home_id + "&key=" + $rootScope.cur_home.invite_key, 
+                    "招待QRコード(" + $rootScope.cur_home.home_name + ")")
             return
         return
 )

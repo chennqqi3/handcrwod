@@ -77,7 +77,7 @@ angular.module('handcrowd', [
 )
 
 .run(function($rootScope, $ionicPlatform, CONFIG, AUTH_EVENTS, $auth, logger,
-        $syncServer, $location, $chat, $cordovaPush, $session, $api, userStorage, chatStorage, $state) {
+        $syncServer, $location, $chat, $cordovaPush, $session, $api, userStorage, chatStorage, missionStorage, $state) {
 
     $rootScope.ver = "?v=" + CONFIG.VER
     $rootScope.error_disconnected = false
@@ -144,39 +144,83 @@ angular.module('handcrowd', [
 
         states = $session.statesFromStorage();
 
-        window.handleOpenURL = function(url) {
+        window.handleOpenURL = function(url) {            
             if (url != '') {
-                params = url.split('&');
-                if (params && params.length > 1) {
-                    for (i = 0; i < params.length; i ++) {
-                        av = params[i].split('=');
-                        if (av) {
-                            if (av[0] == 'user_id')
-                                user_id = av[1];
-                            if (av[0] == 'activate_key')
-                                activate_key = av[1];
-                        }
-                    }
+                parts = url.split('?');
+                if (parts && parts.length > 1) {
+                    cmd = parts[0];
+                    switch (cmd) {
+                        case "handcrowd://signup":
+                            params = parts[1].split('&');
+                            if (params && params.length > 1) {
+                                for (i = 0; i < params.length; i ++) {
+                                    av = params[i].split('=');
+                                    if (av) {
+                                        if (av[0] == 'user_id')
+                                            user_id = av[1];
+                                        if (av[0] == 'activate_key')
+                                            activate_key = av[1];
+                                    }
+                                }
 
-                    if (user_id != undefined && activate_key != undefined) {                        
-                        console.log("User clicked activate mail: user_id=" + user_id + "activate_key=" + activate_key);
-                        $api.show_waiting();
-                        params = {
-                            user_id: user_id,
-                            activate_key: activate_key
-                        }
+                                if (user_id != undefined && activate_key != undefined) {                        
+                                    console.log("User clicked activate mail: user_id=" + user_id + "activate_key=" + activate_key);
+                                    $api.show_waiting();
+                                    params = {
+                                        user_id: user_id,
+                                        activate_key: activate_key
+                                    }
 
-                        $auth.activate(params).then(function(res) {
-                            $api.hide_waiting();
-                            if (res.err_code == 0) {
-                                logger.logSuccess("ユーザー登録が完了しました。ご利用いただきまして、ありがとうございます。");
-                                $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
-                                $state.transitionTo("tab.chats");
+                                    $auth.activate(params).then(function(res) {
+                                        $api.hide_waiting();
+                                        if (res.err_code == 0) {
+                                            logger.logSuccess("ユーザー登録が完了しました。ご利用いただきまして、ありがとうございます。");
+                                            $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
+                                            $state.transitionTo("tab.chats");
+                                        }
+                                        else {
+                                            logger.logError(res.err_msg);
+                                        }
+                                    });
+                                }
                             }
-                            else {
-                                logger.logError(res.err_msg);
+                            break;
+                        case "handcrowd://invite_home":
+                            params = parts[1].split('&');
+                            if (params && params.length > 1) {
+                                for (i = 0; i < params.length; i ++) {
+                                    av = params[i].split('=');
+                                    if (av) {
+                                        if (av[0] == 'id')
+                                            home_id = av[1];
+                                        if (av[0] == 'key')
+                                            invite_key = av[1];
+                                    }
+                                }
+
+                                if (home_id != undefined && invite_key != undefined) {
+                                    homeStorage.invite_from_qr(home_id, invite_key);
+                                }
                             }
-                        });
+                            break;
+                        case "handcrowd://invite_chat":
+                            params = parts[1].split('&');
+                            if (params && params.length > 1) {
+                                for (i = 0; i < params.length; i ++) {
+                                    av = params[i].split('=');
+                                    if (av) {
+                                        if (av[0] == 'id')
+                                            mission_id = av[1];
+                                        if (av[0] == 'key')
+                                            invite_key = av[1];
+                                    }
+                                }
+
+                                if (mission_id != undefined && invite_key != undefined) {
+                                    missionStorage.invite_from_qr(mission_id, invite_key);
+                                }
+                            }
+                            break;
                     }
                 }
             }

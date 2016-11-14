@@ -1,8 +1,8 @@
 angular.module('app.storage.mission', [])
 
 .factory('missionStorage', 
-    function($rootScope, $api, $session, $dateutil, $chat, $filter) {
-        var add, attaches, break_mission, complete, delete_back_image, edit, get, get_mission, invitable_members, invite, open, open_member, pin, refresh_remaining, refresh_sort, remove, remove_attach, remove_member, search, search_completed, set_back_pos, set_mission, set_repeat, unpinned_missions, priv;
+    function($rootScope, $api, $session, $dateutil, $chat, $filter, $ionicPopup, $state, homeStorage) {
+        var add, attaches, break_mission, complete, delete_back_image, edit, get, get_mission, invitable_members, invite, open, open_member, pin, refresh_remaining, refresh_sort, remove, remove_attach, remove_member, search, search_completed, set_back_pos, set_mission, set_repeat, unpinned_missions, priv, invite_from_qr;
         search = function(home_id) {
             var params;
             params = {
@@ -345,7 +345,7 @@ angular.module('app.storage.mission', [])
                 }
             });
         };
-        break_mission = function(mission_id, complete_flag, callback) {
+        break_mission = function(mission_id, callback) {
             var params;
             params = {
                 mission_id: mission_id
@@ -484,6 +484,11 @@ angular.module('app.storage.mission', [])
                 html += '    <ion-option-button class="btn-unpin button-assertive' + pin_show + '" ng-click="pinMission(' + mission_id + ')">';
                 html += '        <i class="icon ion-ios-trash-outline"></i>';
                 html += '    </ion-option-button>';
+                if (mission.private_flag == 1) {
+                    html += '    <ion-option-button ng-click="breakMission(' + mission_id + ')">';
+                    html += '        <i class="icon ion-log-out"></i>';
+                    html += '    </ion-option-button>';
+                }
                 if (include_self)
                     html += '</ion-item>';
             }
@@ -534,6 +539,9 @@ angular.module('app.storage.mission', [])
                 html += '    <ion-option-button class="btn-unpin button-assertive' + pin_show + '" ng-click="pinMission(' + mission_id + ')">';
                 html += '        <i class="icon ion-ios-trash-outline"></i>';
                 html += '    </ion-option-button>';
+                html += '    <ion-option-button ng-click="breakMission(' + mission_id + ')">';
+                html += '        <i class="icon ion-log-out"></i>';
+                html += '    </ion-option-button>';
                 if (include_self)
                     html += '</ion-item>';
 
@@ -568,6 +576,43 @@ angular.module('app.storage.mission', [])
                     return callback(res.data);
                 }
             });
+        };
+
+        invite_from_qr = function(mission_id, invite_key, callback) {
+            mission = get_mission(mission_id);
+            if (mission != null)
+                $state.go('tab.chatroom', {mission_id: mission_id});
+            else {
+                get_name(mission_id, function(res) {
+                    if (res.err_code == 0 && !$api.is_empty(res.mission_name)) {
+                        $ionicPopup.confirm({
+                            title: 'グループ招待',
+                            template: 'チャットルーム「' + res.mission_name + '」に参加します。よろしいでしょうか？',
+                            buttons: [
+                                { text: 'キャンセル' },
+                                {
+                                    text: '<b>OK</b>',
+                                    type: 'button-positive',
+                                    onTap: function(e) {
+                                        self_invite(mission_id, invite_key, function(res) {
+                                            if (res.err_code == 0) {            
+                                                homeStorage.search().then(function() {
+                                                    $state.go('tab.chatroom', {mission_id: mission_id});
+                                                });
+                                            }
+                                            else
+                                                logger.logError(res.err_msg);
+
+                                            if (callback)
+                                                callback(res);
+                                        });
+                                    }
+                                }
+                            ]
+                        });
+                    }
+                });
+            }
         };
 
         return {
@@ -612,7 +657,9 @@ angular.module('app.storage.mission', [])
             priv: priv,
 
             upload_emoticon: upload_emoticon,
-            add_emoticon: add_emoticon
+            add_emoticon: add_emoticon,
+
+            invite_from_qr: invite_from_qr
         };
     }
 );

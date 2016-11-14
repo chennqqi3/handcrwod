@@ -31,7 +31,7 @@ angular.module('app.dialogs', [])
 
         this.selPerformer = (task) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_performer.html'
+                templateUrl: 'views/dialogs/mdl_performer.html' + $rootScope.ver
                 controller: 'modalPerformerCtrl'
                 resolve:
                     task: ->
@@ -40,7 +40,7 @@ angular.module('app.dialogs', [])
 
         this.addMissionMember = (mission, search_string) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/mission/mission_member_add.html'
+                templateUrl: 'views/mission/mission_member_add.html' + $rootScope.ver
                 controller: 'missionMemberAddCtrl'
                 resolve:
                     mission: ->
@@ -51,7 +51,7 @@ angular.module('app.dialogs', [])
 
         this.addTask = (mission, task_name) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/task/task_add.html'
+                templateUrl: 'views/task/task_add.html' + $rootScope.ver
                 controller: 'modalAddTaskCtrl'
                 resolve:
                     mission: ->
@@ -62,7 +62,7 @@ angular.module('app.dialogs', [])
 
         this.showContract = (title, content) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_contract.html'
+                templateUrl: 'views/dialogs/mdl_contract.html' + $rootScope.ver
                 controller: 'modalContractCtrl'
                 resolve:
                     title: ->
@@ -73,7 +73,7 @@ angular.module('app.dialogs', [])
 
         this.settingBackImage = (mission, back_type) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_back_image.html'
+                templateUrl: 'views/dialogs/mdl_back_image.html' + $rootScope.ver
                 controller: 'modalBackImageCtrl'
                 resolve:
                     mission: ->
@@ -84,7 +84,7 @@ angular.module('app.dialogs', [])
 
         this.uploadAttach = (type, object_id) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_upload.html'
+                templateUrl: 'views/dialogs/mdl_upload.html' + $rootScope.ver
                 controller: 'modalUploadCtrl'
                 resolve:
                     type: ->
@@ -96,19 +96,13 @@ angular.module('app.dialogs', [])
         # Home related
         this.addHome = () ->
             modalInstance = $modal.open(
-                templateUrl: 'views/home/home_add.html'
+                templateUrl: 'views/home/home_add.html' + $rootScope.ver
                 controller: 'homeAddCtrl'
-            )
-
-        this.openHome = () ->
-            modalInstance = $modal.open(
-                templateUrl: 'views/home/home_open.html'
-                controller: 'homeOpenCtrl'
             )
 
         this.inviteHome = (home, email) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/home/home_invite.html'
+                templateUrl: 'views/home/home_invite.html' + $rootScope.ver
                 controller: 'homeInviteCtrl'
                 resolve:
                     home: ->
@@ -119,7 +113,7 @@ angular.module('app.dialogs', [])
 
         this.editHome = (home) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/home/home_edit.html'
+                templateUrl: 'views/home/home_edit.html' + $rootScope.ver
                 controller: 'homeEditCtrl'
                 resolve:
                     home: ->
@@ -128,7 +122,7 @@ angular.module('app.dialogs', [])
 
         this.selPriv = (priv, callback) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_sel_priv.html'
+                templateUrl: 'views/dialogs/mdl_sel_priv.html' + $rootScope.ver
                 controller: 'selPrivCtrl'
                 resolve:
                     priv: ->
@@ -139,7 +133,7 @@ angular.module('app.dialogs', [])
 
         this.selRoomPriv = (priv, callback) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_sel_rpriv.html'
+                templateUrl: 'views/dialogs/mdl_sel_rpriv.html' + $rootScope.ver
                 controller: 'selRPrivCtrl'
                 resolve:
                     priv: ->
@@ -150,7 +144,7 @@ angular.module('app.dialogs', [])
 
         this.importCSV = (home_id) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_import_csv.html'
+                templateUrl: 'views/dialogs/mdl_import_csv.html' + $rootScope.ver
                 controller: 'importCSVCtrl'
                 resolve:
                     home_id: ->
@@ -160,14 +154,14 @@ angular.module('app.dialogs', [])
         # Mission related
         this.addMission = () ->
             modalInstance = $modal.open(
-                templateUrl: 'views/mission/mission_add.html'
+                templateUrl: 'views/mission/mission_add.html' + $rootScope.ver
                 controller: 'missionAddCtrl'
             )
 
         this.openMission = (private_flag) ->
             if private_flag == 2
                 modalInstance = $modal.open(
-                    templateUrl: 'views/mission/mission_open_member.html'
+                    templateUrl: 'views/mission/mission_open_member.html' + $rootScope.ver
                     controller: 'missionOpenCtrl'
                     resolve:
                         private_flag: ->
@@ -175,7 +169,7 @@ angular.module('app.dialogs', [])
                 )
             else
                 modalInstance = $modal.open(
-                    templateUrl: 'views/mission/mission_open.html'
+                    templateUrl: 'views/mission/mission_open.html' + $rootScope.ver
                     controller: 'missionOpenCtrl'
                     resolve:
                         private_flag: ->
@@ -184,7 +178,7 @@ angular.module('app.dialogs', [])
 
         this.editMission = (mission) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/mission/mission_edit.html'
+                templateUrl: 'views/mission/mission_edit.html' + $rootScope.ver
                 controller: 'missionEditCtrl'
                 resolve:
                     mission: ->
@@ -193,7 +187,7 @@ angular.module('app.dialogs', [])
 
         this.memberMission = (mission) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/mission/mission_member.html'
+                templateUrl: 'views/mission/mission_member.html' + $rootScope.ver
                 controller: 'missionMemberCtrl'
                 resolve:
                     mission: ->
@@ -202,7 +196,7 @@ angular.module('app.dialogs', [])
 
         this.reqEntrance = (task) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_req_entr.html'
+                templateUrl: 'views/dialogs/mdl_req_entr.html' + $rootScope.ver
                 controller: 'modalReqEntrCtrl'
                 resolve:
                     task: ->
@@ -211,7 +205,7 @@ angular.module('app.dialogs', [])
 
         this.helpEntrance = (task) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_help_entr.html'
+                templateUrl: 'views/dialogs/mdl_help_entr.html' + $rootScope.ver
                 controller: 'modalHelpEntrCtrl'
                 resolve:
                     task: ->
@@ -220,7 +214,7 @@ angular.module('app.dialogs', [])
 
         this.inviteMission = (mission, email) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/mission/mission_invite.html'
+                templateUrl: 'views/mission/mission_invite.html' + $rootScope.ver
                 controller: 'missionInviteCtrl'
                 resolve:
                     mission: ->
@@ -229,10 +223,17 @@ angular.module('app.dialogs', [])
                         return email
             )
 
+        this.missionEmoticon = () ->
+            modalInstance = $modal.open(
+                templateUrl: 'views/mission/mission_emoticon.html' + $rootScope.ver
+                controller: 'missionEmoticonCtrl'
+            )
+
         this.chatSearch = (search_this_room, search_string, callback) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/chatroom/chat_search.html'
+                templateUrl: 'views/chatroom/chat_search.html' + $rootScope.ver
                 controller: 'chatMessageCtrl'
+                size: 'lg'
                 resolve:
                     search_this_room: ->
                         return search_this_room
@@ -245,23 +246,25 @@ angular.module('app.dialogs', [])
         # alert
         this.showAlerts = () ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_alerts.html'
+                templateUrl: 'views/dialogs/mdl_alerts.html' + $rootScope.ver
                 controller: 'modalAlertsCtrl'
             )
 
-        this.previewImage = (url) ->
+        this.previewImage = (url, title) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_preview.html'
+                templateUrl: 'views/dialogs/mdl_preview.html' + $rootScope.ver
                 controller: 'modalPreviewImageCtrl'
                 size: 'lg'
                 resolve:
                     url: ->
                         return url
+                    title: ->
+                        return title
             )
 
         this.previewVideo = (url) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_preview_video.html'
+                templateUrl: 'views/dialogs/mdl_preview_video.html' + $rootScope.ver
                 controller: 'modalPreviewVideoCtrl'
                 size: 'lg'
                 resolve:
@@ -272,11 +275,25 @@ angular.module('app.dialogs', [])
         # user profile
         this.showUserProfile = (user_id) ->
             modalInstance = $modal.open(
-                templateUrl: 'views/dialogs/mdl_profile.html'
+                templateUrl: 'views/dialogs/mdl_profile.html' + $rootScope.ver
                 controller: 'modalProfileCtrl'
                 resolve:
                     user_id: ->
                         return user_id
+            )
+
+        this.showQR = (url, deep_link, title) ->
+            modalInstance = $modal.open(
+                templateUrl: 'views/dialogs/mdl_qr.html' + $rootScope.ver
+                controller: 'modalShowQRCtrl'
+                size: 'lg'
+                resolve:
+                    url: ->
+                        return url
+                    deep_link: ->
+                        return deep_link
+                    title: ->
+                        return title
             )
         return this
 )
@@ -526,8 +543,7 @@ angular.module('app.dialogs', [])
                 if res.err_code == 0
                     mission.job_back_pos = res.job_back_pos
                     mission.prc_back_pos = res.prc_back_pos
-                    missionStorage.set_mission(mission)
-                    $rootScope.cur_mission = mission
+                    missionStorage.set_cur_mission(mission)
                     logger.logSuccess('配置情報を更新しました。')
                     $rootScope.$broadcast('refresh_back_image')
 
@@ -544,8 +560,7 @@ angular.module('app.dialogs', [])
                     mission.job_back_url = res.job_back_url
                     mission.prc_back = res.prc_back
                     mission.prc_back_url = res.prc_back_url
-                    missionStorage.set_mission(mission)
-                    $rootScope.cur_mission = mission
+                    missionStorage.set_cur_mission(mission)
                     logger.logSuccess('背景画像を削除しました。')
                     $rootScope.$broadcast('refresh_back_image')
 
@@ -722,9 +737,18 @@ angular.module('app.dialogs', [])
 )
 
 .controller('modalPreviewImageCtrl', 
-    ($scope, $rootScope, $modalInstance, $api, logger, url) ->
+    ($scope, $rootScope, $modalInstance, $api, logger, url, title) ->
+        if url
+            len = url.length
+            if url.substring(len-3) == 'gif'
+                $scope.url = url
+            else
+                $scope.url = url + '/1000'
 
-        $scope.url = url
+        if $api.is_empty(title)
+            $scope.title = "プレビュー"
+        else
+            $scope.title = title
 
         $scope.close = ->
             $modalInstance.dismiss('close')
@@ -748,6 +772,19 @@ angular.module('app.dialogs', [])
             if res.err_code == 0
                 $scope.user = res.user
         )
+
+        $scope.close = ->
+            $modalInstance.dismiss('close')
+)
+
+.controller('modalShowQRCtrl', 
+    ($scope, $rootScope, $modalInstance, $api, logger, url, deep_link, title) ->
+        $scope.url = url
+        $scope.qr_url = $api.qr_image_url(url, 300)
+        if $api.is_empty(title)
+            $scope.title = "QRコード"
+        else
+            $scope.title = title
 
         $scope.close = ->
             $modalInstance.dismiss('close')

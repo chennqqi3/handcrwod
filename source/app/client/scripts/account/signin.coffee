@@ -4,21 +4,8 @@ angular.module('app.signin', [])
 
 # for toggle task edit panel
 .controller('signinCtrl', 
-    ($scope, $rootScope, CONFIG, $api, $auth, $location, AUTH_EVENTS, $session, $routeParams, logger, $syncServer, chatStorage, homeStorage, missionStorage) ->
-        chatStorage.refresh_unreads_title()        
-
-        $scope.paramsFromStorage = ->
-            try 
-                return JSON.parse(localStorage.getItem('signin_params') || {})
-            catch err
-                return {}
-
-        $scope.paramsToStorage = (params)->
-            try 
-                localStorage.setItem('signin_params', JSON.stringify(params))                
-            catch err
-                return {}
-
+    ($scope, $rootScope, CONFIG, $api, $auth, $location, AUTH_EVENTS, $session, $routeParams, logger, chatStorage) ->
+        chatStorage.refresh_unreads_title()
         $scope.canSubmit = ->
             return $scope.form_signin.$valid
 
@@ -31,8 +18,13 @@ angular.module('app.signin', [])
         $scope.procLogin = (err_code) ->
             if err_code == 0
                 $rootScope.$broadcast(AUTH_EVENTS.loginSuccess)
-                $location.path('/home')
-                $scope.paramsToStorage(null)
+                if $rootScope.redirect_url != undefined
+                    url = $rootScope.redirect_url
+                    $rootScope.redirect_url = undefined
+                    $location.path(url)
+                else
+                    $location.path('/home')
+                $session.signinParamsToStorage(null)
             else if err_code == 51
                 $scope.showExpireError = true
                 $scope.showSigninError = false
@@ -45,14 +37,14 @@ angular.module('app.signin', [])
         if $routeParams.token != undefined
             if $routeParams.from == "facebook"
                 $scope.showSignin = false
-                $scope.params = $scope.paramsFromStorage()
+                $scope.params = $session.signinParamsFromStorage()
                 $auth.loginFacebook($routeParams.token)
                     .then((err_code) ->
                         $scope.procLogin(err_code)
                     )
             else if $routeParams.from == "google"
                 $scope.showSignin = false
-                $scope.params = $scope.paramsFromStorage()
+                $scope.params = $session.signinParamsFromStorage()
                 $auth.loginGoogle($routeParams.token)
                     .then((err_code) ->
                         $scope.procLogin(err_code)
@@ -61,7 +53,7 @@ angular.module('app.signin', [])
                 $auth.autoLogin($routeParams.token, null, null)
         else
             $scope.params = $location.search()
-            $scope.paramsToStorage($scope.params)
+            $session.signinParamsToStorage($scope.params)
 
         $scope.api_url = CONFIG.API_BASE
         $scope.base_url = $api.base_url()
@@ -71,7 +63,7 @@ angular.module('app.signin', [])
         $scope.google_signup_url = "signup_google"
 
         $scope.user =
-            email: $session.email
+            login_id: $session.login_id
             password: ''
 
         $scope.showSigninError = false

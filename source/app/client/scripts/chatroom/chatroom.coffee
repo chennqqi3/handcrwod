@@ -19,6 +19,18 @@ angular.module('app.chatroom', [])
 
         $scope.mission_id = parseInt($routeParams.mission_id, 10)
         $scope.chat_id = parseInt($routeParams.chat_id, 10)
+        if !isNaN($scope.chat_id) && !$api.is_empty($scope.chat_id)
+            $rootScope.goto_cmsg_id = $scope.chat_id
+            $rootScope.goto_mission_id = $scope.mission_id
+            $location.path("/chats/" + $scope.mission_id)
+            return
+
+        # メッセージ移行後にページを更新しても正常に表示されるように
+        if !$api.is_empty($scope.goto_cmsg_id)
+            if $scope.goto_mission_id == $scope.mission_id
+                $scope.chat_id = $scope.goto_cmsg_id
+            $rootScope.goto_cmsg_id = null
+            $rootScope.goto_mission_id = null
 
         MAX_MSG_LENGTH = 100
 
@@ -26,7 +38,9 @@ angular.module('app.chatroom', [])
 
         # 招待QRコード
         $scope.showInviteQR = ->
-            $dialogs.showQR($api.base_url() + "#/qr/chat/" + $rootScope.cur_mission.mission_id + "/" + $rootScope.cur_mission.invite_key, "招待QRコード(" + $rootScope.cur_mission.mission_name + ")")
+            $dialogs.showQR($api.base_url() + "#/qr/chat/" + $rootScope.cur_mission.mission_id + "/" + $rootScope.cur_mission.invite_key, 
+                "handcrowd://invite_chat?id=" + $rootScope.cur_mission.mission_id + "&key=" + $rootScope.cur_mission.invite_key, 
+                "招待QRコード(" + $rootScope.cur_mission.mission_name + ")")
             return
 
         if $rootScope.cmsg_sn == undefined
@@ -408,6 +422,7 @@ angular.module('app.chatroom', [])
                         $chat.send(null, $rootScope.cur_home.home_id, $scope.mission_id, str, to_id, 1)
                     else
                         logger.logError(data.err_msg)
+                    $('#btn_upload input').val('');
                 )
                 file.upload = upload
                 return
@@ -536,6 +551,10 @@ angular.module('app.chatroom', [])
             $scope.sync()
 
             $scope.refreshBackImage()
+        )
+
+        $scope.$on("refresh-missions", ->
+            $scope.sync(false)
         )
 
         # Search tasks by mission
@@ -1318,6 +1337,9 @@ angular.module('app.chatroom', [])
 
         # Initialize
         $scope.sync = (load_chat_message) ->
+            if load_chat_message == undefined
+                load_chat_message = true
+
             $scope.session = $session
 
             if $session.user_id != null 
@@ -1335,18 +1357,26 @@ angular.module('app.chatroom', [])
                         missionStorage.set_cur_mission(res.mission)
                         $scope.refreshBackImage()
 
-                        if load_chat_message != false
+                        if load_chat_message
                             $scope.init_cmsg()
                             chatStorage.messages($scope.mission_id, $scope.chat_id)
                                 .then((messages) ->
                                     chatStorage.cache_messages($scope.mission_id, messages)
                                     $scope.load_messages(messages)
+                                    if messages.length == 0 && !$api.is_empty($scope.chat_id)
+                                        # in case of first message, goto next message
+                                        chatStorage.messages($scope.mission_id, null, $scope.chat_id)
+                                            .then((messages) ->
+                                                chatStorage.cache_messages($scope.mission_id, messages)
+                                                $scope.load_messages(messages)
+                                            )
+
                                 )
 
-                        taskStorage.search($scope.mission_id).then((tasks) ->
-                            ##if tasks.length > 0 && !$scope.show_process
-                            ##    $scope.showProcess()
-                        )
+                            taskStorage.search($scope.mission_id).then((tasks) ->
+                                ##if tasks.length > 0 && !$scope.show_process
+                                ##    $scope.showProcess()
+                            )
                     else 
                         logger.logError(res.err_msg)
                         $location.path('/home')

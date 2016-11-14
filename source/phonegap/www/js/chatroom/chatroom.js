@@ -1137,32 +1137,33 @@ angular.module('app.chatroom', [])
                 }
             }
             if (readIds.length > 0) {
-                return chatStorage.read_messages($scope.mission_id, readIds).then(function(data) {
-                    var k, len1, results;
-                    if (data.err_code === 0) {
-                        results = [];
-                        for (k = 0, len1 = messages.length; k < len1; k++) {
-                            message = messages[k];
-                            if (readIds.indexOf(message.cmsg_id) !== -1) {
-                                message.unread = false;
-                                message.read_class = "unread read";
-                                if ($('#chat_' + message.cmsg_id).length > 0) {
-                                    $('#chat_' + message.cmsg_id + ' .unread-mark').addClass(message.read_class);
-                                }
-                                delta = -1;
-                                delta_to = 0;
-                                message.to_flag = chatStorage.is_to_mine(message);
-                                if (message.to_flag)
-                                    delta_to = -1;
-                                $rootScope.cur_mission.unreads += delta;
-                                $rootScope.cur_mission.to_unreads += delta_to;
-                                $rootScope.cur_home.unreads += delta;
-                                $rootScope.cur_home.to_unreads += delta_to;
-                            }
+                var k, len1;
+                for (k = 0, len1 = messages.length; k < len1; k++) {
+                    message = messages[k];
+                    if (readIds.indexOf(message.cmsg_id) !== -1) {
+                        message.unread = false;
+                        message.read_class = "unread read";
+                        if ($('#chat_' + message.cmsg_id).length > 0) {
+                            $('#chat_' + message.cmsg_id + ' .unread-mark').addClass(message.read_class);
                         }
+                        delta = -1;
+                        delta_to = 0;
+                        message.to_flag = chatStorage.is_to_mine(message);
+                        if (message.to_flag)
+                            delta_to = -1;
+                        $rootScope.cur_mission.unreads += delta;
+                        $rootScope.cur_mission.to_unreads += delta_to;
+                        $rootScope.cur_home.unreads += delta;
+                        $rootScope.cur_home.to_unreads += delta_to;
+                    }
+                }
 
-                        missionStorage.set_mission($rootScope.cur_mission);
-                        chatStorage.refresh_unreads_title();
+                missionStorage.set_mission($rootScope.cur_mission);
+                chatStorage.refresh_unreads_title();
+
+                chatStorage.read_messages($scope.mission_id, readIds).then(function(data) {
+                    if (data.err_code === 0) {
+                        
                     } else {
                         return logger.logError(data.err_msg);
                     }

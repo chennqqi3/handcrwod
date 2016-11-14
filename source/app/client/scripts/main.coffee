@@ -20,6 +20,7 @@ angular.module('app.controller.main', [])
                 '/forgotpwd'
                 '/resetpwd'
                 '/loadapp'
+                '/qr'
             ]
                 found = true if p == path || path.indexOf(p + "/") == 0
             return found

@@ -160,7 +160,7 @@
 
 				if(preg_match('/android|ip(hone|od)/i',$useragent))
 				{
-					$url = "handcrowd://?signup=1&user_id=" .  $params->user_id . "&activate_key=" . $params->activate_key;				
+					$url = "handcrowd://signup?user_id=" .  $params->user_id . "&activate_key=" . $params->activate_key;				
 					ob_clean();
 					header('Location: ' . $url);					
 				}

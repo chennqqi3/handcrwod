@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
         <!-- end needs images -->
 
-        <link rel="stylesheet" href="styles/main.css?v=2.8.4">
+        <link rel="stylesheet" href="styles/main.css?v=2.8.5">
         <link rel="apple-touch-icon" href="images/webapp.png">
         <link rel="apple-touch-icon-precompsed" href="images/webapp.png">
         <link rel="apple-touch-startup-image" href="images/webapp.png">
@@ -47,12 +47,12 @@
             <div class="error-connection" ng-class="{'show': error_disconnected}"><i class="fa fa-warning"></i> サーバーに接続できません。</div>
         </div>
 
-        <script src="scripts/vendor.js?v=2.8.4"></script>
+        <script src="scripts/vendor.js?v=2.8.5"></script>
 
-        <script src="scripts/ui.js?v=2.8.4"></script>
+        <script src="scripts/ui.js?v=2.8.5"></script>
 
-        <script src="scripts/config.js?v=2.8.4"></script>
+        <script src="scripts/config.js?v=2.8.5"></script>
 
-        <script src="scripts/app.js?v=2.8.4"></script>
+        <script src="scripts/app.js?v=2.8.5"></script>
     </body>
 </html>

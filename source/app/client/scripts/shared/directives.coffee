@@ -28,6 +28,7 @@ angular.module('app.directives', [])
                         '/forgotpwd'
                         '/resetpwd'
                         '/loadapp'
+                        '/qr'
                     ]
                         $element.addClass('body-special').removeClass('expanded') if p == path || path.indexOf(p + "/") == 0
 
