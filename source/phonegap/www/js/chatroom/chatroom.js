@@ -747,7 +747,15 @@ angular.module('app.chatroom', [])
             }
 
             // build html
-            if ($('#chat_' + message.cmsg_id).length > 0) {
+            len = $('#chat_' + message.cmsg_id).length
+            if (len > 0) {
+                // fix twice display of message
+                if (len > 1) {
+                    for (i = 1; i < len; i ++) {
+                        $('#chat_' + message.cmsg_id + ':eq(' + i + ')').remove();
+                    }
+                }
+
                 message_html = chatStorage.message_to_html(message, $scope.chat_id, false);
                 $('#chat_' + message.cmsg_id).html(message_html);
                 $compile($('#chat_' + message.cmsg_id).contents())($scope);
@@ -808,7 +816,7 @@ angular.module('app.chatroom', [])
                     $scope.last_cid = cmsg.cmsg_id;
                 }
                 
-                $scope.$apply();
+                //$scope.$apply();
 
                 $scope.initEventHandler();
                 
@@ -1006,7 +1014,7 @@ angular.module('app.chatroom', [])
                 }
 
                 $('#chat_' + cmsg.cmsg_id).remove();   
-                return $scope.$apply();
+                $scope.$apply();
             }
         });
 
@@ -1378,12 +1386,12 @@ angular.module('app.chatroom', [])
                 }
 
                 $scope.init_cmsg();
-                $chat.messages($scope.mission_id);
-                /*
+                //$chat.messages($scope.mission_id);
                 chatStorage.messages($scope.mission_id).then(function(messages) {
                     $timeout(function() {
                         $('#loader').hide();
                     }, 1000)
+                    /*
                     var length;
                     $scope.messages = messages;
                     $scope.scrollToBottom(false);
@@ -1403,8 +1411,11 @@ angular.module('app.chatroom', [])
                     }
 
                     $scope.initEventHandler()
+                    */
+                    $scope.chat_id = parseInt($stateParams.chat_id, 10);
+                    chatStorage.cache_messages($scope.mission_id, messages);
+                    $scope.load_messages(messages);
                 });
-                */
 
                 $timeout(function() {
                     $scope.set_last_msg();

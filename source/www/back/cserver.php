@@ -228,7 +228,8 @@
 
             $mission_id = $data["mission_id"];
             $home_id = isset($data["home_id"]) ? $data["home_id"] : null; //message text
-            $content = $data["content"]; //message text
+            $cache_id = $data["cache_id"];
+            $content = _cache_get($data["cache_id"]); //message text
             $is_file = isset($data["is_file"]) ? $data["is_file"] : null; //message text
             $to_id = isset($data["to_id"]) ? $data["to_id"] : null;
             $user_name = $client->session("user_name");
@@ -243,10 +244,10 @@
             if ($home_id == null)
                 $home_id = $mission->home_id;
 
-            $client->log("[Chat message] ");
+            $client->log("[Chat message] cache_id=" . $cache_id);
 
             $this->start();
-            $cmsg = cmsg::message($cmsg_id, $mission_id, $user_id_from, $to_id, $content);
+            $cmsg = cmsg::message($cmsg_id, $mission_id, $user_id_from, $to_id, $content, $cache_id);
             $this->commit();
 
             if ($cmsg != null) {
@@ -261,7 +262,7 @@
                     'mission_name'=> $mission->mission_name,
                     'home_id'=> $home_id,
                     'home_name'=> $home_name,
-                    'content'=> $content,
+                    'cache_id'=> $cache_id,
                     'reacts'=> $cmsg->reacts,
                     'is_file'=> $is_file,
                     'date'=> _google_datetime()
@@ -272,7 +273,7 @@
                 else
                     $user_ids = mission_member::user_ids($mission_id);
                 
-                $this->send_message('chat_message', $msg, $user_id_from, $user_ids); //send data to self and to
+                $this->send_message('chat_message', $msg, $user_id_from, $user_ids, null, null, $content); //send data to self and to
             }
         }
 
@@ -316,6 +317,7 @@
             }
         }
 
+        /*
         private function onChat_messages($client, $data)
         {
             $user_id_from = $client->session('user_id');    //sender id
@@ -341,6 +343,7 @@
             
             $this->send_message('chat_messages', $msg, $user_id_from, $user_ids, null, $client);
         }
+        */
 
         private function onRemove_message($client, $data)
         {
@@ -470,7 +473,7 @@
             $this->send_message('home', $msg, $user_id_from, $user_ids, $client);
         }
 
-        private function send_message($event, $data, $from_id, $to_ids = null, $ignore_client = null, $to_client = null)
+        private function send_message($event, $data, $from_id, $to_ids = null, $ignore_client = null, $to_client = null, $content=null)
         {
             if($to_ids == null)
             {
@@ -484,7 +487,7 @@
                     $must_push = $event == "chat_message";
 
                     if ($must_push) {
-                        $must_push = mission_member::is_push($data["mission_id"], $to_id, $data['content']);
+                        $must_push = mission_member::is_push($data["mission_id"], $to_id, $content);
                         $data["push_flag"] = $must_push;
                         $encodedData = $this->_encodeData($event, $data);
                     } 

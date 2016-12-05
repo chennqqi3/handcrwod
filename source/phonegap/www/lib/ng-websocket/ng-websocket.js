@@ -141,15 +141,14 @@
             };
 
             me.$$ws.onerror = function (error) {
+                console.log("socket error " + JSON.stringify(error));
                 me.$$fireEvent('$error', error);
             };
 
             me.$$ws.onopen = function () {
+                console.log("opened connection")
                 // Clear the reconnect task if exists
-                if (me.$$reconnectTask) {
-                    clearInterval(me.$$reconnectTask);
-                    delete me.$$reconnectTask;
-                }
+                me.$clearReconnect();
 
                 // Flush the message queue
                 if (me.$$config.enqueue && me.$$queue.length > 0) {
@@ -164,9 +163,13 @@
 
             me.$$ws.onclose = function () {
                 // Activate the reconnect task
+                console.log("close connection");
                 if (me.$$config.reconnect) {
+                    me.$clearReconnect();
                     me.$$reconnectTask = setInterval(function () {
                         if (me.$status() === me.$CLOSED) me.$open();
+                        if (me.$status() === me.$OPEN) me.$clearReconnect();
+                        console.log("reconnect")
                     }, me.$$config.reconnectInterval);
                 }
 
@@ -250,10 +253,7 @@
         me.$close = function () {
             if (me.$status() !== me.$CLOSED) me.$$ws.close();
 
-            if (me.$$reconnectTask) {
-                clearInterval(me.$$reconnectTask);
-                delete me.$$reconnectTask;
-            }
+            me.$clearReconnect();
 
             me.$$config.reconnect = false;
 
@@ -271,6 +271,13 @@
 
         me.$mockup = function () {
             return me.$$config.mock;
+        };
+
+        me.$clearReconnect = function() {
+            if (me.$$reconnectTask) {
+                clearInterval(me.$$reconnectTask);
+                delete me.$$reconnectTask;
+            }                            
         };
 
         // setup

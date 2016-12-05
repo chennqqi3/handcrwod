@@ -1694,5 +1694,66 @@
 	{
 		$prot = CSERVER_SSL ? "wss" : "ws";
 		return $prot . "://" . CSERVER_HOST . ":" . CSERVER_PORT . "/" . $app . "/";
-	}	
+	}
+
+	// memcache
+	function _cache_uris()
+	{
+		global $_cache_servers;
+		if ($_cache_servers == null) {
+			$_cache_servers = preg_split('/,/', MEMCACHE_SERVER);
+		}
+		$cnt = count($_cache_servers);
+		if ($cnt == 0)
+			return null;
+
+		$uris = array();
+		foreach ($_cache_servers as $server) {
+			array_push($uris, sprintf(MEMCACHE_URI, $server));
+		}
+		return $uris;
+	}
+
+	function _cache_connect($cache_id, $force = false)
+	{
+		global $_cache_servers;
+		global $_caches;
+		if ($_cache_servers == null) {
+			$_cache_servers = preg_split('/,/', MEMCACHE_SERVER);
+		}
+		if ($_caches == null) {
+			$_caches = array();
+			for ($i = 0; $i < count($_cache_servers); $i ++)
+				array_push($_caches, null);
+		}
+		$server_no = substr($cache_id, 0, 2) + 0;
+		$server_ip = $_cache_servers[$server_no];
+
+		if (!$force && $_caches[$server_no])
+			return $_caches[$server_no];
+
+		if ($server_ip) {
+			$memcache = new Memcache;
+			$memcache->connect($server_ip, 11211) or $memcache = null;
+
+			$_caches[$server_no] = $memcache;
+
+			return $memcache;
+		}
+
+		return null;
+	}
+
+	function _cache_get($cache_id) {
+		$memcache = _cache_connect($cache_id);
+		if ($memcache)
+			return $memcache->get($cache_id);
+		return null;
+	}
+
+	function _cache_set($cache_id, $val) {
+		$memcache = _cache_connect($cache_id);
+		if ($memcache)
+			$memcache->set($cache_id, $val);
+	}
 ?>

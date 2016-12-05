@@ -19,6 +19,7 @@ angular.module('handcrowd', [
 
     // common
     'app.api',
+    'app.cache',
     'app.auth',
     'app.logger',
     'app.dateutil',

@@ -143,11 +143,24 @@
 								<label class="control-label" for="cserver_debug"><?php l("デバッグ");?></label>
 								<div class="controls"><?php $this->oConfig->checkbox_single("cserver_debug", "デバッグ情報を出力する。"); ?></div>
 							</fieldset> <!-- /fieldset -->
+							<h3>6. <?php l("キャッシューサーバー設定");?></h3>
+							<fieldset class="control-group" id="group_memcache_server">
+								<label class="control-label" for="memcache_server"><?php l("サーバーＩＰ（複数）");?></label>
+								<div class="controls"><?php $this->oConfig->input("memcache_server", array("class" => "input-xlarge", "placeholder" => "例: localhost,133.222.44.27")); ?></div>
+							</fieldset> <!-- /fieldset -->
+							<fieldset class="control-group" id="group_memcache_port">
+								<label class="control-label" for="memcache_port"><?php l("ポート");?></label>
+								<div class="controls"><?php $this->oConfig->input("memcache_port", array("class" => "input-large", "placeholder" => "例: 9000")); ?></div>
+							</fieldset> <!-- /fieldset -->
+							<fieldset class="control-group" id="group_memcache_uri">
+								<label class="control-label" for="memcache_uri"><?php l("URI");?></label>
+								<div class="controls"><?php $this->oConfig->input("memcache_uri", array("class" => "input-xlarge", "placeholder" => "例: ")); ?></div>
+							</fieldset> <!-- /fieldset -->
 						</div>
 					</div>
 					<div class="row">
 						<div class="span12">
-							<h3>6. <?php l("ユーザープラン設定");?></h3>
+							<h3>7. <?php l("ユーザープラン設定");?></h3>
 							<table class="table table-bordered">
 								<tr>
 									<th></th>
@@ -345,6 +358,12 @@ $(function () {
 			},
 			cserver_port: {
 				required: true,
+			},
+			memcache_server: {
+				required: true,
+			},
+			memcache_port: {
+				required: true,
 			}
 		},
 
@@ -414,6 +433,12 @@ $(function () {
 				required: "<?php l('サーバーＩＰを入力してください。');?>"
 			},
 			cserver_port: {
+				required: "<?php l('ポートを入力してください。');?>"
+			},
+			memcache_server: {
+				required: "<?php l('サーバーＩＰを入力してください。複数指定の場合「,」区切りしてください。');?>"
+			},
+			memcache_port: {
 				required: "<?php l('ポートを入力してください。');?>"
 			}
 		}

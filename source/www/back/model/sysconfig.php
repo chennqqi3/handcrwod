@@ -68,6 +68,11 @@
 				/* entrance */
 				"entrance_email",
 
+				/* memcache server */
+				"memcache_server",
+				"memcache_port",
+				"memcache_uri",
+
 				/* chat server */
 				"cserver_host",
 				"cserver_port",
@@ -121,6 +126,10 @@
 				"login_fail_lock" => "5",
 
 				"entrance_email" => "request@reflux.jp",
+
+				"memcache_server" => "localhost",
+				"memcache_port" => "11211",
+				"memcache_uri" => "https://%s/cache/",
 
 				"cserver_host" => "www.handcrowd.com",
 				"cserver_port" => "9000",
@@ -191,6 +200,12 @@
 
 			$config .= "/* entrance */\n";
 			$config .= $this->define_string("entrance_email");
+			$config .= "\n";
+
+			$config .= "/* memcached */\n";
+			$config .= $this->define_string("memcache_server");
+			$config .= $this->define_number("memcache_port");
+			$config .= $this->define_string("memcache_uri");
 			$config .= "\n";
 
 			$config .= "/* chat server */\n";

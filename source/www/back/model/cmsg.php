@@ -20,7 +20,8 @@
                     "content",
                     "reacts",
                     "attach",
-                    "file_size"),
+                    "file_size",
+                    "cache_id"),
                 array("auto_inc" => true));
         }
 
@@ -37,7 +38,7 @@
             return $err;
         }
 
-        public static function message($cmsg_id, $mission_id, $from_id, $to_id, $content) 
+        public static function message($cmsg_id, $mission_id, $from_id, $to_id, $content, $cache_id=null) 
         {
             if (_is_empty($content))
                 return null;
@@ -54,6 +55,7 @@
             $cmsg->to_id = $to_id; // unuse
             $cmsg->cmsg_type = CMSG_TEXT;
             $cmsg->content = $content;
+            $cmsg->cache_id = $cache_id;
 
             $err = $cmsg->save();
 
@@ -133,7 +135,7 @@
                 $cmsg = cmsg::getModel($cmsg_id);
                 if ($cmsg != null)
                 {
-                    $err = $cmsg->remove();
+                    $err = $cmsg->remove(true);
                     if ($err == ERR_OK) {
                         cunread::read($cmsg_id);
                         $err = cunread::refresh_unreads($cmsg->mission_id);
@@ -147,6 +149,70 @@
             return ERR_OK;
         }
 
+        /*
+        private static function messages_in_mission($mission_id, $prev_id, $next_id, $limit)
+        {
+            if ($limit <= 0)
+                $limit = 60;
+            
+            $cmsgs = array();
+            if ($mission_id == null)
+                return $cmsgs;
+
+            $user_names = array();
+
+            $cmsg = new cmsg;
+
+            $sql = "SELECT cmsg_id, content, from_id, create_time, reacts
+                FROM t_cmsg
+                WHERE mission_id=" . _sql($mission_id);
+
+            $order = "DESC";
+            if (!_is_empty($prev_id)) {
+                // load prev
+                $sql .= " AND cmsg_id < " . _sql($prev_id);
+            }
+            else if (!_is_empty($next_id)) {
+                // load next
+                $sql .= " AND cmsg_id > " . _sql($next_id);
+                $order = "ASC";
+            }
+
+            $sql .= " ORDER BY cmsg_id " . $order . " LIMIT " . $limit;
+                
+            $err = $cmsg->query($sql);
+
+            while ($err == ERR_OK)
+            {
+                if (isset($user_names[$cmsg->from_id]))
+                    $from_name = $user_names[$cmsg->from_id];
+                else {
+                    $from_name = user::get_user_name($cmsg->from_id);
+                    $user_names[$cmsg->from_id] = $from_name;
+                }
+                $item = array(
+                    "cmsg_id" => $cmsg->cmsg_id,
+                    "content" => $cmsg->content,
+                    "user_id" => $cmsg->from_id,
+                    "user_name" => $from_name,
+                    "date" => $cmsg->create_time,
+                    "unread" => false,
+                    "star" => false,
+                    "reacts" => json_decode($cmsg->reacts)
+                );
+
+                if ($order == "DESC")
+                    array_splice($cmsgs, 0, 0, array($item));
+                else
+                    array_push($cmsgs, $item);
+
+                $err = $cmsg->fetch();
+            }
+
+            return $cmsgs;
+        }
+        */
+
         public static function messages($home_id, $mission_id, $user_id, $prev_id, $next_id, $star=false, $limit=null) 
         {
             if ($limit <= 0)
@@ -156,29 +222,27 @@
             if ($home_id == null)
                 return $cmsgs;
 
+            $user_names = array();
+
             $cmsg = new cmsg;
 
             if ($mission_id != null) {
-                $sql = "SELECT m.*, f.user_name from_name, u.cunread_id, ms.cmsg_star_id
+                $sql = "SELECT m.cmsg_id, m.content, m.from_id, m.create_time, m.reacts, u.cunread_id, ms.cmsg_star_id
                     FROM t_cmsg m 
-                    INNER JOIN t_mission mi ON m.mission_id=mi.mission_id
                     " . ($star ? "INNER" : "LEFT") . " JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
-                    LEFT JOIN m_user f ON m.from_id=f.user_id
                     LEFT JOIN t_cunread u ON m.cmsg_id=u.cmsg_id AND u.user_id=" . _sql($user_id) . "
-                    WHERE m.mission_id=" . _sql($mission_id) . " AND m.del_flag=0 AND ms.hidden IS NULL
-                        AND (mi.private_flag=" . CHAT_BOT . " AND m.to_id=" . _sql($user_id) ." OR mi.private_flag!=" . CHAT_BOT . ")";
+                    WHERE m.mission_id=" . _sql($mission_id) . " AND m.del_flag=0";
+                //$cmsgs = static::messages_in_mission($mission_id, $prev_id, $next_id, $limit);
             }
             else {
-                $sql = "SELECT m.*, f.user_name from_name, u.cunread_id, ms.cmsg_star_id, mi.mission_id, mi.mission_name
+                $sql = "SELECT m.cmsg_id, m.content, m.from_id, m.create_time, m.reacts, u.cunread_id, ms.cmsg_star_id, mi.mission_id, mi.mission_name
                     FROM t_cmsg m 
                     INNER JOIN t_mission mi ON m.mission_id=mi.mission_id
                     INNER JOIN t_home h ON h.home_id=mi.home_id
                     " . ($star ? "INNER" : "LEFT") . " JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
-                    LEFT JOIN m_user f ON m.from_id=f.user_id
                     LEFT JOIN t_cunread u ON m.cmsg_id=u.cmsg_id AND u.user_id=" . _sql($user_id) . "
-                    WHERE h.home_id=" . _sql($home_id) . " AND m.del_flag=0 AND ms.hidden IS NULL
-                        AND (mi.private_flag=" . CHAT_BOT . " AND m.to_id=" . _sql($user_id) ." OR mi.private_flag!=" . CHAT_BOT . ")";    
-            }
+                    WHERE h.home_id=" . _sql($home_id) . " AND m.del_flag=0"; 
+            }   
 
             $order = "DESC";
             if (!_is_empty($prev_id)) {
@@ -197,11 +261,18 @@
 
             while ($err == ERR_OK)
             {
+                if (isset($user_names[$cmsg->from_id]))
+                    $from_name = $user_names[$cmsg->from_id];
+                else {
+                    $from_name = user::get_user_name($cmsg->from_id);
+                    $user_names[$cmsg->from_id] = $from_name;
+                }
+
                 $item = array(
                     "cmsg_id" => $cmsg->cmsg_id,
                     "content" => $cmsg->content,
                     "user_id" => $cmsg->from_id,
-                    "user_name" => $cmsg->from_name,
+                    "user_name" => $from_name,
                     "date" => $cmsg->create_time,
                     "unread" => $cmsg->cunread_id != null,
                     "star" => $cmsg->cmsg_star_id != null,

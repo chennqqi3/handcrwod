@@ -101,6 +101,9 @@ angular.module('app.auth', [])
             $rootScope.alerts = data.alerts;
             $rootScope.unreads = data.unreads;
             $rootScope.chat_uri = data.chat_uri;
+            $rootScope.cache_uris = data.cache_uris
+            $rootScope.cache_uri = $rootScope.cache_uris[Math.floor(Math.random() * $rootScope.cache_uris.length)];
+
             this.statesToStorage();
             try {
                 encoded = sjcl.encrypt("hc2015", JSON.stringify({

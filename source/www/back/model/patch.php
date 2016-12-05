@@ -400,6 +400,9 @@ No.157 タスクの詳細画面を出すのに、タスクを選んで右上の�
 			"2.8" => array("func" => "patch2_8", "description" => "
 - #17 修正
 新規にグループを作って既存のユーザーを招待をしました。しかし、まだ招待したユーザーが承認を押していないのに、メンバーリストに表示されていて、メッセージが出来るように思えてしまい混乱します。また、Web版の場合は、承認前なのにメッセージを送ることができて、通知までされます。
+"),		
+			"2.9" => array("func" => "patch2_9", "description" => "チャットサーバー安定化
+-キャッシュー利用
 ")
 			);
 
@@ -1221,6 +1224,22 @@ ADD INDEX `accepted` (`accepted`) ;";
 			$this->db->execute_batch($sql);
 
 			return ERR_OK;
+		}
+
+		public function patch2_9()
+		{
+			$sql = "ALTER TABLE `t_cmsg`
+ADD COLUMN `cache_id`  varchar(40) NULL AFTER `file_size`,
+ADD UNIQUE INDEX `cache_id` (`cache_id`) ;
+DELETE m FROM t_cmsg m
+LEFT JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id
+WHERE ms.hidden=1;
+DELETE FROM t_cmsg WHERE del_flag=1;
+";
+			$this->db->execute_batch($sql);
+
+			return ERR_OK;
+			
 		}
 	};
 ?>

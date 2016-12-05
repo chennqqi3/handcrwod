@@ -595,6 +595,7 @@
 				WHERE m.mission_id=" . _sql($params->mission_id) . " AND 
 					mm.user_id=" . _sql($my_id) . " AND
 					m.del_flag=0";
+					_debug_log($sql);
 
 			$err = $mission->query($sql);
 			if ($err == ERR_NODATA)
@@ -604,6 +605,8 @@
 
 			$mission->user_id = $mission->opp_user_id;
 			$mission->user_name = $mission->opp_user_name;
+			if ($mission->user_id)
+				$mission->avartar = _avartar_full_url($mission->opp_user_id);
 
 			$mission_member = new model;
 			$err = $mission_member->query("SELECT mm.user_id, u.user_name, u.email, u.login_id, mm.push_flag, mm.priv

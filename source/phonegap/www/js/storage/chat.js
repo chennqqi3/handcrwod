@@ -219,9 +219,9 @@ angular.module('app.storage.chat', [])
                         cmsg.date_label = date_label;
                         if (cmsg.user_id !== user_id) {
                             cmsg.show_avartar = true;
-                            return user_id = cmsg.user_id;
+                            user_id = cmsg.user_id;
                         } else {
-                            return cmsg.show_avartar = false;
+                            cmsg.show_avartar = false;
                         }
                     });
                     $rootScope.read_message_offset = 0;
@@ -585,9 +585,14 @@ angular.module('app.storage.chat', [])
             angular.forEach($rootScope.homes, function(home) {
                 unreads += home.unreads;
             });
-            if (ionic.Platform.isIOS())
-            {
-                cordova.plugins.notification.badge.set(unreads);
+            try {
+                if (ionic.Platform.isIOS())
+                {
+                    cordova.plugins.notification.badge.set(unreads);
+                }
+            }
+            catch(e) {
+
             }
         };
 

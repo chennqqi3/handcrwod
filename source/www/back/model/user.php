@@ -38,6 +38,17 @@
 				array("auto_inc" => true));
 		}
 
+		public function save()
+		{
+			$err = parent::save();
+			if ($err == ERR_OK)
+			{
+				$cache_id = static::cache_id_of_user_name($this->user_id);
+				_cache_set($cache_id, $this->user_name);
+			}
+			return $err;
+		}
+
 		public static function getModel($pkvals, $ignore_del_flag=false)
 		{
 			$model = new static;
@@ -134,7 +145,13 @@
 			global $_SERVER;
 			$logined = ERR_FAILLOGIN;
 
-			if ($this->email != "") {
+			if ($this->login_id != "") {
+				$user = new user;
+				$err = $user->select("email=" . _sql($this->login_id) . " OR login_id=" . _sql($this->login_id));
+				if ($err == ERR_OK && $user->password == md5($this->password) && $this->password != null)
+					$logined = $user->activate_flag == ACTIVATED ? ERR_OK : ERR_USER_UNACTIVATED;
+			}
+			else if ($this->email != "") {
 				$user = new user;
 				$err = $user->select("email=" . _sql($this->email) . " OR login_id=" . _sql($this->email));
 				if ($err == ERR_OK && $user->password == md5($this->password) && $this->password != null)
@@ -173,6 +190,36 @@
 			}
 
 			return $logined;
+		}
+
+		public function post_login($home_id=null)
+		{
+			$planconfig = new planconfig($this->plan_type);	
+
+			if ($home_id != null)
+				$last_home = home::last_home($home_id);
+			else
+				$last_home = home::last_home();
+
+			$ret = array(
+				"session_id" => session_id(),
+				"user_id" => $this->user_id, 
+				"user_name" => $this->user_name,
+				"login_id" => $this->login_id,
+				"email" => $this->email,
+				"avartar" => _avartar_full_url($this->user_id),
+				"language" => $this->language,
+				"time_zone" => $this->time_zone,
+				"plan" => $planconfig->props,
+				"plan_end_date" => $this->plan_end_date,
+				"cur_home" => $last_home,
+				"alerts" => user::get_alerts($this->user_id),
+				"unreads" => cunread::all($this->user_id),
+				"chat_uri" => _chat_uri(),
+				"cache_uris" => _cache_uris()
+			);
+
+			return $ret;
 		}
 
 		public function checkPlan()
@@ -250,16 +297,27 @@
 			_send_mail($this->email, $this->user_name, $title, $body, true);
 		}
 
+		public static function cache_id_of_user_name($user_id)
+		{
+			return "00un" . $user_id;
+		}
+
 		public static function get_user_name($user_id)
 		{
 			if ($user_id == null)
 				return "";
 
+			$cache_id = static::cache_id_of_user_name($user_id);
+			$user_name = _cache_get($cache_id);
+
+			if ($user_name != null)
+				return $user_name;
+
 			$user = user::getModel($user_id);
-			if ($user == null)
-				return "";
-			else
-				return $user->user_name;
+			$user_name = $user == null ? "" : $user->user_name;
+			_cache_set($cache_id, $user_name);
+
+			return $user_name;
 		}
 
 		public static function get_total_file_size()

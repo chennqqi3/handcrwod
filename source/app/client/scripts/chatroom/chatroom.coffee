@@ -62,6 +62,12 @@ angular.module('app.chatroom', [])
 
             $rootScope.cmsg_sn -= 1
 
+            $timeout(->
+                $rootScope.$broadcast('elastic:adjust')
+                ta = angular.element('#chat_ta')            
+                $scope.$emit 'elastic:resize', ta
+            , 1000)
+
         $scope.clear_cmsg = (clear_storage) ->
             $scope.cmsg = 
                 cmsg_id: $rootScope.cmsg_sn
@@ -103,11 +109,15 @@ angular.module('app.chatroom', [])
 
         $scope.load_messages = (messages) ->
             $scope.messages = messages
+
             ## refresh message list
-            $scope.loaded = false
-            $timeout(->
-                $scope.loaded = true
-            )
+            html = chatStorage.messages_to_html($scope.messages, $scope.chat_id)
+            div_messages = angular.element('#chat_main #messages')
+            div_messages.html(html)
+            $compile(div_messages.contents())($scope)
+
+            $('#chat_main #loader').hide()
+            $scope.initEventHandler()
 
             length = $scope.messages.length
             if length > 0
@@ -701,7 +711,12 @@ angular.module('app.chatroom', [])
                 $('#chat_' + message.temp_cmsg_id).remove()
 
             # build html
-            if ($('#chat_' + message.cmsg_id).length > 0)
+            len = $('#chat_' + message.cmsg_id).length
+            if (len > 0)
+                # fix twice display of message
+                if (len > 1)
+                    for i in [1..len-1]
+                        $('#chat_' + message.cmsg_id + ':eq(' + i + ')').remove()
                 message_html = chatStorage.message_to_html(message, $scope.chat_id, false)
                 $('#chat_' + message.cmsg_id).html(message_html)
                 $compile($('#chat_' + message.cmsg_id).contents())($scope)
@@ -756,9 +771,12 @@ angular.module('app.chatroom', [])
                 else if length == 1
                     $scope.last_cid = cmsg.cmsg_id
 
-                $scope.$apply()
+                #$scope.$apply()
 
                 $scope.initEventHandler()
+
+                if $rootScope.windowState == 'visible'
+                    $scope.startReadTimer(read_timer)
                 return
         )
 
@@ -1052,32 +1070,33 @@ angular.module('app.chatroom', [])
                                 readIds.push(message.cmsg_id)
 
                 if(readIds.length > 0)
+                    for message in messages
+                        if readIds.indexOf(message.cmsg_id) != -1
+                            message.unread = false
+                            message.read_class = "unread read"
+                            if $('#chat_' + message.cmsg_id).length > 0
+                                $('#chat_' + message.cmsg_id + ' .unread-mark i').addClass(message.read_class)
+                            delta = -1
+                            delta_to = 0
+                            message.to_flag = chatStorage.is_to_mine(message)
+                            if message.to_flag
+                                delta_to = -1
+                            $rootScope.cur_mission.unreads += delta
+                            $rootScope.cur_mission.to_unreads += delta_to
+                            $rootScope.cur_home.unreads += delta
+                            $rootScope.cur_home.to_unreads += delta_to
+                            $rootScope.$broadcast('unread-message', $rootScope.cur_mission)
+                            ###
+                            if $rootScope.cur_mission.private_flag == 3
+                                $rootScope.bot_mission.unreads--
+                            ###
+
+                    missionStorage.set_mission($rootScope.cur_mission)
+                    chatStorage.refresh_unreads_title()
+
                     chatStorage.read_messages($scope.mission_id, readIds)
                         .then((data) ->
                             if data.err_code == 0
-                                for message in messages
-                                    if readIds.indexOf(message.cmsg_id) != -1
-                                        message.unread = false
-                                        message.read_class = "unread read"
-                                        if $('#chat_' + message.cmsg_id).length > 0
-                                            $('#chat_' + message.cmsg_id + ' .unread-mark i').addClass(message.read_class)
-                                        delta = -1
-                                        delta_to = 0
-                                        message.to_flag = chatStorage.is_to_mine(message)
-                                        if message.to_flag
-                                            delta_to = -1
-                                        $rootScope.cur_mission.unreads += delta
-                                        $rootScope.cur_mission.to_unreads += delta_to
-                                        $rootScope.cur_home.unreads += delta
-                                        $rootScope.cur_home.to_unreads += delta_to
-                                        $rootScope.$broadcast('unread-message', $rootScope.cur_mission)
-                                        ###
-                                        if $rootScope.cur_mission.private_flag == 3
-                                            $rootScope.bot_mission.unreads--
-                                        ###
-
-                                missionStorage.set_mission($rootScope.cur_mission)
-                                chatStorage.refresh_unreads_title()
                             else
                                 logger.logError(data.err_msg)
                         )
@@ -1356,31 +1375,31 @@ angular.module('app.chatroom', [])
 
                         missionStorage.set_cur_mission(res.mission)
                         $scope.refreshBackImage()
-
-                        if load_chat_message
-                            $scope.init_cmsg()
-                            chatStorage.messages($scope.mission_id, $scope.chat_id)
-                                .then((messages) ->
-                                    chatStorage.cache_messages($scope.mission_id, messages)
-                                    $scope.load_messages(messages)
-                                    if messages.length == 0 && !$api.is_empty($scope.chat_id)
-                                        # in case of first message, goto next message
-                                        chatStorage.messages($scope.mission_id, null, $scope.chat_id)
-                                            .then((messages) ->
-                                                chatStorage.cache_messages($scope.mission_id, messages)
-                                                $scope.load_messages(messages)
-                                            )
-
-                                )
-
-                            taskStorage.search($scope.mission_id).then((tasks) ->
-                                ##if tasks.length > 0 && !$scope.show_process
-                                ##    $scope.showProcess()
-                            )
                     else 
                         logger.logError(res.err_msg)
                         $location.path('/home')
                 )
+
+                if load_chat_message
+                    $scope.init_cmsg()
+                    chatStorage.messages($scope.mission_id, $scope.chat_id)
+                        .then((messages) ->
+                            chatStorage.cache_messages($scope.mission_id, messages)
+                            $scope.load_messages(messages)
+                            if messages.length == 0 && !$api.is_empty($scope.chat_id)
+                                # in case of first message, goto next message
+                                chatStorage.messages($scope.mission_id, null, $scope.chat_id)
+                                    .then((messages) ->
+                                        chatStorage.cache_messages($scope.mission_id, messages)
+                                        $scope.load_messages(messages)
+                                    )
+
+                        )
+
+                    taskStorage.search($scope.mission_id).then((tasks) ->
+                        ##if tasks.length > 0 && !$scope.show_process
+                        ##    $scope.showProcess()
+                    )
         
         $scope.sync()
 
@@ -1570,28 +1589,5 @@ angular.module('app.chatroom', [])
                     return
                 return
 
-        }
-)
-.directive('messageList', 
-    ($compile, chatStorage, $timeout, $rootScope) ->
-        getTemplate = (scope) ->
-            # build html
-            return chatStorage.messages_to_html(scope.messages, scope.chat_id);
-
-        linker = (scope, element, attrs) ->
-            element.html(getTemplate(scope.$parent))
-            $compile(element.contents())(scope)
-
-            $timeout(->
-                $('#loader').hide()
-                $rootScope.$broadcast('elastic:adjust')
-                if (scope.$parent)
-                    scope.$parent.initEventHandler()
-            , 1000)
-
-        return {
-            restrict: "E"
-            replace: true
-            link: linker
         }
 )

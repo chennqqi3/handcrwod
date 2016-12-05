@@ -49,6 +49,18 @@ angular.module('app.auth', [])
                     }))
             catch err
 
+        this.signinParamsFromStorage = ->
+            try 
+                return JSON.parse(localStorage.getItem('signin_params') || {})
+            catch err
+                return {}
+
+        this.signinParamsToStorage = (params)->
+            try 
+                localStorage.setItem('signin_params', JSON.stringify(params))                
+            catch err
+                return {}
+
         $rootScope.$on('select-mission', () ->
             $this.statesToStorage()
         )
@@ -84,11 +96,12 @@ angular.module('app.auth', [])
             this.time_zone = data.time_zone
             this.states = {}
             this.planconfig = data.plan
-            $rootScope.cur_home = data.cur_home
             $rootScope.alerts = data.alerts
+            $rootScope.unreads = data.unreads
             $rootScope.chat_uri = data.chat_uri
-            this.setCurHome(data.cur_home, false)
-            this.setCurMission(data.cur_mission, false)
+            $rootScope.cache_uris = data.cache_uris
+            $rootScope.cache_uri = $rootScope.cache_uris[Math.floor(Math.random() * $rootScope.cache_uris.length)]
+
             this.statesToStorage()
 
             encoded = sjcl.encrypt("hc2015", JSON.stringify(
@@ -111,6 +124,13 @@ angular.module('app.auth', [])
             this.time_zone = null
             this.states = null
             this.planconfig = null
+            $rootScope.homes = []
+            $rootScope.cur_home = null
+            $rootScope.missions = []
+            $rootScope.cur_mission = null
+            $rootScope.tasks = []
+            $rootScope.alerts = []
+            $rootScope.unreads = []
 
             try
                 localStorage.setItem(SESSION, null)
@@ -120,40 +140,11 @@ angular.module('app.auth', [])
             return '' if this.user_id == undefined || this.session_id == undefined || this.user_id == null || this.session_id == null
             return this.user_id + ":" + this.session_id
 
-        this.setCurHome = (home, toStorage) ->
-            if toStorage == undefined
-                toStorage = true
-            old_home_id = null
-            new_home_id = null
-            if $rootScope.cur_home == undefined
-                $rootScope.cur_home = null
-
-            if $rootScope.cur_home != null
-                old_home_id = $rootScope.cur_home.home_id
-            if home != null && home.home_id != null
-                new_home_id = home.home_id
-            $rootScope.cur_home = home
-
-            if toStorage
-                $this.statesToStorage()
-            
-            if old_home_id != new_home_id
-                $rootScope.$broadcast('select-home')
-            return
-
-        this.setCurMission = (mission, toStorage) ->
-            if toStorage == undefined
-                toStorage = true
-            $rootScope.cur_mission = mission
-            if toStorage
-                $this.statesToStorage()
-            return
-
         return this
 )
 
 .factory('$auth', 
-    ($api, $session, $rootScope, $location, $http, AUTH_EVENTS, CONFIG, logger) ->
+    ($api, $session, $rootScope, $location, $http, AUTH_EVENTS, CONFIG, logger, missionStorage, homeStorage) ->
         authService = {}
 
         authService.autoLogin = (session_id, authorizedRoles, event) ->            
@@ -175,21 +166,10 @@ angular.module('app.auth', [])
                 $api.call('user/get_profile', { TOKEN: token, 'cur_home_id': cur_home_id })
                     .success((data, status, headers, config) ->
                         if data.err_code == 0
-                            $session.create(
-                                session_id: session_id
-                                user_id: data.user.user_id
-                                user_role: 'user'
-                                user_name: data.user.user_name
-                                email: data.user.email
-                                avartar: data.user.avartar
-                                language: data.user.language
-                                time_zone: data.user.time_zone
-                                plan: data.user.plan
-                                cur_home: data.user.cur_home
-                                cur_mission: if states.cur_mission != null then states.cur_mission else null
-                                alerts: data.user.alerts
-                                chat_uri: data.user.chat_uri
-                            )
+                            $session.create(data.user)
+
+                            homeStorage.set_cur_home(data.user.cur_home, false)
+                            missionStorage.set_cur_mission((if states.cur_mission != null then states.cur_mission else null), false)
 
                             $rootScope.$broadcast('reload_session')
                             if path.indexOf('/signin') == 0
@@ -227,7 +207,48 @@ angular.module('app.auth', [])
                 .then((res) ->
                     if res.data.err_code == 0
                         $session.create(res.data)
+                        homeStorage.set_cur_home(res.data.cur_home, false)
+                        missionStorage.set_cur_mission(res.data.cur_mission, false)
                     return res.data.err_code
+                )
+
+        authService.signup = (user, callback) ->
+            return $api
+                .call('user/signup', user)
+                .then((res) ->
+                    if res.data.err_code == 0
+                        $session.create(res.data)
+                        homeStorage.set_cur_home(res.data.cur_home, false)
+                        missionStorage.set_cur_mission(res.data.cur_mission, false)
+                    
+                    if callback != undefined
+                        callback(res.data)
+                )
+
+        authService.signupGoogle = (user, callback) ->
+            return $api
+                .call('google/register', user)
+                .then((res) ->
+                    if res.data.err_code == 0
+                        $session.create(res.data)
+                        homeStorage.set_cur_home(res.data.cur_home, false)
+                        missionStorage.set_cur_mission(res.data.cur_mission, false)
+                    
+                    if callback != undefined
+                        callback(res.data)
+                )
+
+        authService.signupFacebook = (user, callback) ->
+            return $api
+                .call('facebook/register', user)
+                .then((res) ->
+                    if res.data.err_code == 0
+                        $session.create(res.data)
+                        homeStorage.set_cur_home(res.data.cur_home, false)
+                        missionStorage.set_cur_mission(res.data.cur_mission, false)
+                    
+                    if callback != undefined
+                        callback(res.data)
                 )
         
         authService.activate = (credentials) ->
@@ -236,6 +257,8 @@ angular.module('app.auth', [])
                 .then((res) ->
                     if res.data.err_code == 0
                         $session.create(res.data)
+                        homeStorage.set_cur_home(res.data.cur_home, false)
+                        missionStorage.set_cur_mission(res.data.cur_mission, false)
                     return res.data
                 )
 
@@ -247,6 +270,8 @@ angular.module('app.auth', [])
                 .then((res) ->
                     if res.data.err_code == 0
                         $session.create(res.data)
+                        homeStorage.set_cur_home(res.data.cur_home, false)
+                        missionStorage.set_cur_mission(res.data.cur_mission, false)
                     return res.data.err_code
                 )
         
@@ -258,6 +283,8 @@ angular.module('app.auth', [])
                 .then((res) ->
                     if res.data.err_code == 0
                         $session.create(res.data)
+                        homeStorage.set_cur_home(res.data.cur_home, false)
+                        missionStorage.set_cur_mission(res.data.cur_mission, false)
                     return res.data.err_code
                 )
 

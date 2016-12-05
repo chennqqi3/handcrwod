@@ -1,8 +1,8 @@
 angular.module('app.service.chat', [])
 
 .service('$chat', 
-    ($rootScope, $session, chatStorage, userStorage, $http, 
-        CONFIG, logger, $location, $timeout, $interval, AUTH_EVENTS, $websocket, $api, chatizeService) ->
+    ($rootScope, $session, chatStorage, userStorage, $http, CONFIG, logger, 
+        $location, $timeout, $interval, AUTH_EVENTS, $websocket, $api, $cache, chatizeService) ->
         $this = this
         $this.socket = null
         $this.out_queue = []
@@ -39,42 +39,66 @@ angular.module('app.service.chat', [])
             )
 
             $this.socket.$on('chat_message', (cmsg) ->
-                found_mission = false
-                if $rootScope.cur_home.home_id == cmsg.home_id
-                    angular.forEach $rootScope.missions, (mission) ->
-                        if mission.mission_id == cmsg.mission_id
-                            found_mission = true
-                            if $session.user_id != cmsg.user_id
-                                mission.unreads++
-                                mission.visible = true
-                                $rootScope.$apply()
-                                $rootScope.$broadcast('unread-message', mission)
-                        return
+                found_home = false
+                $cache.get_message(cmsg.cache_id, (res) ->
+                    cmsg.content = res.content
 
-                angular.forEach $rootScope.homes, (home) ->
-                    if home.home_id == cmsg.home_id
-                        if $session.user_id != cmsg.user_id
-                            home.unreads++
-                            $rootScope.$apply()
-                            chatStorage.sound_alert()
-                    return
+                    if $session.user_id != cmsg.user_id
+                        unread = chatStorage.get_unread(cmsg)
 
-                chatStorage.reorder_home_mission(cmsg.home_id, cmsg.mission_id)
+                        delta_unreads = 0
+                        delta_to_unreads = 0
 
-                if !found_mission
-                    $rootScope.$broadcast('refresh-homes')
+                        cmsg.to_flag = chatStorage.is_to_mine(cmsg)
+                        if !unread
+                            delta_unreads = 1
+                        if !unread || unread && !unread.to_flag
+                            if cmsg.to_flag
+                                delta_to_unreads = 1
 
-                if $rootScope.windowState == 'hidden' && cmsg.push_flag
-                    title = ''
-                    if cmsg.user_name != null
-                        title = cmsg.user_name + "さん  "
-                    title += '(ハンドクラウド'
-                    if cmsg.home_name != null
-                        title += ":" + cmsg.home_name
-                    title += ")"
-                    $api.show_notification(CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg", title, chatizeService.strip(cmsg.content), "/chats/" + cmsg.mission_id)
+                        if $rootScope.cur_home.home_id == cmsg.home_id && $rootScope.missions
+                            for mission in $rootScope.missions
+                                if mission.mission_id == cmsg.mission_id
+                                    mission.unreads += delta_unreads
+                                    mission.to_unreads += delta_to_unreads
+                                    if delta_unreads > 0 || delta_to_unreads > 0
+                                        chatStorage.set_unread(cmsg)
+                                    mission.visible = true
+                                    $rootScope.$broadcast('unread-message', mission)
 
-                $rootScope.$broadcast('receive_message', cmsg)
+                        if delta_unreads > 0 && $rootScope.homes
+                            for home in $rootScope.homes
+                                if home.home_id == cmsg.home_id
+                                    found_home = true
+                                    home.unreads += delta_unreads
+                                    home.to_unreads += delta_to_unreads
+                                    #$rootScope.$apply()
+                                    chatStorage.sound_alert()
+                                    $rootScope.$broadcast('refresh-home', home)
+                    else
+                        found_home = true
+                    
+                    chatStorage.reorder_home_mission(cmsg.home_id, cmsg.mission_id)
+
+                    if !found_home
+                        $rootScope.$broadcast('refresh-homes')
+
+                    if $rootScope.windowState == 'hidden' && cmsg.push_flag
+                        title = ''
+                        if cmsg.user_name != null
+                            title = cmsg.user_name + "さん  "
+                        title += '(ハンドクラウド'
+                        if cmsg.home_name != null
+                            title += ":" + cmsg.home_name
+                        title += ")"
+                        $api.show_notification(CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg", title, chatizeService.strip(cmsg.content), "/chats/" + cmsg.mission_id)
+                    $rootScope.$broadcast('receive_message', cmsg)
+                )
+            )
+
+            $this.socket.$on('react_message', (cmsg) ->
+                if $rootScope.cur_mission.mission_id == cmsg.mission_id
+                    $rootScope.$broadcast('react_message', cmsg)
             )
 
             $this.socket.$on('remove_message', (cmsg) ->
@@ -153,15 +177,27 @@ angular.module('app.service.chat', [])
 
         $this.send = (cmsg_id, home_id, mission_id, content, to_id, is_file) ->
             if $this.socket != null
+                $cache.set_message(null, content, (res) ->
+                    cache_id = res.cache_id
+                    if cache_id
+                        msg = 
+                            cmsg_id: cmsg_id
+                            home_id: home_id
+                            mission_id: mission_id
+                            cache_id: cache_id
+                            to_id: to_id
+                            is_file: is_file
+                            home_name: $rootScope.cur_home.home_name
+                        $this.emit('chat_message', msg)
+                )
+
+        $this.react = (cmsg_id, mission_id, emoticon_id) ->
+            if $this.socket != null
                 msg = 
                     cmsg_id: cmsg_id
-                    home_id: home_id
                     mission_id: mission_id
-                    content: content
-                    to_id: to_id
-                    is_file: is_file
-                    home_name: $rootScope.cur_home.home_name
-                $this.emit('chat_message', msg)
+                    emoticon_id: emoticon_id
+                $this.emit('react_message', msg)
 
         $this.remove = (cmsg_id, mission_id) ->
             if $this.socket != null

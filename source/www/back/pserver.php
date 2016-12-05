@@ -8,6 +8,7 @@
     ---------------------------------------------------*/
     
     define('OB_DISABLE',        true);
+    define('DEFAULT_PHP',       'pserver.php');
 
     require_once("include/utility.php");
 
