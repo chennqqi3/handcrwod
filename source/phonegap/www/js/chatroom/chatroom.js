@@ -41,7 +41,8 @@ angular.module('app.chatroom', [])
             if (msg == undefined || msg == 'undefined')
                 msg = '';
 
-            $scope.cmsg.content = msg;
+            if (msg != '')
+                $scope.cmsg.content = msg;
         }
         $scope.init_cmsg = function() {
             $scope.cmsg = {
@@ -113,7 +114,6 @@ angular.module('app.chatroom', [])
 
             $('#messages').html(messages_html);
 
-            $scope.scrollToBottom(false);
             length = $scope.messages.length;
             if (length > 0) {
                 $scope.last_cid = $scope.messages[length - 1].cmsg_id;
@@ -125,8 +125,12 @@ angular.module('app.chatroom', [])
             {
                 $timeout(function() {
                     $scope.scrollToMessage($scope.chat_id);
-                    $scope.chat_id = null;
                 });                                        
+            }
+            else {
+                $timeout(function() {
+                    $scope.scrollToBottom(false);
+                });
             }
 
             $scope.initEventHandler();  
@@ -1387,7 +1391,7 @@ angular.module('app.chatroom', [])
 
                 $scope.init_cmsg();
                 //$chat.messages($scope.mission_id);
-                chatStorage.messages($scope.mission_id).then(function(messages) {
+                chatStorage.messages($scope.mission_id, $scope.chat_id).then(function(messages) {
                     $timeout(function() {
                         $('#loader').hide();
                     }, 1000)
@@ -1415,6 +1419,15 @@ angular.module('app.chatroom', [])
                     $scope.chat_id = parseInt($stateParams.chat_id, 10);
                     chatStorage.cache_messages($scope.mission_id, messages);
                     $scope.load_messages(messages);
+                    if (messages.length == 0 && !$api.is_empty($scope.chat_id)) {
+                        alert($scope.chat_id);
+                        // in case of first message, goto next message
+                        chatStorage.messages($scope.mission_id, null, $scope.chat_id)
+                            .then(function(messages) {
+                                chatStorage.cache_messages($scope.mission_id, messages);
+                                $scope.load_messages(messages);
+                            });
+                    }
                 });
 
                 $timeout(function() {
@@ -1452,9 +1465,9 @@ angular.module('app.chatroom', [])
 
             scroller.style.bottom = bottom + "px";
 
-            $('#emoticon_gallery').css('bottom', footerHeight + "px");
-            $('#to_users').css('bottom', footerHeight + "px");
-            $('#file_bar').css('bottom', footerHeight + "px");
+            $('#emoticon_gallery').css('bottom', bottom + "px");
+            $('#to_users').css('bottom', bottom + "px");
+            $('#file_bar').css('bottom', bottom + "px");
 
             var pos = viewScroll.getScrollPosition();
             pos.top += (bottom - old_bottom);

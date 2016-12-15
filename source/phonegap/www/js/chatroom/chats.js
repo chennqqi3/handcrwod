@@ -189,9 +189,6 @@ angular.module('app.chat.list', [])
         }
     };
     $scope.onMessageHold = function(e, itemIndex, message) {
-        console.log('onMessageHold');
-        console.log('message: ' + JSON.stringify(message, null, 2));
-
         var buttons = [{
                 text: '<i class="ion-share icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージへ移動</i>'
             }];
@@ -275,6 +272,7 @@ angular.module('app.chat.list', [])
                             if (res.err_code == 0) {
                                 $rootScope.$broadcast('refresh-missions', res.mission_id);
                                 logger.logSuccess('新しいチャットルームが作成されました。');
+                                $state.transitionTo("tab.chatroom", {mission_id: res.mission_id});
                             }
                             else
                                 logger.logError(res.err_msg);

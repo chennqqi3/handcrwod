@@ -9,7 +9,7 @@
 
     <ion-content  id="chat_view" delegate-handle="userMessageScroll" on-scroll-complete="onMessageScrollComplete()">
         <div ng-repeat="message in messages" class="message-wrapper" on-hold="onMessageHold($event, $index, message)">
-            <div id="chat_{{message.cmsg_id}}">
+            <div id="s_chat_{{message.cmsg_id}}">
                 <img ng-click="viewProfile(message)" class="profile-pic avartar left" ng-src="{{message.avartar}}" ng-if="message.show_avartar"/>
 
                 <div class="chat-message left" ng-class="{'me': session.user_id == message.user_id, 'border-top': message.show_avartar, 'editing': message.editing}">
