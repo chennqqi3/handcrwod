@@ -28,7 +28,7 @@
             <input type="text" class="form-control" ng-model="search_user" maxlength="50" placeholder="検索...">
         </label>
         <ul class="user-list">
-            <li data-ng-repeat="member in cur_mission.members | filter:{user_name:search_user}" ng-click="to_message(member)">
+            <li data-ng-repeat="member in cur_mission.members | filter:{user_name:search_user}" ng-click="to_message(member)" ng-if="member.user_id!=session.user_id">
                 <img ng-src="{{member.avartar}}" class="avartar img30_30">
                 {{member.user_name}}
             </li>
@@ -80,7 +80,7 @@
 </ion-view>
 
 <script id="chatroom-menu.html" type="text/ng-template">
-    <ion-popover-view style="height:340px">
+    <ion-popover-view style="height:390px">
         <ion-content>
             <ion-list>
                 <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".summary({mission_id:mission_id})"><i class="icon icon-notebook"></i>概要</ion-item>

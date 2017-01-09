@@ -24,7 +24,7 @@ a:hover {
     background-color: rgba(0,0,0,0) !important;
 }
 
-.row {
+.ionic-datepicker .row {
     margin-left: 0px;
     margin-right: 0px;
 }
@@ -129,6 +129,22 @@ a:hover {
 }
 
 .login-page .item-button button {
+    margin: 0px;
+}
+
+.login-page .item-row {
+    background: rgba(0,0,0,0);
+    border: none 0px;
+    margin: 10px;
+    padding: 0px;
+    margin-right: -20px;
+}
+
+.login-page .item-row .row {
+    display: block;
+    padding: 0px;
+}
+.login-page .item-row .row .button {
     margin: 0px;
 }
 

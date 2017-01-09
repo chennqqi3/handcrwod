@@ -128,11 +128,14 @@ angular.module('app.mission.member', [])
                     if (closeModal) {                     
                         $scope.closeAddFromEmail();   
                         $timeout(function() {
-                            $ionicHistory.goBack();    
+                            $ionicHistory.goBack();  
+                            $scope.close_search_member();  
                         })
                     }
-                    else
+                    else {
                         $ionicHistory.goBack();
+                        $scope.close_search_member();
+                    }
                     $rootScope.$broadcast("synced-server");
                 }
                 else

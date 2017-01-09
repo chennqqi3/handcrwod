@@ -6,7 +6,8 @@ angular.module('app.chatroom', [])
     function($scope, $rootScope, $state, $stateParams, 
         $ionicActionSheet, $ionicModal, $session,
         missionStorage, chatStorage, taskStorage, homeStorage, $chat, $ionicPopover, chatizeService,
-        $ionicPopup, $ionicScrollDelegate, $timeout, $interval, $api, logger, $dateutil, CONFIG, $compile) {
+        $ionicPopup, $ionicScrollDelegate, $timeout, $interval, $api, logger, $dateutil, CONFIG, $compile, $cordovaFile, $cordovaFileTransfer) {
+
         $rootScope.nav_id = "chatroom_" + $stateParams.mission_id;
         $scope.isAndroid = ionic.Platform.isAndroid(); 
 
@@ -841,8 +842,14 @@ angular.module('app.chatroom', [])
                     url = $(this).attr('preview-image');
                     $scope.modalPreviewImage.show();
                     $('#preview_view #board img').remove();
+                    $('#preview_download button').remove();
                     $('#preview_view #board').append("<img width='100%' src='" + url + "'>");
                     $('#preview_view').css('height', window.screen.height - 44); // header height: 44px
+                    // Add Button and bind to download_image
+                    $('#preview_download').append("<button class='button'>ダウンロード</button>");
+                    $('#preview_download button').on('click', function(){
+                        download_image(url);
+                    });
                 });
 
                 $('.message-wrapper').off('hold').on("hold", function(e) {
@@ -1344,6 +1351,7 @@ angular.module('app.chatroom', [])
         $scope.showUserProfile = function(url) {
             $scope.modalPreviewImage.show();
             $('#preview_view #board img').remove();
+            $('#preview_download button').remove();
             $('#preview_view #board').append("<img width='100%' src='" + url + "'>");
             $('#preview_view').css('height', window.screen.height - 44); // header height: 44px
             return;
@@ -1420,7 +1428,6 @@ angular.module('app.chatroom', [])
                     chatStorage.cache_messages($scope.mission_id, messages);
                     $scope.load_messages(messages);
                     if (messages.length == 0 && !$api.is_empty($scope.chat_id)) {
-                        alert($scope.chat_id);
                         // in case of first message, goto next message
                         chatStorage.messages($scope.mission_id, null, $scope.chat_id)
                             .then(function(messages) {
@@ -1449,6 +1456,30 @@ angular.module('app.chatroom', [])
         };
         
         $scope.sync();
+
+        function download_image(url) {
+            var filename = url.split("/").pop();
+            var directory = cordova.file.cacheDirectory;
+            var targetPath = directory  + filename;
+
+            $cordovaFileTransfer.download(url, targetPath, {}, true).then(function (result) {                
+                $scope.hasil = 'Save file on '+targetPath+' success!';
+                $scope.mywallpaper=targetPath;
+                window.cordova.plugins.imagesaver.saveImageToGallery(targetPath, onSaveImageSuccess, onSaveImageError);
+                function onSaveImageSuccess() {
+                    console.log('--------------success');
+                    $cordovaFile.removeFile(directory, $filename);
+                }
+                function onSaveImageError(error) {
+                    console.log('--------------error: ' + error);
+                    $cordovaFile.removeFile(directory, $filename);
+                }
+            }, function (error) {
+                $scope.hasil = 'Error Download file';
+            }, function (progress) {
+                $scope.downloadProgress = (progress.loaded / progress.total) * 100;
+            });
+        };
 
         function resizeLayout() {
             var bottom = keyboardHeight + footerHeight;

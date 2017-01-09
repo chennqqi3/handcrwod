@@ -189,6 +189,9 @@ angular.module('app.chat.list', [])
         }
     };
     $scope.onMessageHold = function(e, itemIndex, message) {
+        console.log('onMessageHold');
+        console.log('message: ' + JSON.stringify(message, null, 2));
+
         var buttons = [{
                 text: '<i class="ion-share icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージへ移動</i>'
             }];

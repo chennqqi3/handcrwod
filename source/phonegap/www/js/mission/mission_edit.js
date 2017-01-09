@@ -9,7 +9,6 @@ angular.module('app.mission.edit', [])
 
         $scope.init = function() {
             $scope.mission_id = parseInt($stateParams.mission_id, 10);
-            $scope.qr_image_url = $api.qr_image_url("https://www.handcrowd.com/app/#/chats/" + $scope.mission_id)
 
             missionStorage.get($scope.mission_id, function(res) {
                 if (res.err_code == 0) {
@@ -19,6 +18,7 @@ angular.module('app.mission.edit', [])
                     $scope.mission.org_push_flag = $scope.mission.push_flag;
                     $scope.mission.total_budget = 0;
                     $scope.mission.total_hours = 0;
+                    $scope.qr_image_url = $api.qr_image_url("https://www.handcrowd.com/app/#/qr/chat/" + $scope.mission_id + "/" + $scope.mission.invite_key)
                 }
                 else
                     logger.logError(res.err_msg)
