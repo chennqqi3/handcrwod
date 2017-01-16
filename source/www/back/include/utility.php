@@ -143,7 +143,7 @@
 			}
 
 			$classPath = explode('\\', $class_name);
-			if ($classPath[0] == 'WebSocket')
+			if ($classPath[0] == 'WebSocket' || $classPath[0] == 'Wrench')
 			{
 				$filePath = 'include/plugins/' . implode('/', $classPath) . '.php';
 				if (file_exists($filePath)) {

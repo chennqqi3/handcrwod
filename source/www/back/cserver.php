@@ -3,29 +3,63 @@
         Project Name:       HandCrowd
         Developement:       
         Author:             Ken
-        Date:               2015/09/15
+        Date:               2017/01/11
         Module Name:        Chat server
     ---------------------------------------------------*/
     
     define('OB_DISABLE',        true);
-    define('DEFAULT_PHP',       'cserver.php');
+    define('DEFAULT_PHP',       'eserver.php');
 
     require_once("include/utility.php");
 
-    ini_set('display_errors', 1);
-    error_reporting(E_ALL);
+	ini_set('display_errors', 1);
+	error_reporting(E_ALL);
 
-    class ChatServer extends \WebSocket\Application\Application
-    {
+	use Wrench\Exception\BadRequestException;
+
+	class ChatServer extends Wrench\Application\Application
+	{
         private $_clients = array();
         private $_users = array();
+	
+		protected function _encodeData($event, $data)
+		{
+			if(empty($event))
+			{
+				return false;
+			}
+			
+			$payload = array(
+				'event' => $event,
+				'data' => $data
+			);
+			
+			return _json_encode($payload);
+		}
+	
+		protected function _decodeData($data)
+		{
+			$decodedData = json_decode($data, true);
+			if($decodedData === null)
+			{
+				return false;
+			}
+			
+			if(isset($decodedData['event'], $decodedData['data']) === false)
+			{
+				return false;
+			}
+			
+			return $decodedData;
+		}
 
-        public function onConnecting($client, $params)
-        {
+		public function onConnecting($client)
+		{
+			$params = $client->getParams();
             $user_id = null;
-            if (count($params) > 1)
+            if (count($params) > 0)
             {
-                $user_id = $params[1];
+                $user_id = $params[0];
                 $u = user::getModel($user_id);
                 if ($u == null)
                 {
@@ -34,25 +68,24 @@
             }
 
             if ($user_id == null) {
-                $client->log("Invalid user");
-                return false;
+                throw new BadRequestException('Invalid user');
             }
 
-            if (count($params) > 2)
+            if (count($params) > 1)
             {
-                $client_key = $params[2];
-                $client_ip = $client->getClientIp();
+                $client_key = $params[1];
+                $client_ip = $client->getIp();
 
                 // close other client (fix avast antivirus block websocket)
                 foreach($this->_clients as $cl) 
                 {
-                    $ip = $cl->getClientIp();
-                    $port = $cl->getClientPort();
+                    $ip = $cl->getIp();
+                    $port = $cl->getPort();
                     $key = $cl->getClientKey();
                     if ($ip == $client_ip && 
                         $key == $client_key) { 
                         $client->log("close blocked socket ip:" . $ip . " port:" . $port . " client_key:" . $client_key);
-                        $cl->close(null);
+                        $cl->close();
                     }
                 }
 
@@ -61,13 +94,12 @@
 
             $client->session("user_id", $user_id);
             $client->session("user_name", $u->user_name);
-            $client->set_last_time();
-            return true;
-        }
+            $client->setLastTime();
+		}
 
         public function onConnect($client)
         {
-            $id = $client->getClientId();
+            $id = $client->getId();
             $this->_clients[$id] = $client;
 
             $user_id = $client->session('user_id');
@@ -83,7 +115,7 @@
             $user_id = $client->session('user_id');
 
             $client->log("Disconnect user_id:" . $user_id);
-            $id = $client->getClientId();
+            $id = $client->getId();
             unset($this->_clients[$id]);
 
             if (isset($this->_users[$user_id])) {
@@ -91,9 +123,12 @@
             }
         }
 
-        public function onData($data, $client)
-        {       
-            $decodedData = $this->_decodeData($data);
+	    /**
+	     * @see Wrench\Application.Application::onData()
+	     */
+	    public function onData($payload, $client)
+	    {
+            $decodedData = $this->_decodeData($payload->getPayload());
             if($decodedData === false)
             {
                 // @todo: invalid request trigger error...
@@ -127,7 +162,7 @@
             {
                 call_user_func(array($this, $actionName), $client, $data);
             }
-        }
+	    }
 
         public function checkAlreadyReceiveMessage($key, $client)
         {
@@ -153,12 +188,14 @@
         }
         
         private function onEcho($client, $text)
-        {       
+        {   
+            /*
             $encodedData = $this->_encodeData('echo', $text);
             foreach($this->_clients as $sendto)
             {
                 $sendto->send($encodedData);
             }
+            */
         }
 
         private function onBot_message($client, $data)
@@ -214,7 +251,7 @@
 
         private function onChat_message($client, $data)
         {
-            $client->set_last_time();
+            $client->setLastTime();
 
             $user_id_from = $client->session('user_id');    //sender id
             $cmsg_id = $data["cmsg_id"];
@@ -500,7 +537,7 @@
                         if ($to_client != null && $client != $to_client)
                             continue;
                         $ret = $client->send($encodedData);
-                        $client->set_last_time(); // set last time
+                        $client->setLastTime(); // set last time
 
                         if ($ret) {
                             if ($must_push)
@@ -581,19 +618,39 @@
                 }
             }
         }
-    }
+	}
 
-    $server = new \WebSocket\Server('0.0.0.0', CSERVER_PORT, CSERVER_SSL);
+    $protocol = "ws";
+    if (CSERVER_SSL)
+        $protocol .= "s";
+    $uri = sprintf("%s://0.0.0.0:%d/", $protocol, CSERVER_PORT);
+    $server = new \Wrench\Server($uri, array(
+        'allowed_origins'            => array(
+            'mysite.localhost'
+        ),
+        'check_origin'               => false,
+        'connection_manager_class'   => 'Wrench\ConnectionManager',
+        'connection_manager_options' => array(
+            'timeout_select'           => 0,
+            'timeout_select_microsec'  => 200000,
+            'socket_master_class'      => 'Wrench\Socket\ServerSocket',
+            'socket_master_options'    => array(
+                'backlog'                => 1000,
+                'ssl_cert_file'          => CSERVER_CERT_PEM,
+                'ssl_passphrase'         => CSERVER_CERT_PASSPHRASE,
+                'ssl_allow_self_signed'  => true,
+                'timeout_accept'         => 5,
+                'timeout_socket'         => 5,
+            ),
+            'connection_class'         => 'Wrench\Connection',
+            'connection_options'       => array(
+                'socket_class'           => 'Wrench\Socket\ServerClientSocket',
+                'socket_options'         => array(),
+                'connection_id_secret'   => 'asu5gj656h64Da(0crt8pud%^WAYWW$u76dwb',
+                'connection_id_algo'     => 'sha512'
+            )
+        )
+    ));
 
-    // server settings:
-    $server->setMaxClients(1000);
-    $server->setCheckOrigin(false);
-    $server->setAllowedOrigin(CSERVER_HOST);
-    $server->setMaxConnectionsPerIp(30);
-    $server->setMaxRequestsPerMinute(2000);
-
-    // Hint: Status application should not be removed as it displays usefull server informations:
-    $server->registerApplication('status', \WebSocket\Application\StatusApplication::getInstance());
-    $server->registerApplication('chat', ChatServer::getInstance());
-
-    $server->run();
+	$server->registerApplication('chat', new ChatServer());
+	$server->run();
