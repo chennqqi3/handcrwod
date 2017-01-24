@@ -217,7 +217,7 @@
 
     #messages>div:first-child {
         .chat-message.border-top {
-            border-top: none;
+            border-top: none !important;
         }   
     }
 
@@ -769,4 +769,11 @@
 .btn-to {
     font-size: 10px;
     line-height: 20px;
+}
+
+#chat_search_view>div:first-child,
+#chat_star_view>div:first-child {
+    .chat-message.border-top {
+        border-top: none !important;
+    }   
 }

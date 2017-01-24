@@ -306,9 +306,10 @@
 
             $cmsg = new cmsg;
 
-            $sql = "SELECT m.*, f.user_name from_name, mi.mission_name  
+            $sql = "SELECT m.*, f.user_name from_name, mi.mission_name, h.home_id, h.home_name, mi.private_flag  
                 FROM t_cmsg m 
                 INNER JOIN t_mission mi ON m.mission_id=mi.mission_id
+                INNER JOIN t_home h ON h.home_id=mi.home_id
                 INNER JOIN t_mission_member mm ON mm.mission_id=m.mission_id AND user_id=" . _sql($user_id) . "
                 LEFT JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
                 LEFT JOIN m_user f ON m.from_id=f.user_id 
@@ -341,6 +342,8 @@
 
             while ($err == ERR_OK)
             {
+                $home_name = ($cmsg->private_flag != CHAT_MEMBER) ? $cmsg->home_name : "";
+                
                 $item = array(
                     "mission_id" => $cmsg->mission_id,  
                     "mission_name" => $cmsg->mission_name,                  
@@ -349,6 +352,8 @@
                     "user_id" => $cmsg->from_id,
                     "user_name" => $cmsg->from_name,
                     "date" => $cmsg->create_time,
+                    "home_id" => $cmsg->home_id,
+                    "home_name" => $home_name
                 );
 
                 if ($order == "ASC")
@@ -384,6 +389,74 @@
             }
 
             return $err;
+        }
+
+        public static function star_messages($user_id, $prev_id, $next_id, $limit=null) 
+        {
+            if ($limit <= 0)
+                $limit = 60;
+            
+            $cmsgs = array();
+
+            $user_names = array();
+
+            $cmsg = new cmsg;
+
+            $sql = "SELECT m.cmsg_id, m.content, m.from_id, m.create_time, m.reacts,mi.mission_id, mi.mission_name, h.home_id, h.home_name, mi.private_flag
+                FROM t_cmsg m 
+                INNER JOIN t_mission mi ON m.mission_id=mi.mission_id
+                INNER JOIN t_home h ON h.home_id=mi.home_id
+                INNER JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
+                WHERE m.del_flag=0 AND mi.del_flag=0"; 
+
+            $order = "DESC";
+            if (!_is_empty($prev_id)) {
+                // load prev
+                $sql .= " AND m.cmsg_id < " . _sql($prev_id);
+            }
+            else if (!_is_empty($next_id)) {
+                // load next
+                $sql .= " AND m.cmsg_id > " . _sql($next_id);
+                $order = "ASC";
+            }
+
+            $sql .= " ORDER BY m.cmsg_id " . $order . " LIMIT " . $limit;
+                
+            $err = $cmsg->query($sql);
+
+            while ($err == ERR_OK)
+            {
+                if (isset($user_names[$cmsg->from_id]))
+                    $from_name = $user_names[$cmsg->from_id];
+                else {
+                    $from_name = user::get_user_name($cmsg->from_id);
+                    $user_names[$cmsg->from_id] = $from_name;
+                }
+
+                $home_name = ($cmsg->private_flag != CHAT_MEMBER) ? $cmsg->home_name : "";
+
+                $item = array(
+                    "cmsg_id" => $cmsg->cmsg_id,
+                    "content" => $cmsg->content,
+                    "user_id" => $cmsg->from_id,
+                    "user_name" => $from_name,
+                    "date" => $cmsg->create_time,
+                    "reacts" => json_decode($cmsg->reacts),
+                    "mission_id" => $cmsg->mission_id,
+                    "mission_name" => $cmsg->mission_name,
+                    "home_id" => $cmsg->home_id,
+                    "home_name" => $home_name
+                );
+
+                if ($order == "DESC")
+                    array_splice($cmsgs, 0, 0, array($item));
+                else
+                    array_push($cmsgs, $item);
+
+                $err = $cmsg->fetch();
+            }
+
+            return $cmsgs;
         }
 
     };

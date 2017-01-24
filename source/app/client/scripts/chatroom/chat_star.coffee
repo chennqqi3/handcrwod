@@ -9,7 +9,7 @@ angular.module('app.chat.star', [])
             if $rootScope.cur_mission != null && $session.user_id != null 
                 $scope.mission_id = $rootScope.cur_mission.mission_id
 
-                chatStorage.messages(null, null, null, true)
+                chatStorage.star_messages()
                     .then((messages) ->
                         $scope.messages = messages
                         length = $scope.messages.length
@@ -25,7 +25,7 @@ angular.module('app.chat.star', [])
             if $scope.messages
                 prev_id = $scope.messages[0].cmsg_id
 
-                chatStorage.messages(null, prev_id, null, true)
+                chatStorage.star_messages(prev_id, null)
                     .then((messages) ->
                         if messages.length > 0
                             $scope.messages[0].date_label = $dateutil.ellipsis_time_str($scope.messages[0].date, messages[0].date)
@@ -49,7 +49,7 @@ angular.module('app.chat.star', [])
                 length = $scope.messages.length
                 next_id = $scope.messages[length-1].cmsg_id
 
-                chatStorage.messages(null, null, next_id, true)
+                chatStorage.star_messages(null, next_id)
                     .then((messages) ->
                         if messages.length > 0
                             messages[0].date_label = $dateutil.ellipsis_time_str(messages[0].date, $scope.messages[length-1].date)
@@ -88,7 +88,7 @@ angular.module('app.chat.star', [])
             if $scope.scrollTimer != null
                 $scope.stopScrollTimer()                
             $scope.scrollTimer = $timeout(->
-                scrollView = angular.element('#chat_view')
+                scrollView = angular.element('#chat_star_view')
                 elem = angular.element('#chat_' + cmsg_id)
                 if(elem && elem[0])
                     rect = elem[0].getBoundingClientRect()

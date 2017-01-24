@@ -615,8 +615,10 @@
 	function _upload($field, $dest_path)
 	{
 		global $_FILES;
-		if ($_FILES[$field]["error"] != 0)
+		if ($_FILES[$field]["error"] != 0) {
+			_debug_log("fail upload file: error no=" . $_FILES[$field]["error"]);
 			return null;
+		}
 
 		$dir = dirname($dest_path);
 		_mkdir($dir);

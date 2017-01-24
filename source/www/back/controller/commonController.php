@@ -274,9 +274,10 @@
 
 			if (!file_exists($file))
 			{
+				print "該当ファイルは存在しません。";
 				exit;
 			}
-
+			/*
 			$size = @filesize($file);
 			$ext = _extname($file_name);
 			$mime = _mime($ext);
@@ -284,8 +285,9 @@
 			// Send the content type header
 			header('Content-type: ' . $mime);
 
-			if (ISIE || ISEDGE)
+			if (ISIE || ISEDGE) {
 				$file_name = mb_convert_encoding($file_name, "SJIS-win", "UTF-8");
+			}
 
 			if ($mime == "application/octet-stream")
 				header('Content-Disposition: attachment; filename="' . $file_name . '"');
@@ -360,7 +362,22 @@
 			    @ob_flush();
 			    flush();
 			}
+			*/
+			require_once 'include/HTTP/Download.php';
 
+			$ext = _extname($file_name);
+			$mime = _mime($ext);
+
+			$params = array('file'=> $file, 'contenttype' => $mime);
+			$down = new HTTP_Download($params);
+
+			if (ISIE || ISEDGE)
+				$file_name = mb_convert_encoding($file_name, "SJIS-win", "UTF-8");
+
+			$cd = $mime == "application/octet-stream" ? HTTP_DOWNLOAD_ATTACHMENT : HTTP_DOWNLOAD_INLINE;
+			$down->setContentDisposition($cd, $file_name);
+
+			$down->send(true); 
 			exit;
 		}
 
@@ -391,10 +408,10 @@
 
 				if (file_exists($thmb_path))
 				{
-					$fp = fopen($thmb_path, 'rb');
-					header("Content-Type: image/jpeg");
-					header("Content-Length: " . filesize($thmb_path));
-					fpassthru($fp);
+					require_once 'include/HTTP/Download.php';
+					$params = array('file'=> $thmb_path, 'contenttype' => 'image/jpeg');
+					$down = new HTTP_Download($params);
+					$down->send(true);
 				}
 			}
 			exit;

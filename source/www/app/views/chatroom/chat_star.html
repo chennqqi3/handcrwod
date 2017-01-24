@@ -4,8 +4,8 @@
             <h2>スター付きメッセージ</h2>
         </div>
     </header>
-    <div id="chat_view" class="page chat-container" scroll-top="prev()" scroll-bottom="next()">
-        <div ng-repeat="message in messages | filter:{star:true} track by message.cmsg_id" class="message-wrapper" ng-class="{'to-mine': isToMine(message)}">
+    <div id="chat_star_view" class="page chat-container" scroll-top="prev()" scroll-bottom="next()">
+        <div ng-repeat="message in messages track by message.cmsg_id" class="message-wrapper" ng-class="{'to-mine': isToMine(message)}">
             <div id="chat_{{message.cmsg_id}}">
                 <img class="avartar avartar-sm left" ng-src="{{message.avartar}}"/>
 

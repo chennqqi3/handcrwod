@@ -27,7 +27,8 @@
 					"repeat_day",
 					"private_flag",
 					"last_date",
-					"last_cmsg_id"),
+					"last_cmsg_id",
+					"invite_key"),
 				array("auto_inc" => true));
 		}
 
@@ -63,6 +64,8 @@
 			if ($my_id == null)
 				return null;
 
+            $db = db::getDB();
+            
 			$mission = new mission;
 			$mission->home_id = $home_id;
 			$mission->mission_name = $mission_name;
@@ -72,6 +75,14 @@
 			$mission->private_flag = $private_flag;
 
 			$err = $mission->save();
+
+			if ($err == ERR_OK) {
+                // generate invite key
+                $sql = "UPDATE t_mission SET invite_key=md5(concat(mission_id, create_time)) 
+                    WHERE mission_id=" . _sql($mission->mission_id) . ";";
+
+                $db->execute($sql);
+			}
 
 			if ($err == ERR_OK) {
 				if ($private_flag == CHAT_PUBLIC || $private_flag == CHAT_BOT) {
@@ -363,7 +374,9 @@
 			if ($err != ERR_OK)
 				return $err;
 
-			$url = ATTACH_URL . date('Y/m/') . "a_" . $mission_attach->mission_attach_id;
+			$sub_dir = date('Y/m/');
+			$save_file_name =  "a_" . $mission_attach->mission_attach_id;
+			$url = ATTACH_URL . $sub_dir . $save_file_name;
 
 			// real file location
 			$path = DATA_PATH . $url;
@@ -378,9 +391,29 @@
 				// convert to mp4
 				$cmd = 'ffmpeg -i ' . $path . ' -acodec copy -vcodec copy ' . $path . '.mp4';
 				exec($cmd);
-				@unlink($path);
-				@rename($path . '.mp4', $path);
+				if (file_exists($path)) {
+					@unlink($path);
+					@rename($path . '.mp4', $path);
+				}
 				$file_name = preg_replace('/mov$/i', 'mp4', $file_name);
+			}
+			else if ($ext == "jpg" || $ext == "jpeg" || $ext == "png" || $ext == "bmp" || $ext == "gif") {
+				// thumnail
+				$thmb_size = 150;
+				$thmb_file_name = $save_file_name . "_" . $thmb_size . ".jpg";
+				$thmb_dir = DATA_PATH . THUMB_URL . $sub_dir;
+				$thmb_path = $thmb_dir . $thmb_file_name;
+
+				if (!file_exists($thmb_dir))
+					_mkdir($thmb_dir);
+
+				if (!file_exists($thmb_path))
+				{
+					if (copy($path, $thmb_path))
+					{
+						_resize_photo($thmb_path, "jpg", $thmb_size, $thmb_size);
+					}
+				}
 			}
 
 			// download url

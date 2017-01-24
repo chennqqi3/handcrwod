@@ -2,75 +2,8 @@
 
 angular.module('app.storage.chat', [])
 
-.factory('$emoticons', ->
-    icons = [ 
-        (class:'emoticon-smile', title:'笑顔', alt:':)')
-        (class:'emoticon-sad', title:'悲しい', alt:':(')
-        (class:'emoticon-more-smile', title:'もっとスマイル', alt:':D')
-        (class:'emoticon-lucky', title:'やったね', alt:'8-)')
-        (class:'emoticon-surprise', title:'びっくり', alt:':o')
-        (class:'emoticon-wink', title:'ウィンク', alt:';)')
-        (class:'emoticon-tears', title:'ウェ～ん', alt:';(')
-        (class:'emoticon-sweat', title:'汗', alt:'(sweat)')
-        (class:'emoticon-mumu', title:'むむ', alt:':|')
-        (class:'emoticon-kiss', title:'チュ！', alt:':*')
-        (class:'emoticon-tongueout', title:'べー', alt:':p')
-        (class:'emoticon-blush', title:'恥ずかしい', alt:'(blush)')
-        (class:'emoticon-wonder', title:'何なに', alt:':^)')
-        (class:'emoticon-snooze', title:'眠い', alt:'|-)')
-        (class:'emoticon-love', title:'恋してます', alt:'(inlove)')
-        (class:'emoticon-grin', title:'ニヤッ', alt:']:)')
-        (class:'emoticon-talk', title:'話す', alt:'(talk)')
-        (class:'emoticon-yawn', title:'あくび', alt:'(yawn)')
-        (class:'emoticon-puke', title:'ゲーッ', alt:'(puke)')
-        (class:'emoticon-ikemen', title:'イケメン', alt:'(emo)')
-        (class:'emoticon-otaku', title:'オタク', alt:'8-|')
-        (class:'emoticon-ninmari', title:'ニンマリ', alt:':#)')
-        (class:'emoticon-nod', title:'うんうん', alt:'(nod)')
-        (class:'emoticon-shake', title:'いやいや', alt:'(shake)')
-        (class:'emoticon-wry-smile', title:'苦笑い', alt:'(^^;)')
-        (class:'emoticon-whew', title:'やれやれ', alt:'(whew)')
-        (class:'emoticon-clap', title:'拍手', alt:'(clap)')
-        (class:'emoticon-bow', title:'おじぎ', alt:'(bow)')
-        (class:'emoticon-roger', title:'了解！', alt:'(roger)')
-        (class:'emoticon-muscle', title:'筋肉モリモリ', alt:'(flex)')
-        (class:'emoticon-dance', title:'ダンス', alt:'(dance)')
-        (class:'emoticon-komanechi', title:'コマネチ', alt:'(:/)')
-        (class:'emoticon-devil', title:'悪魔', alt:'(devil)')
-        (class:'emoticon-star', title:'星', alt:'(*)')
-        (class:'emoticon-heart', title:'ハート', alt:'(h)')
-        (class:'emoticon-flower', title:'花', alt:'(F)')
-        (class:'emoticon-cracker', title:'クラッカー', alt:'(cracker)')
-        (class:'emoticon-cake', title:'ケーキ', alt:'(^)')
-        (class:'emoticon-coffee', title:'コーヒー', alt:'(coffee)')
-        (class:'emoticon-beer', title:'ビール', alt:'(beer)')
-        (class:'emoticon-handshake', title:'握手', alt:'(handshake)')
-        (class:'emoticon-yes', title:'はい', alt:'(y)')
-    ]
-
-    for icon in icons 
-        icon.exp = icon.alt.replace(/\)/g, '\\)')
-        icon.exp = icon.exp.replace(/\(/g, '\\(')
-        icon.exp = icon.exp.replace(/\:/g, '\\:')
-        icon.exp = icon.exp.replace(/\|/g, '\\|')
-        icon.exp = icon.exp.replace(/\*/g, '\\*')
-        icon.exp = icon.exp.replace(/\^/g, '\\^')
-        icon.exp = new RegExp(icon.exp, 'g')
-
-    return {
-        icons: icons
-    }
-)
-
 .factory('chatStorage', 
-    ($api, $session, $dateutil, $rootScope, filterFilter, AUTH_EVENTS, $auth, CONFIG, $filter) ->
-        # Initialize
-        init = ->
-            ###
-            if $auth.isAuthenticated()
-                search()
-            ###
-
+    ($api, $session, $dateutil, $rootScope, CONFIG, $filter, chatizeService) ->
         cache_messages = (mission_id, messages) ->
             if $rootScope.g_messages == undefined
                 $rootScope.g_messages = []
@@ -97,11 +30,11 @@ angular.module('app.storage.chat', [])
             if $api.is_empty(message)
                 return false
 
-            message.content += ""
             if $api.is_empty(message.content)
                 return false
 
             mine = false
+            message.content += ""
             message.content.replace(/\[to:([^\]]*)\]/g, (item, user_id) ->
                 if $session.user_id + '' == user_id || 'all' == user_id
                     mine = true
@@ -204,9 +137,25 @@ angular.module('app.storage.chat', [])
             html += '           <a href="javascript:;" class="star' + star_cls + '" ng-click="star(' + message.cmsg_id + ')" title="スター付き"><i class="fa text-warning' + star_fa_cls + '"></i></a>'
             html += '           <span class="unread-mark"><i class="fa fa-circle text-danger ' + message.read_class + '"></i></span>'
             html += '       </div>'
-            html += '       <div class="message">' + $filter('chatize')(message.content) + '</div>'
+            html += '       <div class="message">' + $filter('chatize')(message.content)
+            if message.reacts && message.reacts.length > 0
+                html += '       <ul class="reacts">'
+                for react in message.reacts
+                    rtitle = ""
+                    if react[2]
+                        for u in react[2]
+                            if rtitle != ""
+                                rtitle += ","
+                            rtitle += u[1]
+                        rtitle = ' title="' + rtitle + '"'
+                    html += '       <li ng-click="react(' + message.cmsg_id + ', ' + react[0] + ')" ' + rtitle + '>' + chatizeService.emoticon(react[0]) + react[1] + '</li>'    
+                html += '       </ul>'
+            html += '       </div>'
             html += '   </div>'
             html += '   <ul class="button-group' + btn_group_cls + '">'
+            html += '       <li>'
+            html += '           <button type="button" class="btn btn-default btn-xs btn-circle btn-react" title="リアクション" ng-click="add_react(' + message.cmsg_id + ', $event)"><i class="icon-emotsmile"></i></button>'
+            html += '       </li>'
             if $rootScope.canEditTask()
                 html += '   <li>'
                 html += '       <button type="button" class="btn btn-default btn-xs btn-circle" title="タスク新規登録" ng-click="addTask(' + message.cmsg_id + ')"><i class="ln-icon-check-square"></i></button>'
@@ -224,6 +173,9 @@ angular.module('app.storage.chat', [])
                 html += '   <li>'
                 html += '       <button type="button" class="btn btn-default btn-xs btn-circle" title="削除" ng-click="remove(' + message.cmsg_id + ')"><i class="icon-trash"></i></button>'
                 html += '   </li>'
+            html += '       <li>'
+            html += '           <button type="button" class="btn btn-default btn-xs btn-circle" title="未読にする" ng-click="unread(' + message.cmsg_id + ', $event)">未読</button>'
+            html += '       </li>'
             html += '   </ul>'
             html += '   <div class="clear"></div>'
             html += '</div>'
@@ -298,11 +250,48 @@ angular.module('app.storage.chat', [])
                             date_label = $dateutil.ellipsis_time_str(cmsg.date, prev_date)
                             prev_date = cmsg.date
                             cmsg.date_label = date_label
+                            if $rootScope.cur_home.home_id != cmsg.home_id
+                                cmsg.mission_name = cmsg.home_name + '・' + cmsg.mission_name
 
                             if cmsg.mission_id != mission_id || cmsg.user_id != user_id
                                 cmsg.show_avartar = true
                                 user_id = cmsg.user_id
                                 mission_id = cmsg.mission_id
+                            else
+                                cmsg.show_avartar = false
+                        )
+
+                        return messages
+                    else
+                        return []
+                )
+
+        # messages with star
+        star_messages = (prev_id, next_id) ->
+            params = 
+                prev_id: prev_id
+                next_id: next_id
+                limit: 60
+
+            $api.call("chat/star_messages", params)
+                .then((res) ->
+                    if res.data.err_code == 0
+                        messages = res.data.messages
+                        user_id = null
+                        prev_date = null
+                        messages.forEach((cmsg) ->
+                            cmsg.content = cmsg.content + ''
+                            cmsg.avartar = CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg"
+                            cmsg.read_class = "read"
+                            date_label = $dateutil.ellipsis_time_str(cmsg.date, prev_date)
+                            prev_date = cmsg.date
+                            cmsg.date_label = date_label
+                            if $rootScope.cur_home.home_id != cmsg.home_id
+                                cmsg.mission_name = cmsg.home_name + '・' + cmsg.mission_name
+
+                            if cmsg.user_id != user_id
+                                cmsg.show_avartar = true
+                                user_id = cmsg.user_id
                             else
                                 cmsg.show_avartar = false
                         )
@@ -322,6 +311,16 @@ angular.module('app.storage.chat', [])
                     return res.data
                 )
 
+        unread_messages = (mission_id, cmsg_ids) ->
+            params =
+                mission_id: mission_id
+                cmsg_ids: cmsg_ids
+
+            $api.call("chat/unread_messages", params)
+                .then((res) ->
+                    return res.data
+                )
+
         delete_message = (messages, cid) -> 
             if $api.is_empty(messages)
                 return
@@ -331,7 +330,7 @@ angular.module('app.storage.chat', [])
                 message = messages[i]
                 if message.cmsg_id == cid
                     messages.splice(i, 1)
-                    break
+                    $('#chat_' + cid).remove()
             return
 
         set_message = (mission_id, messages, cmsg, callback) ->
@@ -353,7 +352,7 @@ angular.module('app.storage.chat', [])
                     callback(cmsg)
             else
                 setted = false
-                if cmsg.temp_cmsg_id != null && cmsg.temp_cmsg_id != undefined
+                if !$api.is_empty(cmsg.temp_cmsg_id)
                     delete_message(messages, cmsg.cmsg_id) # check if my message is coming after next()
                 if messages.length > 0                       
                     for i in [0..messages.length - 1]
@@ -384,10 +383,13 @@ angular.module('app.storage.chat', [])
                         l_cmsg = messages[messages.length - 1]
                         if l_cmsg.user_id == cmsg.user_id 
                             cmsg.show_avartar = false
+                            cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, l_cmsg.date)
                         else
                             cmsg.show_avartar = true
+                            cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, null) 
                     else
                         cmsg.show_avartar = true
+                        cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, null) 
                     messages.push(cmsg)
 
                     if (callback)
@@ -434,24 +436,73 @@ angular.module('app.storage.chat', [])
             $api.cancel_upload(file.upload)
             return
 
+        get_unread = (cmsg) ->
+            mission_id = cmsg.mission_id
+            unreads = $rootScope.unreads[mission_id]
+            if unreads
+                for u in unreads
+                    if u.cmsg_id == cmsg.cmsg_id
+                        return u
+
+            return null
+
+        set_unread = (cmsg) ->
+            unread = get_unread(cmsg)
+            if unread
+                unread.to_flag = cmsg.to_flag
+            else
+                mission_id = cmsg.mission_id
+                unreads = $rootScope.unreads[mission_id]
+                if unreads == undefined
+                    $rootScope.unreads[mission_id] = []
+                    unreads = $rootScope.unreads[mission_id]
+                
+                unreads.push(
+                    cmsg_id: cmsg.cmsg_id
+                    to_flag: cmsg.to_flag
+                )
+            return
+
+        remove_unread = (cmsg) ->
+            mission_id = cmsg.mission_id
+            unreads = $rootScope.unreads[mission_id]
+            if unreads
+                for u, i in unreads
+                    if u.cmsg_id == cmsg.cmsg_id
+                        unreads.splice(i, 1)
+                        break
+
         # Refresh unreads
-        refresh_unreads_title = () ->
-            unread_missions = 0
+        refresh_unreads_title = (refresh_home) ->
+            if refresh_home == undefined
+                refresh_home = true
             unreads = 0
+            to_unreads = 0
             angular.forEach $rootScope.missions, (mission) ->
                 if mission.unreads > 0
-                    unread_missions++
                     unreads += mission.unreads
+                if mission.to_unreads > 0
+                    to_unreads += mission.to_unreads
                 return
 
             if $rootScope.homes
+                t_unreads = 0
+                t_to_unreads = 0
                 for home in $rootScope.homes
-                    if home.home_id == $rootScope.cur_home.home_id
+                    if $rootScope.cur_home && home.home_id == $rootScope.cur_home.home_id
                         home.unreads = unreads
+                        home.to_unreads = to_unreads
+                        if refresh_home
+                            $rootScope.$broadcast('refresh-home', home)
+                    t_unreads += home.unreads
+                    t_to_unreads += home.to_unreads
 
             title = ""
-            if unread_missions > 0
-                title = "[" + unread_missions + "]"
+            if t_unreads > 0
+                title = "[" + t_unreads 
+                if t_to_unreads > 0
+                    title += "(" + t_to_unreads + ")"
+                title += "]"
 
             document.title = title + "ハンドクラウド"
             return
@@ -475,7 +526,7 @@ angular.module('app.storage.chat', [])
                     if mission.mission_id == last_mission_id
                         mission.order = order - 1
 
-            refresh_unreads_title()
+            refresh_unreads_title(false)
 
         sound_alert = ->
             audioElement = document.createElement('audio')
@@ -501,19 +552,24 @@ angular.module('app.storage.chat', [])
             params.limit = 10
 
         return {
-            init: init
             cache_messages: cache_messages
+            is_to_mine: is_to_mine
             message_to_html: message_to_html
             messages_to_html: messages_to_html
             messages: messages
             search_messages: search_messages
+            star_messages: star_messages
             read_messages : read_messages
+            unread_messages: unread_messages
             delete_message: delete_message
             set_message: set_message
             remove_message: remove_message
             star_message: star_message
             upload_file: upload_file
             cancel_upload_file: cancel_upload_file
+            get_unread: get_unread
+            set_unread: set_unread
+            remove_unread: remove_unread
             refresh_unreads_title: refresh_unreads_title
             reorder_home_mission: reorder_home_mission
             sound_alert: sound_alert

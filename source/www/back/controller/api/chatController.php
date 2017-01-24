@@ -47,6 +47,29 @@
 			$this->finish(array(), $err);
 		}
 
+		public function star_messages()
+		{
+			$param_names = array("prev_id", "next_id", "limit");
+			$this->setApiParams($param_names);
+			$params = $this->api_params;
+
+            $prev_id = $params->prev_id;
+            $next_id = $params->next_id;
+            $limit = $params->limit;
+
+			$my_id = _user_id();
+
+			$cmsgs = cmsg::star_messages($my_id,  $prev_id, $next_id, $limit);
+
+			$ret = array(
+                'messages' => $cmsgs,
+                'prev_id' => $prev_id,
+                'next_id' => $next_id
+            );
+
+			$this->finish($ret, ERR_OK);
+		}
+
 		public function read_messages()
 		{
 			$param_names = array("mission_id", "cmsg_ids");
@@ -114,6 +137,21 @@
 				$cmsgs = array();
 			else {
 				$cmsgs = cmsg::messages($home_id, $mission_id, _user_id(), $prev_id, $next_id, $star, $limit);
+
+				if ($prev_id == $next_id) {
+					// for searching message
+
+					if (count($cmsgs) > 0) {
+						$lcmsg = $cmsgs[count($cmsgs) - 1];
+						$next_id2 = $lcmsg["cmsg_id"];
+					}
+					else {
+						$next_id2 = $next_id - 1;
+					}
+					$cmsgs2 = cmsg::messages($home_id, $mission_id, _user_id(), null, $next_id2, $star, $limit);
+
+					$cmsgs = array_merge($cmsgs, $cmsgs2);
+				}
 			}
 
 			$ret = array(
@@ -129,12 +167,12 @@
 
 		public function search_messages()
 		{
-			$param_names = array("home_id", "mission_id", "search_string", "prev_id", "next_id");
+			$param_names = array("mission_id", "search_string", "prev_id", "next_id");
 			$this->setApiParams($param_names);
-			$this->checkRequired(array("home_id", "search_string"));
+			$this->checkRequired(array("search_string"));
 			$params = $this->api_params;
 
-			$cmsgs = cmsg::search_messages($params->home_id, $params->mission_id, $params->search_string, $params->prev_id, $params->next_id, _user_id());
+			$cmsgs = cmsg::search_messages(null, $params->mission_id, $params->search_string, $params->prev_id, $params->next_id, _user_id());
 
 			$this->finish(array("messages" => $cmsgs), ERR_OK);
 		}
