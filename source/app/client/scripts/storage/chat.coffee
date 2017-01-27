@@ -242,23 +242,12 @@ angular.module('app.storage.chat', [])
                 .then((res) ->
                     if res.data.err_code == 0
                         messages = res.data.messages
-                        user_id = null
-                        prev_date = null
-                        mission_id = null
                         messages.forEach((cmsg) ->
+                            cmsg.content = cmsg.content + ''
                             cmsg.avartar = CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg"
-                            date_label = $dateutil.ellipsis_time_str(cmsg.date, prev_date)
-                            prev_date = cmsg.date
-                            cmsg.date_label = date_label
-                            if $rootScope.cur_home.home_id != cmsg.home_id
-                                cmsg.mission_name = cmsg.home_name + '・' + cmsg.mission_name
-
-                            if cmsg.mission_id != mission_id || cmsg.user_id != user_id
-                                cmsg.show_avartar = true
-                                user_id = cmsg.user_id
-                                mission_id = cmsg.mission_id
-                            else
-                                cmsg.show_avartar = false
+                            cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, null)
+                            if $rootScope.cur_home.home_id != cmsg.home_id && !$api.is_empty(cmsg.home_name)
+                                cmsg.mission_name = cmsg.mission_name + '(' + cmsg.home_name + ')'
                         )
 
                         return messages
@@ -277,23 +266,12 @@ angular.module('app.storage.chat', [])
                 .then((res) ->
                     if res.data.err_code == 0
                         messages = res.data.messages
-                        user_id = null
-                        prev_date = null
                         messages.forEach((cmsg) ->
                             cmsg.content = cmsg.content + ''
                             cmsg.avartar = CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg"
-                            cmsg.read_class = "read"
-                            date_label = $dateutil.ellipsis_time_str(cmsg.date, prev_date)
-                            prev_date = cmsg.date
-                            cmsg.date_label = date_label
-                            if $rootScope.cur_home.home_id != cmsg.home_id
-                                cmsg.mission_name = cmsg.home_name + '・' + cmsg.mission_name
-
-                            if cmsg.user_id != user_id
-                                cmsg.show_avartar = true
-                                user_id = cmsg.user_id
-                            else
-                                cmsg.show_avartar = false
+                            cmsg.date_label = $dateutil.ellipsis_time_str(cmsg.date, null)
+                            if $rootScope.cur_home.home_id != cmsg.home_id && !$api.is_empty(cmsg.home_name)
+                                cmsg.mission_name = cmsg.mission_name + '(' + cmsg.home_name + ')'
                         )
 
                         return messages

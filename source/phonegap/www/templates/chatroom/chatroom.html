@@ -5,14 +5,9 @@
     <ion-nav-buttons side="right">
         <button menu-toggle="right" class="button button-icon icon ion-ios-more" ng-click="showOthers($event)"></button>
     </ion-nav-buttons>
-    <div id="loader">
-        <div>
-            <div class="hc-loader">Loading...</div>
-        </div>
-    </div>
     <ion-content id="chat_view" has-bouncing="true" class="has-header transparent"
       delegate-handle="userMessageScroll" on-scroll-complete="onScrollComplete()">
-      <div id="messages"></div>
+        <div id="messages"></div>
     </ion-content>
 
     <div id="emoticon_gallery" style="visibility: hidden;">
@@ -32,7 +27,7 @@
                 <img ng-src="{{member.avartar}}" class="avartar img30_30">
                 {{member.user_name}}
             </li>
-            <li ng-click="to_message()"><img ng-src="{{all_avartar}}" class="avartar img30_30"> 全員</li>
+            <li ng-click="to_message()" ng-if="cur_mission.private_flag!=2"><img ng-src="{{all_avartar}}" class="avartar img30_30"> 全員</li>
         </ul>
     </div>
 
@@ -80,7 +75,7 @@
 </ion-view>
 
 <script id="chatroom-menu.html" type="text/ng-template">
-    <ion-popover-view style="height:390px">
+    <ion-popover-view style="height:340px">
         <ion-content>
             <ion-list>
                 <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".summary({mission_id:mission_id})"><i class="icon icon-notebook"></i>概要</ion-item>
@@ -89,7 +84,6 @@
                 <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".attach({mission_id:mission_id})"><i class="icon icon-paper-clip"></i>添付ファイル</ion-item>
                 <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".edit({mission_id:mission_id})"><i class="icon icon-settings"></i>設定</ion-item>
                 <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".member({mission_id:mission_id})" ng-if="cur_mission.private_flag==1 && canEditMissionMember()"><i class="icon icon-users"></i>メンバー</ion-item>
-                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".star({mission_id:mission_id})"><i class="icon icon-star"></i>スター付き</ion-item>
             </ion-list>
         </ion-content>
     </ion-popover-view>

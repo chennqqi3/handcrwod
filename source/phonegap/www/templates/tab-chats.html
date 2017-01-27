@@ -1,14 +1,37 @@
 <ion-view view-title="チャット">
+    <ion-header class="bar bar-header bar-positive item-input-inset" ng-show="show_search_bar">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" ng-model="search.text" placeholder="検索..." ng-change="search_chats()">
+        </label>
+        <button class="button button-icon icon ion-ios-arrow-right" ng-click="close_search_bar()"></button>
+    </ion-header>
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
-        <button menu-toggle="right" class="button button-icon icon ion-qr-scanner" ng-click="scan_qr()"></button>
-        <button menu-toggle="right" class="button button-icon icon ion-ios-search" ng-click="open_search_chat()"></button>
+        <button menu-toggle="right" class="button button-icon icon ion-ios-search" ng-click="open_search_bar()"></button>
+        <button menu-toggle="right" class="button button-icon icon ion-ios-more" ng-click="showOthers($event)"></button>
     </ion-nav-buttons>
     <ion-content delegate-handle="missionScroll">
         <ion-list class="chat-list">
             <chat-rooms ng-if="loaded"></chat-rooms>
         </ion-list>
     </ion-content>
+
+    <ion-footer-bar class="bar-stable bar-positive item-input-inset" ng-if="show_search_bar">
+        <button class="button button-icon icon ion-ios-search" type="submit" ng-click="open_search_chat()">メッセージも検索
+        </button>
+    </ion-footer-bar>
 </ion-view>
+
+<script id="chats-menu.html" type="text/ng-template">
+    <ion-popover-view style="height:130px">
+        <ion-content>
+            <ion-list>
+                <ion-item class="item item-icon-left" ng-click="scan_qr()"><i class="icon ion-qr-scanner"></i>招待QRスキャン</ion-item>
+                <ion-item class="item item-icon-left" ng-click="hideOthers()" ui-sref=".member"><i class="icon icon-users"></i>メンバー</ion-item>
+            </ion-list>
+        </ion-content>
+    </ion-popover-view>
+</script>

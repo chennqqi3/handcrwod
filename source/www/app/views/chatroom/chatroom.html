@@ -134,7 +134,7 @@
                 </div>
             </div>
             <ul class="emoticon-list clearfix">
-                <li ng-repeat="em in emoticons | filter:{title:search_emoticon}" class="emoticon" title="{{em.title}} {{em.alt}}" ng-click="emoticon_message(em.alt)" style="background-image: url({{em.image}})"></li>
+                <li ng-repeat="em in emoticons | filter:emoticonFilter" class="emoticon" title="{{em.title}} {{em.alt}}" ng-click="emoticon_message(em.alt)" style="background-image: url({{em.image}})"></li>
                 <li class="emoticon icon-plus" ng-click="manage_emoticon()"></li>
             </ul>
         </h3>
@@ -179,7 +179,7 @@
                     <img ng-src="{{member.avartar}}" class="avartar img30_30">
                     {{member.user_name}}
                 </li>
-                <li ng-click="to_message()"><img ng-src="{{all_avartar}}" class="avartar img30_30"> 全員</li>
+                <li ng-click="to_message()" ng-if="cur_mission.private_flag!=2"><img ng-src="{{all_avartar}}" class="avartar img30_30"> 全員</li>
             </ul>
         </h3>
     </div>

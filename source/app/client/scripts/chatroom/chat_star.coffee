@@ -4,6 +4,8 @@ angular.module('app.chat.star', [])
 
 .controller('chatStarCtrl', 
     ($scope, $api, $location, chatStorage, missionStorage, filterFilter, $rootScope, $routeParams, logger, $session, $dateutil, $timeout, $dialogs, CONFIG) -> 
+        MAX_MSG_LENGTH = 100
+
         # Initialize
         $scope.sync = () ->
             if $rootScope.cur_mission != null && $session.user_id != null 
@@ -60,7 +62,6 @@ angular.module('app.chat.star', [])
                                 $scope.messages.splice(0, $scope.messages.length-MAX_MSG_LENGTH)
 
                             $scope.startScrollTimer(next_id, "next")
-                            console.log("next_id:" + next_id)
 
                             $scope.initPreviewLink()
 
@@ -89,7 +90,7 @@ angular.module('app.chat.star', [])
                 $scope.stopScrollTimer()                
             $scope.scrollTimer = $timeout(->
                 scrollView = angular.element('#chat_star_view')
-                elem = angular.element('#chat_' + cmsg_id)
+                elem = angular.element('#chat_star_' + cmsg_id)
                 if(elem && elem[0])
                     rect = elem[0].getBoundingClientRect()
                     if(type == "prev")
@@ -100,7 +101,7 @@ angular.module('app.chat.star', [])
                             scrollOffset -= rect.height
                     else
                         scrollOffset = 0
-                    scrollView.duScrollToElement(angular.element('#chat_' + cmsg_id), scrollOffset)
+                    scrollView.duScrollToElement(angular.element('#chat_star_' + cmsg_id), scrollOffset)
 
                 $scope.stopScrollTimer()
             )

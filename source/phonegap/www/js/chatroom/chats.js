@@ -1,7 +1,7 @@
 angular.module('app.chat.list', [])
 
 .controller('chatsCtrl', 
-    function($scope, $rootScope, $session, $ionicPopup, $ionicModal, $ionicListDelegate, $ionicScrollDelegate, $ionicActionSheet, homeStorage, missionStorage, chatStorage, logger, $timeout, $state, qrStorage) {
+    function($scope, $rootScope, $api, $session, $ionicPopup, $ionicPopover, $ionicModal, $ionicListDelegate, $ionicScrollDelegate, $ionicActionSheet, homeStorage, missionStorage, chatStorage, logger, $timeout, $state, qrStorage) {
     // toggle group
     $scope.groups = [true, true, true];
     $scope.toggleGroup = function(index) {
@@ -49,13 +49,77 @@ angular.module('app.chat.list', [])
     }).then(function(modal) {
         $scope.modalChatSearch = modal;
     });
+    /* search bar */
+    $scope.show_search_bar = false;
+    $scope.open_search_bar = function() {
+        $scope.show_search_bar = true;
+        $rootScope.hide_navbar = true;
+        $('.tabs-icon-top').addClass('tabs-hide');
+    }
+    $scope.close_search_bar = function() {
+        $scope.show_search_bar = false;
+        $rootScope.hide_navbar = false;
+        $('.tabs-icon-top').removeClass('tabs-hide');
+
+        $scope.search.text = '';
+        $scope.search_chats();
+    }
+    $scope.search_chats = function() {
+        query = $scope.search.text;
+        if (query != '')
+            query = query.toUpperCase();
+        viewScroll = $ionicScrollDelegate.$getByHandle('missionScroll');
+        viewScroll.scrollTop(true);
+        if ($rootScope.cur_home) {
+            len = $rootScope.missions.length;
+            for (n = 0; n < len; n ++) {
+                mission = $rootScope.missions[n];
+
+                if (!(mission.private_flag == 0 || mission.private_flag == 1))
+                    continue;
+
+                id = missionStorage.mission_html_id(mission);
+
+                if (query == '' || mission.mission_name.toUpperCase().indexOf(query) != -1)
+                    $('#' + id).show();
+                else
+                    $('#' + id).hide();
+            }
+
+            len = $rootScope.missions.length;
+            for (n = 0; n < len; n ++) {
+                mission = $rootScope.missions[n];
+
+                if (!(mission.private_flag == 2 && mission.user_id != $session.user_id && mission.accepted == 1))
+                    continue;
+
+                id = missionStorage.mission_html_id(mission);
+
+                if (query == '' || mission.mission_name.toUpperCase().indexOf(query) != -1)
+                    $('#' + id).show();
+                else
+                    $('#' + id).hide();
+            }
+
+            if (query != '') {
+                $('#room_divider').hide();
+                $('#member_divider').hide();
+            }
+            else {
+                $('#room_divider').show();
+                $('#member_divider').show();
+            }
+        }
+    }
     $scope.open_search_chat = function() {
         $scope.show_search_chat = false;
         $rootScope.hide_navbar = false;
 
-        $scope.search.text = "";
         $scope.init_search_result();
-        $scope.modalChatSearch.show();        
+        $scope.modalChatSearch.show();
+
+        if ($scope.search.text != '')
+            $scope.search_chat();
     }
     $scope.init_search_result = function() {
         $scope.prev_id = null;
@@ -70,7 +134,9 @@ angular.module('app.chat.list', [])
             $scope.init_search_result();
 
         var search_string = $scope.search.text;
+        $api.show_waiting();
         chatStorage.search_messages($rootScope.cur_home.home_id, null, search_string, $scope.prev_id, $scope.next_id).then(function(messages) {
+            $api.hide_waiting();
             if (messages.length > 0) {
                 if ($scope.next_id !== null) {
                     for (var i = 0; i < messages.length; i++)
@@ -160,11 +226,32 @@ angular.module('app.chat.list', [])
     $scope.close = function() {
         $scope.modalChatSearch.hide();
         $scope.init_search_result();
+        $scope.close_search_bar();
     };
 
+    // menu
+    $ionicPopover.fromTemplateUrl('chats-menu.html', {
+        scope: $scope
+    }).then(function(popover) {
+        $scope.otherMenu = popover;
+    });
+
+    $scope.showOthers = function($event) {
+        $scope.otherMenu.show($event);
+    }
+
+    $scope.hideOthers = function($event) {
+        $scope.otherMenu.hide($event);   
+    }
+
     $scope.$on('$destroy', function() {
+        $scope.otherMenu.remove();
         $scope.modalChatSearch.remove();
         $scope.init_search_result();
+        $scope.close_search_bar();
+    });
+    $scope.$on('$stateChangeStart', function(event, next, current) {
+        $scope.close_search_bar();
     });
     $scope.$on('modal.hidden', function() {
         // Execute action
@@ -388,9 +475,11 @@ angular.module('app.chat.list', [])
             scroll_top = false;
         $scope.loaded = false;
         if ($rootScope.cur_home != null) {
+            $api.show_waiting();
             missionStorage.search($rootScope.cur_home.home_id)
                 .then(function(missions) {
                     $scope.loaded = true;
+                    $api.hide_waiting();
                     var viewScroll = $ionicScrollDelegate.$getByHandle('missionScroll');
                     if (scroll_top)
                         viewScroll.scrollTop(true);
@@ -459,6 +548,7 @@ angular.module('app.chat.list', [])
     };
 
     $scope.scan_qr = function() {
+        $scope.hideOthers();
         qrStorage.scan();
     };
            

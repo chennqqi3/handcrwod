@@ -1,31 +1,22 @@
 angular.module('app.chat.star', [])
 
 .controller('chatStarCtrl', 
-    function($scope, $api, chatStorage, missionStorage, filterFilter, $rootScope, $routeParams, logger, $session, $dateutil, $timeout, CONFIG) {
+    function($scope, $api, chatStorage, $rootScope, logger, $session, $state, $timeout, $ionicActionSheet, $ionicScrollDelegate) {
+        var viewScroll = $ionicScrollDelegate.$getByHandle('chat_star_scroll');
+
         $scope.sync = function() {
-            if ($rootScope.cur_mission !== null && $session.user_id !== null) {
-                $scope.mission_id = $rootScope.cur_mission.mission_id;
-                return chatStorage.messages(null, null, null, true).then(function(messages) {
-                    var length;
-                    $scope.messages = messages;
-                    length = $scope.messages.length;
-                    if (length > 0) {
-                        $scope.last_cid = $scope.messages[length - 1].cmsg_id;
-                    } else {
-                        $scope.last_cid = null;
-                    }
-                    return $scope.initPreviewLink();
-                });
-            }
+            chatStorage.star_messages(null, null).then(function(messages) {
+                $scope.messages = messages;
+                $scope.initPreviewLink();
+            });
         };
         $scope.prev = function() {
             var prev_id;
             if ($scope.messages) {
                 prev_id = $scope.messages[0].cmsg_id;
-                return chatStorage.messages(null, prev_id, null, true).then(function(messages) {
+                chatStorage.star_messages(prev_id, null).then(function(messages) {
                     var i, j, ref;
                     if (messages.length > 0) {
-                        $scope.messages[0].date_label = $dateutil.ellipsis_time_str($scope.messages[0].date, messages[0].date);
                         for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
                             $scope.messages.splice(i, 0, messages[i]);
                         }
@@ -48,10 +39,9 @@ angular.module('app.chat.star', [])
             if ($scope.messages) {
                 length = $scope.messages.length;
                 next_id = $scope.messages[length - 1].cmsg_id;
-                return chatStorage.messages(null, null, next_id, true).then(function(messages) {
+                chatStorage.star_messages(null, next_id).then(function(messages) {
                     var i, j, ref;
                     if (messages.length > 0) {
-                        messages[0].date_label = $dateutil.ellipsis_time_str(messages[0].date, $scope.messages[length - 1].date);
                         for (i = j = 0, ref = messages.length - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
                             $scope.messages.push(messages[i]);
                         }
@@ -61,7 +51,6 @@ angular.module('app.chat.star', [])
                         }
                         */
                         $scope.startScrollTimer(next_id, "next");
-                        console.log("next_id:" + next_id);
                         $scope.initPreviewLink();
                         return messages;
                     } else {
@@ -86,24 +75,37 @@ angular.module('app.chat.star', [])
                 $scope.stopScrollTimer();
             }
             return $scope.scrollTimer = $timeout(function() {
-                var elem, rect, scrollOffset, scrollView;
-                scrollView = angular.element('#chat_star_view');
-                elem = angular.element('#chat_star_' + cmsg_id);
-                if (elem && elem[0]) {
-                    rect = elem[0].getBoundingClientRect();
-                    if (type === "prev") {
-                        scrollOffset = 0;
-                    } else if (type === "next") {
-                        scrollOffset = scrollView.outerHeight();
-                        if (rect) {
-                            scrollOffset -= rect.height;
-                        }
-                    } else {
-                        scrollOffset = 0;
-                    }
-                    scrollView.duScrollToElement(angular.element('#chat_star_' + cmsg_id), scrollOffset);
+                var elem = angular.element(document.querySelector('#chat_star_' + cmsg_id));
+                var view = angular.element(document.querySelector('#chat_star_view'));
+                var viewHeight = view[0].offsetHeight;
+
+                if (elem[0] == null) {
+                    return null;
                 }
-                return $scope.stopScrollTimer();
+
+                var rect = elem[0].getBoundingClientRect();                
+                var scrollTop = 0;
+                if(type == "prev")
+                {
+                    var elemTop = rect.top;
+                    var firstElemId = $scope.messages[0].cmsg_id;
+                    var firstElem = angular.element(document.querySelector('#chat_star_' + firstElemId));
+                    var firstElemTop = firstElem[0].getBoundingClientRect().top;
+
+                    scrollTop = elemTop - firstElemTop + 2;
+                }
+                else if(type == "next")
+                {
+                    var elemTop = rect.top;
+                    var firstElemId = $scope.messages[0].cmsg_id;
+                    var firstElem = angular.element(document.querySelector('#chat_star_' + firstElemId));
+                    var firstElemTop = firstElem[0].getBoundingClientRect().top;
+
+                    scrollTop = elemTop - firstElemTop - view[0].offsetHeight + rect.height - 2;
+                }
+
+                viewScroll.scrollTo(rect.left, scrollTop);
+                $scope.stopScrollTimer();
             });
         };
         $scope.stopScrollTimer = function() {
@@ -112,6 +114,23 @@ angular.module('app.chat.star', [])
                 return $scope.scrollTimer = null;
             }
         };
+
+        $scope.onScrollComplete = function() {
+            var elem = angular.element(document.querySelector('#chat_star_view'));
+            var scrollTop = viewScroll.getScrollPosition().top;
+            var scrollHeight = elem[0].scrollHeight;
+            var viewHeight = elem[0].offsetHeight;
+
+            console.log("scrollHeight:" + scrollHeight
+                         + " scrollTop:" + scrollTop 
+                         + " viewHeight:" + viewHeight);
+
+            if(scrollTop <= 1)
+                $scope.prev();
+            else if(scrollTop + viewHeight <= scrollHeight+1 && scrollTop + viewHeight >= scrollHeight-1)
+                $scope.next();
+        };
+
         $scope.goMessage = function(message) {
             $rootScope.$broadcast('scroll-to-message', message.cmsg_id);
         };
@@ -119,7 +138,6 @@ angular.module('app.chat.star', [])
         $scope.unstar = function(message) {
             message.star = false;
             chatStorage.star_message(message.cmsg_id, message.star);
-            $rootScope.$broadcast('unstar-message', message);
             return;
         };
 
@@ -135,6 +153,33 @@ angular.module('app.chat.star', [])
             });
 
             return mine;
+        };
+
+        $scope.onMessageHold = function(e, itemIndex, message) {
+            var buttons = [{
+                    text: '<i class="ion-share icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージへ移動</i>'
+                }, {
+                    text: '<i class="fa fa-star-o icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">スターを外す</i>'
+                }];
+
+            $ionicActionSheet.show({
+                buttons: buttons,
+                buttonClicked: function(index) {
+                    switch (index) {
+                        case 0: // go
+                            $scope.goMessage(message);
+                            break;
+                        case 1: // unstar
+                            $scope.unstar(message);
+                            break;
+                    }
+
+                    return true;
+                }
+            });
+        };    
+        $scope.goMessage = function(message) {
+            $state.transitionTo("tab.star.chatroom", {mission_id: message.mission_id, chat_id: message.cmsg_id});
         };
 
     }

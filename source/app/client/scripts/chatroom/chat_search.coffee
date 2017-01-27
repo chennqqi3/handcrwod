@@ -59,7 +59,7 @@ angular.module('app.chatroom.search', [])
                 $scope.stopScrollTimer()                
             $scope.scrollTimer = $timeout(->
                     scrollView = angular.element('#chat_search_view')
-                    elem = angular.element('#chat_' + cmsg_id)
+                    elem = angular.element('#chat_search_' + cmsg_id)
                     if(elem && elem[0])
                         rect = elem[0].getBoundingClientRect()
                         if(type == "prev")
@@ -70,7 +70,7 @@ angular.module('app.chatroom.search', [])
                                 scrollOffset -= rect.height
                         else
                             scrollOffset = 0
-                        scrollView.duScrollToElement(angular.element('#chat_' + cmsg_id), scrollOffset)
+                        scrollView.duScrollToElement(angular.element('#chat_search_' + cmsg_id), scrollOffset)
 
                     $scope.stopScrollTimer()
                 )

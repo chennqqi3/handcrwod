@@ -1372,6 +1372,7 @@ angular.module('app.chatroom', [])
                             homeStorage.set_cur_home(home)
                         else if res.mission.private_flag == 2 && $rootScope.cur_home
                             res.mission.home_id = $rootScope.cur_home.home_id
+                            res.mission.accepted = 1
 
                         missionStorage.set_cur_mission(res.mission)
                         $scope.refreshBackImage()
@@ -1382,7 +1383,7 @@ angular.module('app.chatroom', [])
 
                 if load_chat_message
                     $scope.init_cmsg()
-                    chatStorage.messages($scope.mission_id, $scope.chat_id)
+                    chatStorage.messages($scope.mission_id, $scope.chat_id, $scope.chat_id)
                         .then((messages) ->
                             chatStorage.cache_messages($scope.mission_id, messages)
                             $scope.load_messages(messages)
@@ -1416,12 +1417,21 @@ angular.module('app.chatroom', [])
                 $scope.exitSearch()
             return
         $scope.onSelectSearchMessage = (message) ->
-            if !$api.is_empty($scope.cur_mission) && message.mission_id == $scope.cur_mission.mission_id
-                $scope.chat_id = message.cmsg_id
-                $scope.scrollToMessage($scope.chat_id)
-            else
-                $location.path("/chats/" + message.mission_id + "/" + message.cmsg_id)
+            ##if !$api.is_empty($scope.cur_mission) && message.mission_id == $scope.cur_mission.mission_id
+            ##    $scope.chat_id = message.cmsg_id
+            ##    $scope.scrollToMessage($scope.chat_id)
+            ##else
+            $location.path("/chats/" + message.mission_id + "/" + message.cmsg_id)
             return
+
+        # filter for searching emoticons
+        $scope.emoticonFilter = (em) ->
+            query = $scope.search_emoticon
+            if $api.is_empty(query)
+                return true
+
+            query = query.toUpperCase()
+            return em.title.toUpperCase().indexOf(query) != -1 || em.alt.toUpperCase().indexOf(query) != -1
 
         return
 )

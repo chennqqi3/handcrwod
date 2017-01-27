@@ -306,11 +306,11 @@
 
             $cmsg = new cmsg;
 
-            $sql = "SELECT m.*, f.user_name from_name, mi.mission_name, h.home_id, h.home_name, mi.private_flag  
+            $sql = "SELECT m.*, f.user_name from_name, mi.mission_name, h.home_id, h.home_name, mi.private_flag, mm.opp_user_id  
                 FROM t_cmsg m 
                 INNER JOIN t_mission mi ON m.mission_id=mi.mission_id
-                INNER JOIN t_home h ON h.home_id=mi.home_id
-                INNER JOIN t_mission_member mm ON mm.mission_id=m.mission_id AND user_id=" . _sql($user_id) . "
+                LEFT JOIN t_home h ON h.home_id=mi.home_id
+                INNER JOIN t_mission_member mm ON mm.mission_id=m.mission_id AND mm.user_id=" . _sql($user_id) . "
                 LEFT JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
                 LEFT JOIN m_user f ON m.from_id=f.user_id 
                 WHERE m.del_flag=0 AND mi.del_flag=0 AND ms.hidden IS NULL AND
@@ -342,7 +342,13 @@
 
             while ($err == ERR_OK)
             {
-                $home_name = ($cmsg->private_flag != CHAT_MEMBER) ? $cmsg->home_name : "";
+                if ($cmsg->private_flag == CHAT_MEMBER) {
+                    $cmsg->mission_name = user::get_user_name($cmsg->opp_user_id);
+                    $home_name = "";
+                }
+                else {
+                    $home_name = $cmsg->home_name;
+                }
                 
                 $item = array(
                     "mission_id" => $cmsg->mission_id,  
@@ -402,22 +408,23 @@
 
             $cmsg = new cmsg;
 
-            $sql = "SELECT m.cmsg_id, m.content, m.from_id, m.create_time, m.reacts,mi.mission_id, mi.mission_name, h.home_id, h.home_name, mi.private_flag
+            $sql = "SELECT m.cmsg_id, m.content, m.from_id, m.create_time, m.reacts,mi.mission_id, mi.mission_name, h.home_id, h.home_name, mi.private_flag, mm.opp_user_id  
                 FROM t_cmsg m 
                 INNER JOIN t_mission mi ON m.mission_id=mi.mission_id
-                INNER JOIN t_home h ON h.home_id=mi.home_id
+                LEFT JOIN t_home h ON h.home_id=mi.home_id
                 INNER JOIN t_cmsg_star ms ON m.cmsg_id=ms.cmsg_id AND ms.user_id=" . _sql($user_id) . "
+                INNER JOIN t_mission_member mm ON mm.mission_id=m.mission_id AND mm.user_id=" . _sql($user_id) . "
                 WHERE m.del_flag=0 AND mi.del_flag=0"; 
 
             $order = "DESC";
             if (!_is_empty($prev_id)) {
                 // load prev
-                $sql .= " AND m.cmsg_id < " . _sql($prev_id);
+                $sql .= " AND m.cmsg_id > " . _sql($prev_id);
+                $order = "ASC";
             }
             else if (!_is_empty($next_id)) {
                 // load next
-                $sql .= " AND m.cmsg_id > " . _sql($next_id);
-                $order = "ASC";
+                $sql .= " AND m.cmsg_id < " . _sql($next_id);
             }
 
             $sql .= " ORDER BY m.cmsg_id " . $order . " LIMIT " . $limit;
@@ -433,6 +440,13 @@
                     $user_names[$cmsg->from_id] = $from_name;
                 }
 
+                if ($cmsg->private_flag == CHAT_MEMBER) {
+                    $cmsg->mission_name = user::get_user_name($cmsg->opp_user_id);
+                    $home_name = "";
+                }
+                else {
+                    $home_name = $cmsg->home_name;
+                }
                 $home_name = ($cmsg->private_flag != CHAT_MEMBER) ? $cmsg->home_name : "";
 
                 $item = array(
@@ -448,7 +462,7 @@
                     "home_name" => $home_name
                 );
 
-                if ($order == "DESC")
+                if ($order == "ASC")
                     array_splice($cmsgs, 0, 0, array($item));
                 else
                     array_push($cmsgs, $item);

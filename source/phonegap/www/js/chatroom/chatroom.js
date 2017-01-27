@@ -105,7 +105,7 @@ angular.module('app.chatroom', [])
 
         $scope.load_messages = function(messages) {
             $timeout(function() {
-                $('#loader').hide();
+                $api.hide_waiting();
                 $rootScope.$broadcast('elastic:adjust'); 
             })
             var length;
@@ -1040,14 +1040,6 @@ angular.module('app.chatroom', [])
             chatStorage.star_message(message.cmsg_id, message.star);
         };
 
-        $rootScope.$on('unstar-message', function(evt, message) {
-            len = $scope.messages.length;
-            for (i = 0; i < len; i ++) {
-                if ($scope.messages[i].cmsg_id == message.cmsg_id)
-                    $scope.messages[i].star = false;
-            }
-        });
-
         $scope.unread = function(message) {
             chatStorage.unread_messages($scope.mission_id, [message.cmsg_id]).then(function(data) {
                 var mission;
@@ -1236,7 +1228,7 @@ angular.module('app.chatroom', [])
                 { text: '<i class="ion-quote icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージ引用</i>' }, 
                 { text: '<i class="ion-edit icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージ編集</i>' }, 
                 { text: '<i class="ion-trash-a icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージ削除</i>' }, 
-                { text: '<i class="fa ' + (message.star ? 'fa-star' : 'fa-star-o') + ' icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">スター付き</i>' },
+                { text: '<i class="fa ' + (message.star ? 'fa-star-o' : 'fa-star') + ' icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">' + (message.star ? 'スターを外す' : 'スター付き') + '</i>' },
                 { text: '<i class="ion-ios-copy-outline icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">メッセージコピー</i>' },
                 { text: '<i class="icon-emoticon-smile icon-button icon-action" ></i><span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">リアクション</i>' },
                 { text: '<span class="tab-action">&nbsp;&nbsp;&nbsp;</span><i class="text-action">未読にする</i>' }
@@ -1371,10 +1363,9 @@ angular.module('app.chatroom', [])
             if ($session.user_id !== null) {
                 missionStorage.set_cur_mission(mission);
 
-                if ($api.is_empty(mission) || ((mission.private_flag==0 || mission.private_flag==1) && $api.is_empty(mission.members)))
+                if ($api.is_empty(mission) || $api.is_empty(mission.members))
                 {
                     missionStorage.get($scope.mission_id, function(res) {
-                        console.log("get mission detail");
                         var m;
                         if (res.err_code === 0) {
                             if (res.mission.private_flag != 2 && $rootScope.cur_home.home_id != res.mission.home_id) {
@@ -1386,8 +1377,10 @@ angular.module('app.chatroom', [])
                                 console.log("new set_cur_home");
                                 homeStorage.set_cur_home(home);
                             }
-                            else if (res.mission.private_flag == 2 && $rootScope.cur_home)
+                            else if (res.mission.private_flag == 2 && $rootScope.cur_home) {
                                 res.mission.home_id = $rootScope.cur_home.home_id;
+                                res.mission.accepted = 1;
+                            }
                             
                             missionStorage.set_cur_mission(res.mission);
                         } else {
@@ -1398,10 +1391,11 @@ angular.module('app.chatroom', [])
                 }
 
                 $scope.init_cmsg();
+                $api.show_waiting();
                 //$chat.messages($scope.mission_id);
-                chatStorage.messages($scope.mission_id, $scope.chat_id).then(function(messages) {
+                chatStorage.messages($scope.mission_id, $scope.chat_id, $scope.chat_id).then(function(messages) {
                     $timeout(function() {
-                        $('#loader').hide();
+                        $api.hide_waiting();
                     }, 1000)
                     /*
                     var length;

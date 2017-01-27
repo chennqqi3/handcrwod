@@ -104,6 +104,7 @@ angular.module('handcrowd', [
 
     $rootScope.$on('$stateChangeSuccess', function(event, current, previous, rejection) {
         console.log('stateChangeSuccess ' + $location.path());
+        $rootScope.hide_navbar = false;
     });
 
     $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
@@ -385,7 +386,7 @@ angular.module('handcrowd', [
             })
             .state('tab.tasks.edit', {
                 url: '/edit/:task_id',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-tasks@tab': {
                         templateUrl: 'templates/task/task_edit.html' + ver,
@@ -405,11 +406,22 @@ angular.module('handcrowd', [
                 }
             })
 
+            // chatroom
             .state('tab.chatroom', {
                 url: '/chats/:mission_id/:chat_id?',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
+                        templateUrl: 'templates/chatroom/chatroom.html' + ver,
+                        controller: 'chatroomCtrl'
+                    }
+                }
+            })
+            .state('tab.star.chatroom', {
+                url: '/chats/:mission_id/:chat_id?',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
                         templateUrl: 'templates/chatroom/chatroom.html' + ver,
                         controller: 'chatroomCtrl'
                     }
@@ -430,9 +442,19 @@ angular.module('handcrowd', [
             // edit chatroom
             .state('tab.chatroom.edit', {
                 url: '/edit',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
+                        templateUrl: 'templates/mission/mission_edit.html' + ver,
+                        controller: 'missionEditCtrl'
+                    }
+                }
+            })
+            .state('tab.star.chatroom.edit', {
+                url: '/edit',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
                         templateUrl: 'templates/mission/mission_edit.html' + ver,
                         controller: 'missionEditCtrl'
                     }
@@ -442,9 +464,19 @@ angular.module('handcrowd', [
             // summary of chatroom
             .state('tab.chatroom.summary', {
                 url: '/summary',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
+                        templateUrl: 'templates/mission/mission_summary.html' + ver,
+                        controller: 'missionSummaryCtrl'
+                    }
+                }
+            })
+            .state('tab.star.chatroom.summary', {
+                url: '/summary',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
                         templateUrl: 'templates/mission/mission_summary.html' + ver,
                         controller: 'missionSummaryCtrl'
                     }
@@ -454,7 +486,7 @@ angular.module('handcrowd', [
             // task of chatroom
             .state('tab.chatroom.task', {
                 url: '/task',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
                         templateUrl: 'templates/task/task_list.html' + ver,
@@ -462,11 +494,31 @@ angular.module('handcrowd', [
                     }
                 }
             })
+            .state('tab.star.chatroom.task', {
+                url: '/task',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
+                        templateUrl: 'templates/task/task_list.html' + ver,
+                        controller: 'taskListCtrl'
+                    }
+                }
+            })
             .state('tab.chatroom.task.edit', {
                 url: '/edit/:task_id',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
+                        templateUrl: 'templates/task/task_edit.html' + ver,
+                        controller: 'taskEditCtrl'
+                    }
+                }
+            })
+            .state('tab.star.chatroom.task.edit', {
+                url: '/edit/:task_id',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
                         templateUrl: 'templates/task/task_edit.html' + ver,
                         controller: 'taskEditCtrl'
                     }
@@ -476,9 +528,19 @@ angular.module('handcrowd', [
             // process of chatroom
             .state('tab.chatroom.process', {
                 url: '/process',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
+                        templateUrl: 'templates/process/process.html' + ver,
+                        controller: 'processCtrl'
+                    }
+                }
+            })
+            .state('tab.star.chatroom.process', {
+                url: '/process',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
                         templateUrl: 'templates/process/process.html' + ver,
                         controller: 'processCtrl'
                     }
@@ -488,9 +550,19 @@ angular.module('handcrowd', [
             // attach of chatroom
             .state('tab.chatroom.attach', {
                 url: '/attach',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
+                        templateUrl: 'templates/mission/mission_attach.html' + ver,
+                        controller: 'missionAttachCtrl'
+                    }
+                }
+            })
+            .state('tab.star.chatroom.attach', {
+                url: '/attach',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
                         templateUrl: 'templates/mission/mission_attach.html' + ver,
                         controller: 'missionAttachCtrl'
                     }
@@ -500,7 +572,7 @@ angular.module('handcrowd', [
             // member of chatroom
             .state('tab.chatroom.member', {
                 url: '/member',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
                         templateUrl: 'templates/mission/mission_member.html' + ver,
@@ -508,11 +580,31 @@ angular.module('handcrowd', [
                     }
                 }
             })
+            .state('tab.star.chatroom.member', {
+                url: '/member',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
+                        templateUrl: 'templates/mission/mission_member.html' + ver,
+                        controller: 'missionMemberCtrl'
+                    }
+                }
+            })
             .state('tab.chatroom.member.add', {
                 url: '/add',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
+                        templateUrl: 'templates/mission/mission_member_add.html' + ver,
+                        controller: 'missionMemberAddCtrl'
+                    }
+                }
+            })
+            .state('tab.star.chatroom.member.add', {
+                url: '/add',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
+                views: {
+                    'tab-star@tab': {
                         templateUrl: 'templates/mission/mission_member_add.html' + ver,
                         controller: 'missionMemberAddCtrl'
                     }
@@ -522,7 +614,7 @@ angular.module('handcrowd', [
             // add emoticion
             .state('tab.chatroom.emoticon_add', {
                 url: '/emoticon_add',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
                     'tab-chats@tab': {
                         templateUrl: 'templates/chatroom/emoticon_add.html' + ver,
@@ -530,26 +622,37 @@ angular.module('handcrowd', [
                     }
                 }
             })
-
-            // star
-            .state('tab.chatroom.star', {
-                url: '/star',
-                data: { authorizedRoles: [USER_ROLES.user] },
+            .state('tab.star.chatroom.emoticon_add', {
+                url: '/emoticon_add',
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
-                    'tab-chats@tab': {
-                        templateUrl: 'templates/chatroom/chat_star.html' + ver,
-                        controller: 'chatStarCtrl'
+                    'tab-star@tab': {
+                        templateUrl: 'templates/chatroom/emoticon_add.html' + ver,
+                        controller: 'emoticonAddCtrl'
                     }
                 }
             })
 
-            .state('tab.member', {
+            // member
+            .state('tab.chats.member', {
                 url: '/member',
-                data: { authorizedRoles: [USER_ROLES.user] },
+                data: { authorizedRoles: [USER_ROLES.user], hideTabs: true },
                 views: {
-                    'tab-member': {
+                    'tab-chats@tab': {
                         templateUrl: 'templates/member/member_list.html' + ver,
                         controller: 'memberListCtrl'
+                    }
+                }
+            })
+
+            // star
+            .state('tab.star', {
+                url: '/star',
+                data: { authorizedRoles: [USER_ROLES.user] },
+                views: {
+                    'tab-star': {
+                        templateUrl: 'templates/tab-star.html' + ver,
+                        controller: 'chatStarCtrl'
                     }
                 }
             })

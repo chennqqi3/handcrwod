@@ -67,6 +67,7 @@ angular.module('app.api', [])
                     text = text.substr(0, 30)
                     text = text.replace(/\n/g, ' ')
                     text = text + ' ...'
+
                 notification = new Notification(title, 
                     icon: img,
                     body: text
@@ -78,8 +79,22 @@ angular.module('app.api', [])
                         window.focus()
             catch e
                 # ...
-            
             return
+
+        qr_image_url = (url, size) ->
+            if size == undefined
+                size = 300
+            return "http://chart.apis.google.com/chart?cht=qr&chs=" + size + "x" + size + "&chl=" + encodeURIComponent(url) + "&chld=H|0"
+            
+        init_emoticon = (icon) ->
+            icon.image = CONFIG.BASE + icon.image
+            icon.exp = icon.alt.replace(/\)/g, '\\)')
+            icon.exp = icon.exp.replace(/\(/g, '\\(')
+            icon.exp = icon.exp.replace(/\:/g, '\\:')
+            icon.exp = icon.exp.replace(/\|/g, '\\|')
+            icon.exp = icon.exp.replace(/\*/g, '\\*')
+            icon.exp = icon.exp.replace(/\^/g, '\\^')
+            icon.exp = new RegExp(icon.exp, 'g')
 
         return {
             call: call_api
@@ -90,6 +105,8 @@ angular.module('app.api', [])
             base_url: get_base_url
             init_notification: init_notification
             show_notification: show_notification
+            qr_image_url: qr_image_url
+            init_emoticon: init_emoticon
         }
 )
 

@@ -397,11 +397,30 @@ img.profile-pic.right {
     font-size: 12px;
 }
 
-.message-detail .time {
+.message-detail .misc {
     display: inline-block;
     float: right;
     padding-right: 5px;
+    padding-left: 5px;
+    line-height: 16px;
+    vertical-align: middle;
     color: #999;
+}
+
+.message-detail .time {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.message-detail .mission-name {
+    display: inline-block;
+    max-width: 100px;
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+    overflow:hidden;
+    vertical-align: middle;
+    color: #333;
+
 }
 
 .message .reacts {
@@ -429,18 +448,18 @@ img.profile-pic.right {
     margin-right: 5px;
 }
 
-.message-detail .time .unread {
+.message-detail .misc .unread {
     visibility: visible;
     opacity: 1;
     transition: visibility 1s, opacity 1s, easy;
 }
 
-.message-detail .time .unread.read {
+.message-detail .misc .unread.read {
     visibility: hidden;
     opacity: 0;
 }
 
-.message-detail .time .read {
+.message-detail .misc .read {
     visibility: hidden;
     opacity: 0;
 }
@@ -448,6 +467,7 @@ img.profile-pic.right {
 .bar.item-input-inset .item-input-wrapper {
     padding-top: 5px;
     padding-bottom: 5px;
+    margin-top: 0px;
 }
 .bar.item-input-inset .item-input-wrapper input {
     width: 100% !important;
@@ -834,11 +854,6 @@ div#emoticon_gallery .footer-btn {
 a.autolinker {
     color: #3b88c3;
     text-decoration: none;
-}
-
-.message-detail .time {
-    display: inline-block;
-    padding-left: 5px;
 }
 
 .text-danger {
@@ -1234,6 +1249,9 @@ ul.rating li i {
         box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px
     }
 }
+.hc-loader {
+    z-index: 9999;
+}
 .hc-loader:not(:required) {
     overflow: hidden;
     position: relative;
@@ -1252,6 +1270,11 @@ ul.rating li i {
 }
 
 #loader {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
     display: table;
     width: 100%;
     height: 100%;
@@ -1295,4 +1318,8 @@ ul.rating li i {
 
 .item-input-wrapper input {
     width: 100%;
+}
+
+.selectable{
+    -webkit-user-select: auto;
 }

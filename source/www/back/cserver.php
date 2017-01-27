@@ -103,7 +103,8 @@
             $this->_clients[$id] = $client;
 
             $user_id = $client->session('user_id');
-            if (!isset($this->_users[$user_id]) || !is_array($this->_users[$user_id]))
+
+            if (!isset($this->_users[$user_id]))
                 $this->_users[$user_id] = array();
             $this->_users[$user_id][$id] = $client;
 
@@ -148,10 +149,11 @@
                     "event" => $event
                 );
 
-                $this->send_message('ok', $msg, $user_id_from, array($user_id_from)); //send data to self 
+                $this->send_ok($msg, $client); //send data to self 
 
                 if ($this->checkAlreadyReceiveMessage($key, $client))
                 {
+                    $this->log("Already receive message");
                     // if already received message, skip the message
                     return;
                 }
@@ -311,6 +313,9 @@
                     $user_ids = mission_member::user_ids($mission_id);
                 
                 $this->send_message('chat_message', $msg, $user_id_from, $user_ids, null, null, $content); //send data to self and to
+            }
+            else {
+                $client->log("Could not set cmsg");
             }
         }
 
@@ -510,6 +515,12 @@
             $this->send_message('home', $msg, $user_id_from, $user_ids, $client);
         }
 
+        private function send_ok($data, $client)
+        {
+            $encodedData = $this->_encodeData('ok', $data);
+            $ret = $client->send($encodedData);
+        }
+
         private function send_message($event, $data, $from_id, $to_ids = null, $ignore_client = null, $to_client = null, $content=null)
         {
             if($to_ids == null)
@@ -647,7 +658,7 @@
                 'socket_class'           => 'Wrench\Socket\ServerClientSocket',
                 'socket_options'         => array(),
                 'connection_id_secret'   => 'asu5gj656h64Da(0crt8pud%^WAYWW$u76dwb',
-                'connection_id_algo'     => 'sha512'
+                'connection_id_algo'     => 'md5'
             )
         )
     ));

@@ -75,6 +75,26 @@ angular.module('app.service.chat', [])
                                     #$rootScope.$apply()
                                     chatStorage.sound_alert()
                                     $rootScope.$broadcast('refresh-home', home)
+
+                        if cmsg.push_flag
+                            title = ''
+                            if cmsg.user_name != null
+                                title = cmsg.user_name + "さん  "
+                            title += '(ハンドクラウド'
+                            if cmsg.home_name != null
+                                title += ":" + cmsg.home_name
+                            title += ")"
+
+                            img = CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg"
+                            text = chatizeService.strip(cmsg.content)
+                            path = "/chats/" + cmsg.mission_id
+                            if $rootScope.windowState == 'hidden'
+                                $api.show_notification(img, title, text, path)
+
+                            try 
+                                if window.external
+                                    window.external.notify(img, title, text, path)
+                            catch e
                     else
                         found_home = true
                     
@@ -83,15 +103,6 @@ angular.module('app.service.chat', [])
                     if !found_home
                         $rootScope.$broadcast('refresh-homes')
 
-                    if $rootScope.windowState == 'hidden' && cmsg.push_flag
-                        title = ''
-                        if cmsg.user_name != null
-                            title = cmsg.user_name + "さん  "
-                        title += '(ハンドクラウド'
-                        if cmsg.home_name != null
-                            title += ":" + cmsg.home_name
-                        title += ")"
-                        $api.show_notification(CONFIG.AVARTAR_URL + cmsg.user_id + ".jpg", title, chatizeService.strip(cmsg.content), "/chats/" + cmsg.mission_id)
                     $rootScope.$broadcast('receive_message', cmsg)
                 )
             )
