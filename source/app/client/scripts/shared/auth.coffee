@@ -96,6 +96,7 @@ angular.module('app.auth', [])
             this.time_zone = data.time_zone
             this.states = {}
             this.planconfig = data.plan
+            this.tutorial = data.tutorial
             $rootScope.alerts = data.alerts
             $rootScope.unreads = data.unreads
             $rootScope.chat_uri = data.chat_uri
@@ -124,6 +125,7 @@ angular.module('app.auth', [])
             this.time_zone = null
             this.states = null
             this.planconfig = null
+            this.tutorial = null
             $rootScope.homes = []
             $rootScope.cur_home = null
             $rootScope.missions = []

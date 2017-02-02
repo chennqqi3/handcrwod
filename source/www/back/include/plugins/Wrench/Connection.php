@@ -319,7 +319,7 @@ class Connection extends Configurable
     {
         $app = $this->getClientApplication();
 
-        $this->log('Handling payload: ' . $payload->getPayload(), 'debug');
+        //$this->log('Handling payload: ' . $payload->getPayload(), 'debug');
 
         switch ($type = $payload->getType()) {
             case Protocol::TYPE_TEXT:

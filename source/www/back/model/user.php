@@ -34,7 +34,8 @@
 					"access_time",
 					"plan_type",
 					"plan_start_date",
-					"plan_end_date"),
+					"plan_end_date", 
+					"tutorial"),
 				array("auto_inc" => true));
 		}
 
@@ -216,7 +217,8 @@
 				"alerts" => user::get_alerts($this->user_id),
 				"unreads" => cunread::all($this->user_id),
 				"chat_uri" => _chat_uri(),
-				"cache_uris" => _cache_uris()
+				"cache_uris" => _cache_uris(),
+				"tutorial" => $this->tutorial
 			);
 
 			return $ret;

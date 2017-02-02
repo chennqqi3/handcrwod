@@ -16,7 +16,8 @@
                     "client_id",
                     "home_name",
                     "summary",
-                    "logo"),
+                    "logo",
+                    "invite_key"),
                 array("auto_inc" => true));
         }
 
@@ -37,6 +38,8 @@
             if ($my_id == null)
                 return null;
 
+            $db = db::getDB();
+
             $home = new home;
             $home->home_name = $home_name;
             $home->client_id = $my_id;
@@ -50,6 +53,14 @@
                 $home_member->priv = HPRIV_HMANAGER;
                 $home_member->accepted = 1; // 承認済み
                 $err = $home_member->save(); 
+            }
+
+            if ($err == ERR_OK) {
+                // generate invite key
+                $sql = "UPDATE t_home SET invite_key=md5(concat(home_id, create_time)) 
+                    WHERE home_id=" . _sql($home->home_id) . ";";
+
+                $db->execute($sql);
             }
 
             if ($err == ERR_OK) {
@@ -127,11 +138,12 @@
             $home_member = new home_member;
             $home_member->home_id = $this->home_id;
             $home_member->user_id = $user_id;
-            $home_member->priv = HPRIV_MEMBER; // 初期メンバーに登録
+            $home_member->priv = HPRIV_GUEST; // 初期ゲストに登録
             $home_member->accepted = $accepted; // 承認待ち
 
             $err = $home_member->save();
 
+            /*
             if ($err == ERR_OK)
             {
                 // 公開チャットルームにメンバーを追加
@@ -153,6 +165,7 @@
 
                 $err = ERR_OK;
             }
+            */
 
             return $err;
         }
@@ -266,6 +279,61 @@
             }
 
             return $tasks;
+        }
+
+        public static function get_unreads($user_id, $home_priv, $home_id) {
+            $unreads = 0;
+            $to_unreads = 0;
+
+            $sql = "SELECT SUM(mm.unreads) unreads, SUM(mm.to_unreads) to_unreads
+                FROM t_mission m 
+                LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
+                LEFT JOIN m_user ou ON mm.opp_user_id=ou.user_id
+                WHERE m.home_id=" . _sql($home_id) . " AND 
+                    mm.user_id=" . _sql($user_id) . " AND 
+                    m.complete_flag=0 AND 
+                    m.private_flag != " . CHAT_MEMBER . " AND
+                    m.del_flag=0";
+            $model = new model;
+            $err = $model->query($sql);
+            if ($err == ERR_OK) {
+                $unreads = $model->unreads;
+                $to_unreads = $model->to_unreads;
+            }
+
+            $where = '';
+            if ($home_priv == HPRIV_GUEST) {
+                // 参加しているルームのメンバーとのみ
+                $where = "AND hm.user_id IN (
+                        SELECT DISTINCT mm.user_id FROM t_mission_member mm
+                        WHERE mm.mission_id IN (
+                            SELECT DISTINCT mm.mission_id FROM t_mission_member mm
+                            LEFT JOIN t_mission m ON mm.mission_id=m.mission_id
+                            WHERE mm.del_flag=0 AND m.del_flag=0 AND m.complete_flag!=1 
+                                AND m.home_id=" . _sql($home_id) . " 
+                                AND mm.user_id=" . _sql($user_id) . " 
+                                AND m.private_flag=" . CHAT_PRIVATE . "
+                                )
+                        )";
+            }
+            $sql = "SELECT SUM(m.unreads) unreads, SUM(m.to_unreads) to_unreads
+                FROM t_home_member hm 
+                LEFT JOIN (SELECT mm.opp_user_id, mm.unreads, mm.to_unreads
+                    FROM t_mission m 
+                    LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
+                    WHERE m.del_flag=0 AND 
+                        m.private_flag=" . CHAT_MEMBER . " AND 
+                        mm.user_id=" . _sql($user_id) . ") m ON m.opp_user_id=hm.user_id
+                WHERE hm.home_id=" . _sql($home_id) . " AND 
+                    hm.del_flag=0 " . $where;
+
+            $err = $model->query($sql);
+            if ($err == ERR_OK) {
+                $unreads += $model->unreads;
+                $to_unreads += $model->to_unreads;
+            }
+
+            return array("unreads" => $unreads, "to_unreads" => $to_unreads);
         }
     };
 ?>

@@ -17,13 +17,13 @@
                 </dd>
             </div>
             <div class="col-md-12">
-                <input type="text" class="form-control" required ng-model="mission.mission_name" placeholder="ルーム名を入力してください。" auto-focus="true">
+                <input id="new_mission_name" type="text" class="form-control" required ng-model="mission.mission_name" placeholder="ルーム名を入力してください。" auto-focus="true" ng-blur="onChange()">
             </div>
         </div>
         <div class="clear"></div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
-        <button type="submit" class="btn btn-primary" ng-click="ok()" ng-disabled="!canSubmit()">保存</button>
+        <button id="btn_add_mission_ok" type="submit" class="btn btn-primary" ng-click="ok()" ng-disabled="!canSubmit()">保存</button>
     </div>
 </form>

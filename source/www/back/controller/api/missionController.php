@@ -178,12 +178,11 @@
 			$mission = new mission;
 
 			$sql = "SELECT m.*, 
-					mm.pinned, mm.unreads, mm.to_unreads, ou.user_name opp_user_name, mm.opp_user_id, 
+					mm.pinned, mm.unreads, mm.to_unreads, 
 					DATEDIFF(NOW(), m.last_date) pass_date,
 					mm.last_date mm_last_date
 				FROM t_mission m 
 				LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
-				LEFT JOIN m_user ou ON mm.opp_user_id=ou.user_id
 				WHERE m.home_id=" . _sql($home_id) . " AND 
 					mm.user_id=" . _sql($my_id) . " AND
 					m.private_flag != " . CHAT_MEMBER . " AND
@@ -595,7 +594,6 @@
 				WHERE m.mission_id=" . _sql($params->mission_id) . " AND 
 					mm.user_id=" . _sql($my_id) . " AND
 					m.del_flag=0";
-					_debug_log($sql);
 
 			$err = $mission->query($sql);
 			if ($err == ERR_NODATA)
@@ -603,29 +601,35 @@
 			
 			$mission->load_other_info();	
 
-			$mission->user_id = $mission->opp_user_id;
-			$mission->user_name = $mission->opp_user_name;
-			if ($mission->user_id)
-				$mission->avartar = _avartar_full_url($mission->opp_user_id);
+			if ($mission->private_flag == CHAT_MEMBER) {
+				$mission->user_id = $mission->opp_user_id;
+				$mission->user_name = $mission->opp_user_name;
+				if ($mission->user_id)
+					$mission->avartar = _avartar_full_url($mission->opp_user_id);
 
-			$mission_member = new model;
-			$err = $mission_member->query("SELECT mm.user_id, u.user_name, u.email, u.login_id, mm.push_flag, mm.priv
-				FROM t_mission_member mm 
-				INNER JOIN m_user u ON mm.user_id=u.user_id 
-				WHERE mm.mission_id=" . _sql($params->mission_id) . " AND mm.del_flag=0
-				ORDER BY mm.create_time ASC");
-
-			if ($err == ERR_NODATA)
-				$this->checkError(ERR_NOTFOUND_MISSION);
-
-			while ($err == ERR_OK)
-			{
-				$mission_member->avartar = _avartar_full_url($mission_member->user_id);
-				array_push($members, $mission_member->props);
-
-				$err = $mission_member->fetch();
+				array_push($members, array("user_id" => $mission->opp_user_id, 
+						"user_name" => $mission->opp_user_name,
+						"avartar" => _avartar_full_url($mission->opp_user_id)));
 			}
+			else {
+				$mission_member = new model;
+				$err = $mission_member->query("SELECT mm.user_id, u.user_name, u.email, u.login_id, mm.push_flag, mm.priv
+					FROM t_mission_member mm 
+					INNER JOIN m_user u ON mm.user_id=u.user_id 
+					WHERE mm.mission_id=" . _sql($params->mission_id) . " AND mm.del_flag=0
+					ORDER BY mm.create_time ASC");
 
+				if ($err == ERR_NODATA)
+					$this->checkError(ERR_NOTFOUND_MISSION);
+
+				while ($err == ERR_OK)
+				{
+					$mission_member->avartar = _avartar_full_url($mission_member->user_id);
+					array_push($members, $mission_member->props);
+
+					$err = $mission_member->fetch();
+				}
+			}
 			$mission->members = $members;
 
 			$sql = "SELECT IFNULL(SUM(plan_budget), 0) FROM t_task WHERE mission_id=" . _sql($params->mission_id) . " AND del_flag=0";

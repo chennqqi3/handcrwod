@@ -16,16 +16,20 @@
                     "device_type",
                     "device_token",
                     "message",
-                    "fail_count"),
+                    "fail_count",
+                    "mission_id",
+                    "cmsg_id"),
                 array("auto_inc" => true));
         }
 
-        public static function add_push($device_type, $device_token, $message)
+        public static function add_push($device_type, $device_token, $message, $mission_id, $cmsg_id)
         {
             $push_msg = new push_msg;
             $push_msg->device_type = $device_type;
             $push_msg->device_token = $device_token;
             $push_msg->message = $message;
+            $push_msg->mission_id = $mission_id;
+            $push_msg->cmsg_id = $cmsg_id;
             return $push_msg->save();
         }
 
@@ -35,7 +39,7 @@
             $err = $push_msg->select("");
 
             while($err == ERR_OK) {
-                $res = _send_push($push_msg->device_type, $push_msg->device_token, $push_msg->message);
+                $res = _send_push($push_msg->device_type, $push_msg->device_token, $push_msg->message, $push_msg->mission_id, $push_msg->cmsg_id);
 
                 if ($res || $push_msg->fail_count > 3) {
                     $push_msg->remove(true);

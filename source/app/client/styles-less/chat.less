@@ -10,6 +10,16 @@
     font-size: 20px !important;
 }
 
+.emoticon_with_alt {
+    display: inline-block;
+    /* width: 32px; */
+    height: 32px;
+    background-repeat: no-repeat;
+    background-color: rgba(0, 0, 0, 0);
+    background-position: left;
+    font-size: 20px !important;
+    padding-left: 25px !important;
+}
 .chat-main {
     overflow: hidden;
     position: absolute;
@@ -623,7 +633,7 @@
     margin: 0px 3px;
 }
 
-.popover {
+.popover.chatpop {
     max-width: none;
     .popover-title {
         background-color: white;
@@ -714,6 +724,56 @@
         }
 
         &:nth-child(7n + 1) {
+            clear: both;
+        }            
+
+        &:last-child {
+            padding-bottom: 5px;
+        }   
+
+        &:hover {
+            background-color: #dcf0fa;
+            border-color: #b1d6ed;
+        }
+
+        &.selected {
+            border-color: #b1d6ed;
+        }
+    }     
+}
+
+.emoticon-list-with-alt {
+    padding: 5px;
+    margin-bottom: 0px;
+    list-style-type: none;
+    overflow-y: auto;
+    max-height: 234px;
+    height: 74px;
+
+    li {
+        float: left;
+        width: 145px;
+        padding: 5px;
+        cursor: pointer;
+        border: 1px solid #ffffff;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        -webkit-transition: border 0.2s linear 0s;
+        -moz-transition: border 0.2s linear 0s;
+        -ms-transition: border 0.2s linear 0s;
+        -o-transition: border 0.2s linear 0s;
+        transition: border 0.2s linear 0s;
+
+        &:first-child {
+            padding-top: 5px;
+        }
+
+        &:nth-child(6n) {
+            padding-right: 5px;
+        }
+
+        &:nth-child(6n + 1) {
             clear: both;
         }            
 

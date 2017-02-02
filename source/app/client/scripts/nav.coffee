@@ -9,8 +9,36 @@ angular.module('app.controller.nav', [])
         $scope.init = ()->
             $scope.session = $session
             $scope.loaded = false
+
+            $api.hide_tutorial()
+
             $timeout(() ->
                 $scope.loaded = true
+
+                $timeout(->
+                    # チュートリアル
+                    if $session.tutorial
+                        mem_count = 0
+                        for mission in $rootScope.missions
+                            if mission.private_flag == 2 && mission.user_id != $session.user_id
+                                mem_count++
+
+                        if mem_count == 0
+                            $('#btn_nav_invite_member').tutpop(
+                                content: 'グループにメンバーがいません。こちらから他人をグループに招待してください。'
+                            ).tutpop('show').on('close.tutpop', $api.close_tutorial)
+
+                        else
+                            ms_count = 0
+                            for mission in $rootScope.missions
+                                if mission.private_flag == 0 || mission.private_flag == 1
+                                    ms_count++                    
+
+                            if ms_count < 2
+                                $('#btn_add_mission').tutpop(
+                                    content: '新しいルームを作成するには、こちらをクリックしてください。'
+                                ).tutpop('show').on('close.tutpop', $api.close_tutorial)
+                , 1000)
             )
            
         $scope.init()
@@ -45,6 +73,7 @@ angular.module('app.controller.nav', [])
         # Mission related
         $scope.addMission = () ->
             $dialogs.addMission()
+            $api.hide_tutorial()
             return
 
         $scope.openMission = (private_flag) ->
@@ -79,6 +108,7 @@ angular.module('app.controller.nav', [])
         # グループへの招待
         $scope.inviteMember = ->
             $dialogs.inviteHome($rootScope.cur_home)
+            $api.hide_tutorial()
 
         # toggle group
         $scope.groups = [true, true, true]
@@ -183,12 +213,23 @@ angular.module('app.controller.nav', [])
                                     )
                                 else
                                     logger.logError(res.err_msg)
-                            )   
+                            )  
+
+        $scope.scroll_unread = () -> 
+            top = missionStorage.get_top_of_hidden_unreads()
+            h = $('#nav').height()
+            h_avartar = $('.nav-bar .my-avartar').height()
+            h_logout = $('.nav-bar .logout').height()
+            h_unread = $('.nav-bar .unread_hint').height()
+            h = h - h_avartar - h_logout - h_unread
+            top = if top > h then (top - h ) else h
+            $('#nav').animate({scrollTop: top}, 100);
+            return
 )
 
 
 .controller('NavHomeCtrl', 
-    ($scope, $rootScope, $session, AUTH_EVENTS, $route, homeStorage, logger, $dialogs, $location, $timeout) ->
+    ($scope, $rootScope, $session, AUTH_EVENTS, $route, homeStorage, logger, $dialogs, $location, $timeout, $api) ->
         app = $('#app')
 
         $scope.init = ()->
@@ -229,13 +270,13 @@ angular.module('app.controller.nav', [])
         # グループ追加  
         $scope.addHome = ->
             $dialogs.addHome()
+            $api.hide_tutorial()
+            return
 
         $scope.$on('added_home', (event, home) ->
+            $rootScope.$broadcast('refresh-homes')
             if $rootScope.cur_home == null
                 $location.path('/home/' + home.home_id)
-            else
-                $rootScope.$broadcast('refresh-homes')
-                
             return
         )
 )
@@ -291,7 +332,7 @@ angular.module('app.controller.nav', [])
         if $rootScope.cur_home != null
             template += '<li>'
             if ($rootScope.cur_home.priv == HPRIV.HMANAGER) 
-                template += '<a href="javascript:;" title="チャットルーム新規作成" ng-click="addMission()" class="right-button"><i class="icon-plus"></i></a>'
+                template += '<a id="btn_add_mission" href="javascript:;" title="チャットルーム新規作成" ng-click="addMission()" class="right-button"><i class="icon-plus"></i></a>'
             template += '    <a href="javascript:;" ng-click="toggleGroup(0)"><i class="icon-bubbles"></i><span>ルーム</span></a>'
             template += '    <ul class="list-mission">'
 
@@ -315,7 +356,7 @@ angular.module('app.controller.nav', [])
 
             template += '<li>'
             if ($rootScope.cur_home.priv == HPRIV.HMANAGER) 
-                template += '<a href="javascript:;" title="メンバーを招待" ng-click="inviteMember()" class="right-button"><i class="icon-plus"></i></a>'
+                template += '<a id="btn_nav_invite_member" href="javascript:;" title="メンバーを招待" ng-click="inviteMember()" class="right-button"><i class="icon-plus"></i></a>'
             template += '    <a href="javascript:;" ng-click="toggleGroup(2)"><i class="icon-people"></i><span>メンバー</span></a>'
             template += '    <ul class="list-team-member">'
 
@@ -370,7 +411,7 @@ angular.module('app.controller.nav', [])
             for home in $rootScope.homes
                 template += homeStorage.home_to_html(home)
 
-        template += '<li title="グループ新規作成" ng-click="addHome()">'
+        template += '<li id="add_home" title="グループ新規作成" ng-click="addHome()">'
         template += '    <span><i class="icon-plus"></i></span>'
         template += '</li>'
 

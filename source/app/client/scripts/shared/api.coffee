@@ -1,7 +1,7 @@
 angular.module('app.api', [])
 
 .factory('$api', 
-    ($rootScope, $http, $session, $upload, logger, CONFIG, $location) ->
+    ($rootScope, $http, $session, $upload, logger, CONFIG, $location, $dialogs) ->
         call_api = (url, data) ->
             data = data || {}
             data.TOKEN = $session.getTOKEN() if url != 'user/signin' && is_empty(data.TOKEN)
@@ -96,6 +96,22 @@ angular.module('app.api', [])
             icon.exp = icon.exp.replace(/\^/g, '\\^')
             icon.exp = new RegExp(icon.exp, 'g')
 
+        hide_tutorial = () ->
+            $('.tutpop').remove()
+            return
+
+        close_tutorial = () ->
+            $dialogs.confirm("チュートリアルを閉じる", "チュートリアルを閉じます。よろしいですか？", "OK", ->
+                hide_tutorial()
+
+                call_api('user/close_tutorial')
+                    .then((res) ->
+                        if res.data.err_code == 0
+                            $session.tutorial = 0
+                    )
+            )
+            return
+
         return {
             call: call_api
             upload_file: upload_file
@@ -107,6 +123,8 @@ angular.module('app.api', [])
             show_notification: show_notification
             qr_image_url: qr_image_url
             init_emoticon: init_emoticon
+            hide_tutorial: hide_tutorial
+            close_tutorial: close_tutorial
         }
 )
 

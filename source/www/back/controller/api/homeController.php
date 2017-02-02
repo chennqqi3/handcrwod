@@ -194,14 +194,9 @@
             $homes = array();
             $home = new home;
 
-            $sql = "SELECT h.home_id, h.home_name, h.summary, h.client_id, hm.last_date, hm.priv, hu.unreads, hu.to_unreads, h.logo
+            $sql = "SELECT h.home_id, h.home_name, h.summary, h.client_id, hm.last_date, hm.priv, h.logo
                 FROM t_home h 
                 LEFT JOIN t_home_member hm ON h.home_id=hm.home_id
-                LEFT JOIN (SELECT m.home_id, SUM(mm.unreads) unreads, SUM(mm.to_unreads) to_unreads
-                    FROM t_mission m
-                    INNER JOIN t_mission_member mm ON m.mission_id=mm.mission_id
-                    WHERE mm.user_id=" . _sql($my_id) . " AND m.del_flag=0
-                    GROUP BY m.home_id) hu ON h.home_id=hu.home_id
                 WHERE hm.user_id=" . _sql($my_id) . " AND h.del_flag=0 AND hm.accepted=1";
 
             if (!_is_empty($params->search_string)) {
@@ -214,7 +209,7 @@
                 $order = $params->sort_field . " " . $params->sort_order;
             else 
             */
-            $order = "hu.unreads DESC, hm.last_date DESC";
+            $order = "hm.last_date DESC";
 
             $err = $home->query($sql,
                 array("order" => $order));
@@ -223,6 +218,8 @@
 
             while ($err == ERR_OK)
             {
+                $u = home::get_unreads($my_id, $home->priv, $home->home_id);
+
                 $m = array(
                     "home_id" => $home->home_id,
                     "home_name" => $home->home_name,
@@ -230,8 +227,8 @@
                     "logo_url" => $home->logo_url(),
                     "last_date" => $home->last_date,
                     "priv" => $home->priv,
-                    "unreads" => _if_null($home->unreads),
-                    "to_unreads" => _if_null($home->to_unreads)
+                    "unreads" => $u["unreads"],
+                    "to_unreads" => $u["to_unreads"]
                 ); 
 
                 array_push($homes, $m);
@@ -274,54 +271,6 @@
             if ($home == null)
                 $this->checkError(ERR_NOTFOUND_HOME);
 
-            $publics = array();
-            $privates = array();
-
-            $public_where = "m.private_flag=" . CHAT_PUBLIC;
-            if ($params->public_complete_flag != 1)
-                $public_where .= " AND m.complete_flag=0";
-            $private_where = "m.private_flag=" . CHAT_PRIVATE;
-            if ($params->private_complete_flag != 1)
-                $private_where .= " AND m.complete_flag=0";
-
-            $mission = new mission;
-            $sql = "SELECT m.*, 
-                    mm.pinned, mm.unreads, mm.to_unreads
-                FROM t_mission m 
-                LEFT JOIN t_mission_member mm ON m.mission_id=mm.mission_id
-                WHERE m.home_id=" . _sql($params->home_id) . " AND 
-                    mm.user_id=" . _sql($my_id) . " AND
-                    m.del_flag=0 AND (" . $public_where . " OR " . $private_where . ")
-                ORDER BY m.complete_flag ASC, m.mission_name ASC";
-
-            $err = $mission->query($sql);
-            $unreads = 0;
-            $to_unreads = 0;
-            while ($err == ERR_OK)
-            {
-                $m = array(
-                    "mission_id" => $mission->mission_id,
-                    "mission_name" => $mission->mission_name,
-                    "pinned" => $mission->pinned,
-                    "unreads" => _if_null($mission->unreads),
-                    "to_unreads" => _if_null($mission->to_unreads),
-                    "last_date" => $mission->last_date,
-                    "complete_flag" => $mission->complete_flag
-                );
-                $unreads += $mission->unreads;
-                $to_unreads += $mission->to_unreads;
-                if ($mission->private_flag == CHAT_PUBLIC)
-                    array_push($publics, $m);
-                else
-                    array_push($privates, $m);
-
-                $err = $mission->fetch();
-            }
-            $home->unreads = $unreads;
-            $home->to_unreads = $to_unreads;
-            $home->publics = $publics;
-            $home->privates = $privates;
-            
             $home->members = home_member::members($params->home_id);
 
             $found = false;
@@ -334,6 +283,10 @@
 
             if ($found == false)
                 $this->checkError(ERR_NOPRIV);
+
+            $u = home::get_unreads($my_id, $home->priv, $params->home_id);
+            $home->unreads = $u["unreads"];
+            $home->to_unreads = $u["to_unreads"];
 
             // set last home
             home::last_home($home->home_id);

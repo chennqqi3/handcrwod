@@ -59,6 +59,7 @@ angular.module('app.chatroom', [])
                 user_id: $session.user_id
                 user_name: $session.user_name
                 content: msg
+                emoticon_alt: 0
 
             $rootScope.cmsg_sn -= 1
 
@@ -74,12 +75,71 @@ angular.module('app.chatroom', [])
                 user_id: $session.user_id
                 user_name: $session.user_name
                 content: ''
+                emoticon_alt: 0
 
             $rootScope.cmsg_sn -= 1
 
             if clear_storage == true
                 $scope.save_in_storage()
-            return                
+            return
+
+        $scope.on_keypress = (e) ->
+            $timeout(->
+                emoticons = $('#alternative_emoticons')
+                txta = $('#chat_ta')
+
+                emoticon_fitered_count = 0
+                query = ''
+                if $scope.cmsg.content != undefined
+                    query = $scope.cmsg.content.substring($scope.cmsg.emoticon_alt, txta[0].selectionStart)
+                if emoticons.data('isShowing') != 'true'
+                    query = ''
+                for em in $scope.emoticons
+                    if em.alt.toUpperCase().indexOf(query) != -1
+                        emoticon_fitered_count++
+
+                if emoticon_fitered_count == 0 && emoticons.data('isShowing') == 'true'
+                    emoticons.hide()
+                    emoticons.data('isShowing', "false")
+                    $scope.cmsg.emoticon_alt = 0
+
+                else
+                    isShowing = emoticons.data('isShowing')
+                    if isShowing != 'true'                    
+                        if e.key == ':'
+                            $scope.cmsg.emoticon_alt = txta[0].selectionStart
+                            ele = angular.element('#input_bar .item-input-wrapper')
+                            btn_rect = ele[0].getBoundingClientRect()
+                            pos = (x: 0, y: 0)
+                            width = ele[0].clientWidth - 5
+
+                            gwidth = Math.abs($('#alternative_emoticons').width())
+                            gheight = Math.abs($('#alternative_emoticons').height())
+                            pos.x = btn_rect.left
+                            pos.y = btn_rect.top - 69
+
+                            emoticons.data('isShowing', "true")
+                            $('#alternative_emoticons .emoticon-list-with-alt').css('width', width)
+                            emoticons.css('left', pos.x).css('top', pos.y).show()
+            )
+
+        $scope.on_change_message = ->
+            $scope.save_in_storage()
+
+            # チュートリアル
+            if $session.tutorial
+                my_count = 0
+                for m in $scope.messages
+                    if $session.user_id == m.user_id
+                        my_count++
+
+                if my_count == 0
+                    # step 1
+                    if !$api.is_empty($scope.cmsg.content)
+                        $('#chat_ta').tutpop('hide')
+                        $('#btn_send_message').tutpop('show')
+
+            return
 
         $scope.save_in_storage = () ->
             try 
@@ -136,6 +196,21 @@ angular.module('app.chatroom', [])
                 )
             $scope.startReadTimer()
 
+            # チュートリアル
+            if $session.tutorial 
+                my_count = 0
+                for m in $scope.messages
+                    if $session.user_id == m.user_id
+                        my_count++
+
+                if my_count == 0
+                    # step 1
+                    if $api.is_empty($scope.cmsg.content)
+                        $('#chat_ta').tutpop('show')
+                    else
+                        $('#btn_send_message').tutpop('show')
+
+
         # Emoticon
         $rootScope.$on('$viewContentLoaded', ->
             if ($('.chat-main #emoticon_gallery').length > 0)
@@ -149,6 +224,10 @@ angular.module('app.chatroom', [])
             if ($('.chat-main #to_users').length > 0)
                 $('body > #to_users').remove()
                 $('.chat-main #to_users').appendTo($('body'))
+
+            if ($('.chat-main #alternative_emoticons').length > 0)
+                $('body > #alternative_emoticons').remove()
+                $('.chat-main #alternative_emoticons').appendTo($('body'))
 
             $('body > #selection_menu').hide()
             if ($('.chat-main #selection_menu').length > 0) 
@@ -200,6 +279,12 @@ angular.module('app.chatroom', [])
                 $('.btn-react').each(() ->
                     if !$(this).is(e.target) && $(this).has(e.target).length == 0 && $('.popover').has(e.target).length == 0
                         $('#react_emoticons').hide()
+                )
+
+                $('#input_bar .item-input-wrapper').each(() ->
+                    if !$(this).is(e.target) && $(this).has(e.target).length == 0 && $('.popover').has(e.target).length == 0
+                        $('#alternative_emoticons').hide()
+                        $(this).data('isShowing', "false")
                 )
             )
 
@@ -344,6 +429,26 @@ angular.module('app.chatroom', [])
             $scope.cmsg.content = str
             angular.element('#input_bar .footer-btn-wrap .btn-smile').data('isShowing', "false")
             $('#emoticon_gallery').hide()
+
+            $timeout(->
+                chat_ta = document.getElementById('chat_ta')
+                chat_ta.focus()
+                chat_ta.setSelectionRange(start, start)
+            )
+            return
+
+
+        $scope.emoticon_message_with_alt = (emo_text) ->
+            txta = $('.item-input-wrapper textarea')
+            start = txta.prop("selectionStart")
+            str = ""
+            strPrefix = $scope.cmsg.content.substring(0, $scope.cmsg.emoticon_alt - 1)
+            strSuffix = $scope.cmsg.content.substring(start)
+            start += emo_text.length - (start - $scope.cmsg.emoticon_alt + 1)
+            str = strPrefix + emo_text + strSuffix
+            $scope.cmsg.content = str
+            $('#alternative_emoticons').data('isShowing', "false")
+            $('#alternative_emoticons').hide()
 
             $timeout(->
                 chat_ta = document.getElementById('chat_ta')
@@ -750,6 +855,12 @@ angular.module('app.chatroom', [])
 
             $scope.clear_cmsg(true)
 
+            # チュートリアル
+            if $session.tutorial
+                $('#btn_send_message').tutpop('hide')
+
+            return
+
         $scope.$on('receive_message', (event, cmsg) ->
             if cmsg.mission_id == $scope.mission_id
                 console.log("receive cmsg_id:" + cmsg.cmsg_id)
@@ -1119,6 +1230,9 @@ angular.module('app.chatroom', [])
 
         $scope.inviteMission = ->
             $dialogs.addMissionMember($rootScope.cur_mission)
+            # チュートリアル
+            if $session.tutorial
+                $('#btn_room_setting').tutpop('hide')
             return
 
         # Resize
@@ -1307,6 +1421,10 @@ angular.module('app.chatroom', [])
             )
 
         $scope.$on('$destroy', () ->
+            # チュートリアル
+            if $session.tutorial
+                $api.hide_tutorial()
+
             angular.forEach $rootScope.missions, (mission) ->
                 if mission.mission_id == $scope.mission_id && mission.unreads > 0 && !$scope.set_unread
                     chatStorage.read_messages($scope.mission_id)
@@ -1362,6 +1480,23 @@ angular.module('app.chatroom', [])
             $scope.session = $session
 
             if $session.user_id != null 
+                # チュートリアル
+                if $session.tutorial 
+                    # step 1
+                    $('#chat_ta').tutpop(
+                        placement: 'top'
+                        title: 'メッセージ入力'
+                        content: '送信しようとするメッセージを入力してください'
+                    ).on('close.tutpop', $api.close_tutorial)
+                    
+                    # step 2
+                    $('#btn_send_message').tutpop(
+                        placement: 'top'
+                        animate: false
+                        title: 'メッセージ送信'
+                        content: 'こちらを押してメッセージを送信するか、SHIFT ＋ ENTERで送信してください。'
+                    ).on('close.tutpop', $api.close_tutorial)
+
                 missionStorage.get($scope.mission_id, (res) ->
                     if (res.err_code == 0) 
                         if res.mission.private_flag != 2 && $rootScope.cur_home.home_id != res.mission.home_id
@@ -1372,9 +1507,18 @@ angular.module('app.chatroom', [])
                             homeStorage.set_cur_home(home)
                         else if res.mission.private_flag == 2 && $rootScope.cur_home
                             res.mission.home_id = $rootScope.cur_home.home_id
-                            res.mission.accepted = 1
 
                         missionStorage.set_cur_mission(res.mission)
+ 
+                        # チュートリアル
+                        if $session.tutorial
+                            if $rootScope.cur_mission.private_flag == 1 && $scope.canEditMissionMember() && $rootScope.cur_mission.members.length == 1
+                                $('#btn_room_setting').tutpop(
+                                    placement: 'left'
+                                    title: 'ルームに招待'
+                                    content: '他人をルームに招待するには、こちらをクリック後、ポップアップメニューから「ルームの共有」を選択してください。'
+                                ).tutpop('show').on('close.tutpop', $api.close_tutorial)
+
                         $scope.refreshBackImage()
                     else 
                         logger.logError(res.err_msg)
@@ -1433,6 +1577,18 @@ angular.module('app.chatroom', [])
             query = query.toUpperCase()
             return em.title.toUpperCase().indexOf(query) != -1 || em.alt.toUpperCase().indexOf(query) != -1
 
+        # filter for searching alternative emoticons
+        $scope.alternative_emoticonFilter = (em) ->
+            query = ''
+            if $scope.cmsg.content != undefined
+                query = $scope.cmsg.content.substring($scope.cmsg.emoticon_alt, $('#chat_ta')[0].selectionStart)
+            if $('#alternative_emoticons').data('isShowing') != 'true'
+                query = ''
+            if $api.is_empty(query)
+                return true
+
+            query = query.toUpperCase()
+            return em.alt.toUpperCase().indexOf(query) != -1
         return
 )
 

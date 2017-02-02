@@ -2,6 +2,8 @@ angular.module('app.chat.list', [])
 
 .controller('chatsCtrl', 
     function($scope, $rootScope, $api, $session, $ionicPopup, $ionicPopover, $ionicModal, $ionicListDelegate, $ionicScrollDelegate, $ionicActionSheet, homeStorage, missionStorage, chatStorage, logger, $timeout, $state, qrStorage) {
+    viewScroll = $ionicScrollDelegate.$getByHandle('missionScroll');    
+
     // toggle group
     $scope.groups = [true, true, true];
     $scope.toggleGroup = function(index) {
@@ -68,7 +70,6 @@ angular.module('app.chat.list', [])
         query = $scope.search.text;
         if (query != '')
             query = query.toUpperCase();
-        viewScroll = $ionicScrollDelegate.$getByHandle('missionScroll');
         viewScroll.scrollTop(true);
         if ($rootScope.cur_home) {
             len = $rootScope.missions.length;
@@ -551,6 +552,56 @@ angular.module('app.chat.list', [])
         $scope.hideOthers();
         qrStorage.scan();
     };
+
+    $scope.show_unread_hint = false;
+    get_top_of_hidden_unreads = function() {
+        var avartar, el, id, logout, mission, offset, parentRect, _i, _len, _ref;
+        var elem = angular.element(document.querySelector('#chats_view'));
+        var scrollTop = viewScroll.getScrollPosition().top;
+        console.log("scroll " + scrollTop);
+        var scrollHeight = elem[0].scrollHeight;
+        var viewHeight = elem[0].offsetHeight;
+
+        if ($rootScope.missions) {
+            _ref = $rootScope.missions;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                mission = _ref[_i];
+                if (mission.unreads > 0) {
+                    id = missionStorage.mission_html_id(mission);
+                    el = angular.element(document.querySelector('#' + id))[0];
+                    if (el) {
+                        offset = el.getBoundingClientRect();
+                        console.log("offset" + offset.top);
+                        if (offset && offset.top > viewHeight) {
+                            return scrollTop + offset.top + offset.height;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    };
+    $scope.check_hidden_unreads = function() {
+        if ((get_top_of_hidden_unreads() !== null)) {
+            $('.unread_hint').show();
+        }
+        else {
+            $('.unread_hint').hide();
+        }
+    };
+
+    $scope.scroll_unread = function() {
+        var top = get_top_of_hidden_unreads();
+        var elem = angular.element(document.querySelector('#chats_view'));
+        h = elem[0].offsetHeight;
+        top = top > h ? (top - h ) : h;
+        viewScroll.scrollTo(0, top);
+        return;
+    };
+
+    $scope.$on('rendered-missions', function(event) {
+        $scope.check_hidden_unreads();
+    });
            
 })
 
@@ -607,13 +658,14 @@ angular.module('app.chat.list', [])
                 template += missionStorage.mission_to_html(mission, scope.groups);
             }
         }
+        template += '<div class="dummy-item"></div>';
         return template;
     }; 
 
     var linker = function(scope, element, attrs){
       element.html(getTemplate(scope));
       $compile(element.contents())(scope);
-      
+      $rootScope.$broadcast("rendered-missions");
     };
 
     return {

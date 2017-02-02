@@ -3,7 +3,7 @@ angular.module('app.home.invite', [])
 .controller('homeInviteCtrl', 
     ($scope, $rootScope, $modalInstance, $api, home, email, 
         logger, $timeout, $session, homeStorage, $chat, ALERT_TYPE, $dialogs) ->
-        content = $session.user_name + "( " + $session.email + " )様より、「ハンドクラウド」へ招待されました。\n" + 
+        content = $session.user_name + "様より、「ハンドクラウド」へ招待されました。\n" + 
             "招待されたグループは、下記の通りです。\n" +
             "グループ名:" + home.home_name + "\n"
 
@@ -17,6 +17,7 @@ angular.module('app.home.invite', [])
 
         $scope.cancel = ->
             $modalInstance.dismiss('cancel')
+            $api.hide_tutorial()
 
         $scope.ok = ->
             $scope.posting = true
@@ -45,5 +46,33 @@ angular.module('app.home.invite', [])
                 "handcrowd://invite_home?id=" + home.home_id + "&key=" + home.invite_key,
                 "招待QRコード(" + home.home_name + ")")
             return
+
+        # チュートリアル
+        if $session.tutorial
+            $scope._destroy = $scope.$destroy
+            $scope.$destroy = ->
+                $api.hide_tutorial()
+                $scope._destroy()
+
+            $timeout(->
+                # step 1
+                $('#invite_email').tutpop(
+                    placement: 'bottom'
+                    title: 'メールアドレス'
+                    content: '招待しようとするメールアドレスやユーザーIDを入力してください'
+                ).tutpop('show').on('close.tutpop', $api.close_tutorial)
+                # step 2
+                $('#btn_invite_member_ok').tutpop(
+                    placement: 'bottom'
+                    title: 'グループへの招待'
+                    content: '招待ボタンを押すと、招待メールが送付されます。'
+                ).on('close.tutpop', $api.close_tutorial)
+            , 500)
+
+            $scope.onChange = ->
+                if $scope.canSubmit()
+                    $('#invite_email').tutpop('destroy')
+                    $('#btn_invite_member_ok').tutpop('show')
+                return
 
 )

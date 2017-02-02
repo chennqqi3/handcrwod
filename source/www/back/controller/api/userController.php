@@ -74,6 +74,7 @@
 			$user->activate_key = null; // _newId();
 			$user->activate_until = null; // "##DATE_ADD(NOW(),INTERVAL 1 DAY)";
 			$user->plan_type = PLAN_FREE;
+			$user->tutorial = 1;
 
 			if (!_is_empty($params->email)) {
 				$same_user = new user;
@@ -531,6 +532,20 @@
 
 			$my_id = _user_id();
 			$this->finish(array("unreads" => cunread::all($my_id)), ERR_OK);
+		}
+
+		public function close_tutorial()
+		{
+			$this->setApiParams(array());
+			$params = $this->api_params;
+
+			$user = _user();
+			if ($user != null) {
+				$user->tutorial = 0;
+				$user->save();
+			}
+			
+			$this->finish(null, ERR_OK);
 		}
 	}
 ?>

@@ -19,7 +19,7 @@ module.exports = (grunt) ->
     # configurable paths
     yeomanConfig =
         app: "client"
-        dist: "dist"
+        dist: "../www/app"
 
     try
         yeomanConfig.app = require("./bower.json").appPath or yeomanConfig.app

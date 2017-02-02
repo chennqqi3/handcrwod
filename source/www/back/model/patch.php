@@ -403,7 +403,10 @@ No.157 タスクの詳細画面を出すのに、タスクを選んで右上の�
 "),		
 			"2.9" => array("func" => "patch2_9", "description" => "チャットサーバー安定化
 -キャッシュー利用
-")
+"),
+			"2.10" => array("func" => "patch2_10", "description" => "プッシュ通知からクリックした場合、そのメッセージへ移動
+"),
+			"2.11" => array("func" => "patch2_11", "description" => "チュートリアル追加")
 			);
 
 		public function __construct()
@@ -431,7 +434,7 @@ No.157 タスクの詳細画面を出すのに、タスクを選んで右上の�
 					$p["version"] = $version;
 					$must_patches[$version] = $p;
 				}
-				if ($version == $this->version)
+				if ($version === $this->version)
 					$patched = false;
 			}
 
@@ -451,7 +454,7 @@ No.157 タスクの詳細画面を出すのに、タスクを選んで右上の�
 					if ($err != ERR_OK)
 						return $err;
 				}
-				if ($version == $this->version)
+				if ($version === $this->version)
 					$patched = false;
 			}
 
@@ -1240,6 +1243,26 @@ DELETE FROM t_cmsg WHERE del_flag=1;
 
 			return ERR_OK;
 			
+		}
+
+		public function patch2_10() {
+			$sql  = "ALTER TABLE `t_push_msg`
+ADD COLUMN `mission_id`  int NULL AFTER `fail_count`,
+ADD COLUMN `cmsg_id`  int NULL AFTER `mission_id`;
+";
+			$this->db->execute_batch($sql);
+
+			return ERR_OK;
+		}
+
+		public function patch2_11() {
+			$sql  = "ALTER TABLE `m_user`
+ADD COLUMN `tutorial`  int(1) DEFAULT 0 AFTER `plan_end_date`;
+;
+";
+			$this->db->execute_batch($sql);
+
+			return ERR_OK;
 		}
 	};
 ?>

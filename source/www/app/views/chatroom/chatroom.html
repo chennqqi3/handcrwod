@@ -2,12 +2,12 @@
 	<header class="title-bar">
         <ul class="button-group-left" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">
             <li dropdown>
-                <button type="button" class="btn btn-default btn-circle" dropdown-toggle><i class="icon-list"></i></button>
+                <button id="btn_room_setting" type="button" class="btn btn-default btn-circle" dropdown-toggle><i class="icon-list"></i></button>
                 <ul class="dropdown-menu" aria-labelledby="simple-dropdown">
                     <li>
                         <a href ng-click="editMission()"><i class="icon-info"></i> チャットルーム情報</a>
                     </li>
-                    <li ng-show="cur_mission.private_flag!=0 && canEditMissionMember()">
+                    <li ng-show="cur_mission.private_flag == 1 && canEditMissionMember()">
                         <a href ng-click="inviteMission()"><i class="icon-user-follow"></i> ルームの共有</a>
                     </li>
                     <li ng-show="canComplete()">
@@ -102,10 +102,10 @@
                 <button class="btn btn-default btn-circle btn-to" >TO</button>
             </div>
             <label class="item-input-wrapper">
-                <textarea ng-model="cmsg.content" value="" placeholder="メッセージを入力してください。(SHIFT + ENTERで送信)" required minlength="1" maxlength="21000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="save_in_storage()" ng-trim="false" rows='1'></textarea>
+                <textarea ng-model="cmsg.content" value="" placeholder="メッセージを入力してください。(SHIFT + ENTERで送信)" required minlength="1" maxlength="21000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="on_change_message()" ng-trim="false" rows='1' ng-keypress="on_keypress($event)"></textarea>
             </label>
             <div class="footer-btn-wrap">
-                <button class="btn btn-default btn-circle" type="submit" ng-disabled="!cmsg.content || cmsg.content === ''" ng-click="sendMessage()">
+                <button id="btn_send_message" class="btn btn-default btn-circle" type="submit" ng-disabled="!cmsg.content || cmsg.content === ''" ng-click="sendMessage()">
                     <i class="ln-icon-paper-plane"></i>
                 </button>
             </div>
@@ -122,7 +122,7 @@
 
     <div class="resize-handle-h" ng-dblclick="maxRightPanel()"><i class="fa fa-bars fa-rotate-90"></i></div>
 
-    <div id="emoticon_gallery" class="popover fade top in">
+    <div id="emoticon_gallery" class="popover chatpop fade top in">
         <div class="arrow"></div>
         <h3 class="popover-title">
             <div class="search-wrapper">
@@ -140,7 +140,15 @@
         </h3>
     </div>
 
-    <div id="react_emoticons" class="popover fade in">
+    <div id="alternative_emoticons" class="popover chatpop fade top in">
+        <h3 class="popover-title">
+            <ul class="emoticon-list-with-alt clearfix">
+                <li ng-repeat="em in filtered_emoticon = (emoticons | filter:alternative_emoticonFilter)" class="emoticon_with_alt" title="{{em.title}} {{em.alt}}" ng-click="emoticon_message_with_alt(em.alt)" style="background-image: url({{em.image}})" alt="{{em.alt}}">{{em.alt}}</li>
+            </ul>
+        </h3>
+    </div>
+
+    <div id="react_emoticons" class="popover chatpop fade in">
         <div class="arrow"></div>
         <h3 class="popover-title">
             <div class="search-wrapper">
@@ -157,13 +165,13 @@
             </ul>
         </h3>
     </div>
-    <div id="file_drop" class="popover top">
+    <div id="file_drop" class="popover chatpop top">
         <div class="arrow"></div>
         <h3 class="popover-title">
             <div class="drop-box"><strong>このエリアにドロップしてください</strong><br/>（複数ファイル送信可能）</div>
         </h3>
     </div>
-    <div id="to_users" class="popover fade top in">
+    <div id="to_users" class="popover chatpop fade top in">
         <div class="arrow"></div>
         <h3 class="popover-title">
             <div class="search-wrapper">
@@ -183,7 +191,7 @@
             </ul>
         </h3>
     </div>
-    <div id="selection_menu" class="popover fade bottom in">
+    <div id="selection_menu" class="popover chatpop fade bottom in">
         <div class="arrow"></div>
         <h3 class="popover-title">
             <button type="button" class="btn btn-default btn-sm" ng-click="quote()"><i class="fa fa-fw fa-quote-left"></i>　引用</button>

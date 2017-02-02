@@ -3,12 +3,7 @@
 angular.module('app.storage.mission', [])
 
 .factory('missionStorage', 
-    ($rootScope, $api, $session, $dateutil, filterFilter, AUTH_EVENTS, $auth, $chat) ->
-        # Initialize
-        init = ->
-            if $auth.isAuthenticated()
-                search()
-        
+    ($rootScope, $api, $session, $dateutil, $chat, CONFIG) ->
         # Search missions
         search = (home_id, include_completed) ->
             params = 
@@ -26,7 +21,7 @@ angular.module('app.storage.mission', [])
                     else
                         $rootScope.missions = []
 
-                    $rootScope.$broadcast('refreshed-missions')
+                    $rootScope.$broadcast('mission-search-post')
 
                     return $rootScope.missions
                 )
@@ -110,23 +105,36 @@ angular.module('app.storage.mission', [])
 
         # Get mission from mission_id
         get_mission = (mission_id) ->
-            for mission in $rootScope.missions
-                if mission.mission_id == mission_id
-                    return mission
+            if $rootScope.missions
+                for mission in $rootScope.missions
+                    if mission.mission_id == mission_id
+                        return mission
             return null
 
         set_mission = (mission) ->
             if $rootScope.missions != null && $rootScope.missions.length > 0
                 for i in [0..$rootScope.missions.length-1]
                     if $rootScope.missions[i].mission_id == mission.mission_id
-                        $rootScope.missions[i] = mission
-
-                        $rootScope.missions = reset_order($rootScope.missions)
+                        if $rootScope.missions[i] != mission
+                            $rootScope.missions[i] = mission
+                            $rootScope.missions = reset_order($rootScope.missions)
                         return
 
             $rootScope.missions.push(mission)
             $rootScope.missions = reset_order($rootScope.missions)
             return null
+
+        set_cur_mission = (mission, toStorage) ->
+            if toStorage == undefined
+                toStorage = true
+            $rootScope.cur_mission = mission
+            select_mission_in_nav()
+            if $rootScope.cur_mission
+                $rootScope.cur_mission.visible = true
+                set_mission($rootScope.cur_mission)
+            if toStorage
+                $session.statesToStorage()
+            return
 
         add = (mission, callback) ->
             $api.call("mission/add", mission)
@@ -137,6 +145,16 @@ angular.module('app.storage.mission', [])
                             $chat.mission('add', res.data.mission_id, res.data.home_id)
                 )
 
+        get_name = (mission_id, callback) ->
+            params =
+                mission_id: mission_id
+
+            $api.call("mission/get_name", params)
+                .then((res) ->
+                    if callback != undefined
+                        callback(res.data)
+                )
+
         get = (mission_id, callback) ->
             params = 
                 mission_id: mission_id
@@ -145,6 +163,11 @@ angular.module('app.storage.mission', [])
                 .then((res) ->
                     if res.data.err_code == 0
                         res.data.mission.complete_flag = res.data.mission.complete_flag == 1
+                        for icon in res.data.mission.emoticons
+                            $api.init_emoticon(icon)
+
+                        $rootScope.emoticons = res.data.mission.emoticons
+
                     if callback != undefined
                         callback(res.data)
                 )
@@ -244,6 +267,16 @@ angular.module('app.storage.mission', [])
                         callback(res.data)
                         if (res.data.err_code == 0)
                             $chat.mission('invite', res.data.mission_id, res.data.home_id)
+                )
+
+        self_invite = (mission_id, invite_key, callback) ->
+            req = 
+                mission_id: mission_id
+                invite_key: invite_key
+            $api.call("mission/self_invite", req)
+                .then((res) ->
+                    if callback != undefined
+                        callback(res.data)
                 )
 
         remove_attach = (mission_id, mission_attach_id, callback) ->
@@ -348,19 +381,28 @@ angular.module('app.storage.mission', [])
                 return 'mission2_' + mission.user_id
 
         select_mission_in_nav = () ->
-            $('.nav-bar>li').removeClass('active')
-            $('.nav-bar .list-item').removeClass('active')
-            if $rootScope.nav_id.indexOf('chatroom_') == 0
-                if $rootScope.cur_mission
-                    id = mission_html_id($rootScope.cur_mission)
-                    $('#' + id).addClass('active').removeClass('hide')
+            if $rootScope.nav_id
+                $('.nav-bar>li').removeClass('active')
+                $('.nav-bar .list-item').removeClass('active')
+                if $rootScope.nav_id.indexOf('chatroom_') == 0
+                    if $rootScope.cur_mission
+                        id = mission_html_id($rootScope.cur_mission)
+                        $('#' + id).addClass('active').removeClass('hide')
+                else if $rootScope.nav_id == 'home'
+                    $('.nav-bar .nav-home').addClass('active')
+                else if $rootScope.nav_id == 'settings'
+                    $('.nav-bar .my-avartar').addClass('active')
             return
 
         mission_unreads_to_html = (mission) ->
+            txt = ''
             if (mission.unreads > 0)
-                return '       <i class="badge badge-danger">' + mission.unreads + '</i> '
+                txt += '<i class="badge badge-danger">' + mission.unreads + '</i> '
 
-            return ''
+            if (mission.to_unreads > 0)
+                txt += '<i class="badge badge-success"><small>TO</small>' + mission.to_unreads + '</i> '
+
+            return txt
 
         mission_to_html = (mission, groups, include_self) ->
             html = ""
@@ -436,6 +478,30 @@ angular.module('app.storage.mission', [])
 
             return html
 
+        get_top_of_hidden_unreads = () ->
+            parentRect = angular.element('#nav')[0].getBoundingClientRect()
+            avartar = $('.nav-bar .my-avartar').height()
+            logout = $('.nav-bar .logout').height()
+            scroll_top = $('#nav').scrollTop()
+            if $rootScope.missions
+                for mission in $rootScope.missions
+                    if mission.unreads > 0
+                        id = mission_html_id(mission)
+                        el = angular.element('#' + id)[0]
+                        if el 
+                            offset = el.getBoundingClientRect()
+                            if offset && offset.top > parentRect.bottom - avartar - logout
+                                return scroll_top + offset.top + offset.height
+
+            return null
+
+        check_hidden_unreads = () ->
+            if get_top_of_hidden_unreads() != null
+                $('.unread_hint').show()
+            else
+                $('.unread_hint').hide()
+            return
+
         priv = (mission_id, user_id, priv, callback) ->
             params = 
                 mission_id: mission_id
@@ -448,15 +514,44 @@ angular.module('app.storage.mission', [])
                         callback(res.data)
                 )
 
+        upload_emoticon = (mission_id, file) ->
+            $api.upload_file('mission/upload_emoticon', file, {
+                mission_id: mission_id
+            })
+
+        add_emoticon = (emoticon, callback) ->
+            $api.call("mission/add_emoticon", emoticon)
+                .then((res) ->
+                    if callback != undefined
+                        callback(res.data)
+                )
+
+        save_emoticon = (emoticon, callback) ->
+            $api.call("mission/save_emoticon", emoticon)
+                .then((res) ->
+                    if callback != undefined
+                        callback(res.data)
+                )
+
+        remove_emoticon = (emoticon_id, callback) ->
+            params =
+                emoticon_id: emoticon_id
+            $api.call("mission/remove_emoticon", params)
+                .then((res) ->
+                    if callback != undefined
+                        callback(res.data)
+                )
+
         return {
-            init: init
             search: search
             unpinned_missions: unpinned_missions
             search_completed: search_completed
             refresh_remaining: refresh_remaining
             get_mission: get_mission
             set_mission: set_mission
+            set_cur_mission: set_cur_mission
             add: add
+            get_name: get_name
             get: get
             edit: edit
             open: open
@@ -468,6 +563,7 @@ angular.module('app.storage.mission', [])
             remove_member: remove_member
             invitable_members: invitable_members
             invite: invite
+            self_invite: self_invite
 
             remove_attach: remove_attach
             complete: complete
@@ -484,7 +580,14 @@ angular.module('app.storage.mission', [])
             mission_html_id: mission_html_id
             mission_unreads_to_html: mission_unreads_to_html
             mission_to_html: mission_to_html
+            get_top_of_hidden_unreads: get_top_of_hidden_unreads
+            check_hidden_unreads: check_hidden_unreads
 
             priv: priv
+
+            upload_emoticon: upload_emoticon
+            add_emoticon: add_emoticon
+            save_emoticon: save_emoticon
+            remove_emoticon: remove_emoticon
         }
 )

@@ -283,13 +283,12 @@
             if ($home_id == null)
                 $home_id = $mission->home_id;
 
-            $client->log("[Chat message] cache_id=" . $cache_id);
-
             $this->start();
             $cmsg = cmsg::message($cmsg_id, $mission_id, $user_id_from, $to_id, $content, $cache_id);
             $this->commit();
 
             if ($cmsg != null) {
+                $client->log("[Chat message] cache_id=" . $cache_id . " cmsg_id=" . $cmsg->cmsg_id);
                 //prepare data to be sent to client
                 $msg = array(
                     'inserted'=> $cmsg_id == null,
@@ -572,7 +571,7 @@
                             foreach($tokens as $token)
                             {
                                 $this->log("Sending push to :" . $token["device_token"]);
-                                push_msg::add_push($token["device_type"], $token["device_token"], $push_message);
+                                push_msg::add_push($token["device_type"], $token["device_token"], $push_message, $data["mission_id"], $data["cmsg_id"]);
                                 push_token::set_last($to_id, $token["device_type"], $token["device_token"]);
                             }
                         }

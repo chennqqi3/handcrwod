@@ -1029,6 +1029,10 @@ a.autolinker {
     min-width: 30px;
 }
 
+.dummy-item {
+    height: 50px;
+}
+
 .edit-task input[disabled], 
 .edit-task select[disabled], 
 .edit-task textarea[disabled], 
@@ -1322,4 +1326,10 @@ ul.rating li i {
 
 .selectable{
     -webkit-user-select: auto;
+}
+
+.unread_hint {
+    position: fixed;
+    bottom: 0px;
+    z-index: 100;
 }

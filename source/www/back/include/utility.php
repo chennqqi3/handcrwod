@@ -1608,7 +1608,7 @@
 	*/
 
 	$g_apns_context = null;
-	function _send_push($device_type, $device_token, $message) {
+	function _send_push($device_type, $device_token, $message, $mission_id, $cmsg_id) {
         if ($device_type == 1) // iOS
         {
         	global $g_apns_context;
@@ -1633,6 +1633,8 @@
                 'sound' => 'default',
                 'badge' => '1'
             );
+            $body['mission_id'] = $mission_id;
+            $body['cmsg_id'] = $cmsg_id;
 
             $payload = json_encode($body);
             $msg = chr(0) . pack('n', 32) . pack('H*', $device_token) . pack('n', strlen($payload)) . $payload;
@@ -1652,8 +1654,8 @@
             $icon_url = "https://www.handcrowd.com/back/ico/favicon.png";
 
             $data=array(
-            	"notification" => array("title" => "HandCrowd", "text" => $message, "icon"=> $icon_url, "color"=> "#3F51B5"),
-            	"data" => array("title" => "HandCrowd", "message" => $message),
+            	"notification" => array("title" => "HandCrowd", "text" => $message, "icon"=> $icon_url, "color"=> "#3F51B5", "mission_id" => $mission_id, "cmsg_id" => $cmsg_id),
+            	"data" => array("title" => "HandCrowd", "message" => $message, "mission_id" => $mission_id, "cmsg_id" => $cmsg_id),
                 "delay_while_idle"=> true,
             	"to" => $device_token
             );

@@ -13,11 +13,16 @@
         <button menu-toggle="right" class="button button-icon icon ion-ios-search" ng-click="open_search_bar()"></button>
         <button menu-toggle="right" class="button button-icon icon ion-ios-more" ng-click="showOthers($event)"></button>
     </ion-nav-buttons>
-    <ion-content delegate-handle="missionScroll">
+    <ion-content id="chats_view" delegate-handle="missionScroll" on-scroll="check_hidden_unreads()">
         <ion-list class="chat-list">
             <chat-rooms ng-if="loaded"></chat-rooms>
         </ion-list>
     </ion-content>
+
+    <ion-footer-bar class="unread_hint bar-stable bar-assertive" style="display: none;">
+        <button class="button" type="submit" ng-click="scroll_unread()">未読があります↓
+        </button>
+    </ion-footer-bar>
 
     <ion-footer-bar class="bar-stable bar-positive item-input-inset" ng-if="show_search_bar">
         <button class="button button-icon icon ion-ios-search" type="submit" ng-click="open_search_chat()">メッセージも検索

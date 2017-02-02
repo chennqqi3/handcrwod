@@ -191,6 +191,17 @@ angular.module('app.home', [])
 
                 chatStorage.refresh_unreads_title()
 
+            # チュートリアル
+            $timeout(->
+                if $session.tutorial
+                    if $rootScope.homes.length == 0
+                        $('#add_home').tutpop(
+                            content: 'グループが存在しません。こちらからマイグループを作成するか、他のグループから招待してもらってください。'
+                        ).tutpop('show').on('close.tutpop', $api.close_tutorial)
+            , 100)
+
+            return
+
         $scope.$on("synced-server", ->
             $scope.sync()
         ) 
@@ -208,5 +219,6 @@ angular.module('app.home', [])
                     "handcrowd://invite_home?id=" + $rootScope.cur_home.home_id + "&key=" + $rootScope.cur_home.invite_key, 
                     "招待QRコード(" + $rootScope.cur_home.home_name + ")")
             return
+
         return
 )

@@ -1,19 +1,17 @@
 <div id="nav-wrapper" data-ng-controller="NavCtrl">
-    <ul id="nav" class="nav-bar" data-slim-scroll>
+    <ul id="nav" class="nav-bar" data-slim-scroll scroll="onScroll()">
 		<li class="header"><img src="images/logo_banner_white.svg"></li>
-        <li ng-class="{'active': nav_id=='home' }">
+        <li class="nav-home">
             <a ng-href="#/home"><i class="icon-home"></i><span>{{cur_home.home_name | home_label}}</span></a>
         </li>
         <chat-rooms class="rooms" ng-if="loaded"></chat-rooms>
         <li class="dummy"></li>
     </ul>
     <ul class="nav-bar footer">
-    <!--
-        <li class="unread_hint" ng-show="exist_unreads()">
-            <a href="javascript:;" ng-click="show_unreads()"><span>未読があります↓</span> </a>
+        <li class="unread_hint clickable" style="display:hidden" ng-click="scroll_unread()">
+            <span class="text-danger">未読があります↓</span>
         </li>
-    -->
-        <li class="my-avartar" ng-class="{'active': nav_id=='settings'}">
+        <li class="my-avartar">
             <div class="info">
                 <a href="javascript:;" ng-show="alerts.length > 0" ng-click="showAlerts()" class="alert">
                     <i class="icon icon-info"></i>
@@ -25,12 +23,15 @@
                 <span>{{session.user_name}} <small>さんのプロフィール</small></span> 
             </a>
         </li>
+        <!--
         <li class="settings" ng-class="{'active': nav_id=='task_star' }">
             <a href="#/task/star"> <i class="fa fa-star-o"></i><span>スター付きタスク</span> </a>
         </li>
-        <li>
+        -->
+        <li class="logout">
             <a href="javascript:;" ng-click="selectLogout()"> <i class="icon-logout"></i><span>ログアウト</span> </a>
         </li>
+        <!--
         <li class="search-wrapper">
             <form id="search_bar" ng-submit="search()" novalidate>
                 <div class="input-group">
@@ -41,5 +42,6 @@
                 </div>
             </form>
         </li>
+        -->
     </ul>
 </div>

@@ -105,12 +105,12 @@ h3 {
 
     .button-group-right {
         position: absolute;
-        top: 8px;
+        top: 0px;
         right: 10px;
         width: auto;
         list-style: none;
         background: white;
-        padding: 0px;
+        padding: 8px 0px 0px 10px;
 
         > li {
             display: inline-block;
@@ -1152,4 +1152,58 @@ a.edit-popup-empty:hover {
     -ms-transform-origin: 50% 50%;
     -webkit-transform-origin: 50% 50%;
     transform-origin: 50% 50%
+}
+
+.tutpop {
+    &.animate {
+        -webkit-animation-name: wobble;
+        animation-name: wobble;
+        -webkit-animation-duration: 0.8s;
+        animation-duration: 0.8s;
+        -webkit-animation-fill-mode: both;
+        animation-fill-mode: both;
+        -webkit-animation-iteration-count: 1;
+        animation-iteration-count: 1;
+    }
+    z-index: 1060;
+
+    background: @brand-danger;
+    .popover-title {
+        background: @brand-danger;
+        color: white;
+        font-weight: bold;
+        border-bottom: 1px solid darken(@brand-danger, 5%);
+    }
+
+    .popover-content {
+        color: white;
+
+        .buttons {
+            text-align: right;
+        }
+    }
+
+    &.right {
+        >.arrow:after {
+            border-right-color: @brand-danger;
+        }   
+    }
+
+    &.left {
+        >.arrow:after {
+            border-left-color: @brand-danger;
+        }   
+    }
+
+    &.top {
+        >.arrow:after {
+            border-top-color: @brand-danger;
+        }   
+    }
+
+    &.bottom {
+        >.arrow:after {
+            border-bottom-color: @brand-danger;
+        }   
+    }
 }

@@ -613,7 +613,7 @@ angular.module('app.storage.mission', [])
                     }
                 });
             }
-        };
+        };        
 
         return {
             search: search,
