@@ -4,6 +4,8 @@ angular.module('app.chat.list', [])
     function($scope, $rootScope, $api, $session, $ionicPopup, $ionicPopover, $ionicModal, $ionicListDelegate, $ionicScrollDelegate, $ionicActionSheet, homeStorage, missionStorage, chatStorage, logger, $timeout, $state, qrStorage) {
     viewScroll = $ionicScrollDelegate.$getByHandle('missionScroll');    
 
+    var keyboardHeight = 0;
+
     // toggle group
     $scope.groups = [true, true, true];
     $scope.toggleGroup = function(index) {
@@ -601,6 +603,37 @@ angular.module('app.chat.list', [])
 
     $scope.$on('rendered-missions', function(event) {
         $scope.check_hidden_unreads();
+    });
+
+    function resizeLayout() {
+        $('#chats_search_bar').css('bottom', keyboardHeight + "px");
+    }
+
+    // keyboard processiong
+    ionic.on('native.keyboardshow', onShowKeyboard, window);
+    ionic.on('native.keyboardhide', onHideKeyboard, window);
+
+    function onShowKeyboard(e) {
+        if (ionic.Platform.isAndroid() && !ionic.Platform.isFullScreen) {
+            return;
+        }
+
+        keyboardHeight = e.keyboardHeight || e.detail.keyboardHeight;
+        resizeLayout();
+    }
+
+    function onHideKeyboard() {
+        if (ionic.Platform.isAndroid() && !ionic.Platform.isFullScreen) {
+            return;
+        }
+
+        keyboardHeight = 0;
+        resizeLayout();
+    }
+
+    $scope.$on('$destroy', function() {
+        ionic.off('native.keyboardshow', onShowKeyboard, window);
+        ionic.off('native.keyboardhide', onHideKeyboard, window);
     });
            
 })
