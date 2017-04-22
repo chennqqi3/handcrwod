@@ -1,7 +1,7 @@
 angular.module('app.home.add', [])
 
 .controller('homeAddCtrl', 
-    ($scope, $rootScope, $modalInstance, homeStorage, $api, logger, $session, $timeout) ->
+    ($scope, $rootScope, $modalInstance, homeStorage, $api, logger, $session, $timeout, $location) ->
         $scope.posting = false
         $scope.home = 
             home_name: ""
@@ -23,6 +23,7 @@ angular.module('app.home.add', [])
                         $rootScope.$broadcast('added_home', res.home)
                         $scope.cancel()
                         logger.logSuccess('新しいグループが作成されました。')
+                        $location.path('/home/' + res.home.home_id)
                     else
                         logger.logError(res.err_msg)
                     $scope.posting = false

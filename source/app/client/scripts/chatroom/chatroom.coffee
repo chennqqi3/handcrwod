@@ -529,7 +529,10 @@ angular.module('app.chatroom', [])
                     $scope.files.splice(i, 1)
                     $scope.$emit 'elastic:resize', ta                    
                     if data.err_code == 0
-                        str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']" + file.name + "[/file]"
+                        str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']"
+                        if data.width > 0
+                            str += "(" + data.width + "x" + data.height + ") "
+                        str += file.name + "[/file]"
                         if $rootScope.cur_mission && $rootScope.cur_mission.private_flag == 3 
                             to_id = $session.user_id
                         else
@@ -931,7 +934,9 @@ angular.module('app.chatroom', [])
             $('.preview-image').off('click')
             $('.preview-image').on('click', ->
                 url = $(this).attr('preview-image')
-                $dialogs.previewImage(url)
+                width = $(this).attr('w')
+                height = $(this).attr('h')
+                $dialogs.previewImage(url, null, width, height)
             )
             $('.preview-video').off('click')
             $('.preview-video').on('click', ->
@@ -1580,7 +1585,7 @@ angular.module('app.chatroom', [])
         # filter for searching alternative emoticons
         $scope.alternative_emoticonFilter = (em) ->
             query = ''
-            if $scope.cmsg.content != undefined
+            if !$api.is_empty($scope.cmsg.content)
                 query = $scope.cmsg.content.substring($scope.cmsg.emoticon_alt, $('#chat_ta')[0].selectionStart)
             if $('#alternative_emoticons').data('isShowing') != 'true'
                 query = ''

@@ -369,7 +369,10 @@ angular.module('app.chatroom', [])
                     i = $scope.files.indexOf(file);
                     $scope.files.splice(i, 1);
                     if (data.err_code === 0) {
-                        str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']" + file.name + "[/file]";
+                        str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']";
+                        if (data.width > 0)
+                            str += "(" + data.width + "x" + data.height + ") ";
+                        str += file.name + "[/file]";
                         $chat.send(null, $rootScope.cur_home.home_id, $scope.mission_id, str, null, 1);
                     } else {
                         console.log(data.err_msg);
@@ -425,7 +428,10 @@ angular.module('app.chatroom', [])
                     $scope.files.splice(i, 1);
                     $('#btn_upload input').val('');
                     if (data.err_code === 0) {
-                        str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']" + file.name + "[/file]";
+                        str = "[file id=" + data.mission_attach_id + " url='" + data.mission_attach_url + "']";
+                        if (data.width > 0)
+                            str += "(" + data.width + "x" + data.height + ") ";
+                        str += file.name + "[/file]";
                         $chat.send(null, $rootScope.cur_home.home_id, $scope.mission_id, str, null, 1);
                     } else {
                         console.log(data.err_msg);
@@ -840,15 +846,34 @@ angular.module('app.chatroom', [])
             $timeout(function() {
                 $('.preview-image').off('click').on('click', function() {
                     url = $(this).attr('preview-image');
+                    org_url = url;
+                    width = $(this).attr('w');
+                    height = $(this).attr('h');
+                    if (url) {
+                        len = url.length;
+                        if (url.substring(len-3) != 'gif')
+                            url = url + '/1000';
+                    }
+
+                    if (width > 0 && height > 0) {
+                        if (width > 800) {
+                            height = parseInt(height * 800 / width, 10);
+                            width = 800;
+                        }
+                        style = "height: " + height + "px; width: " + width + "px;";
+                    }
+                    else 
+                        style = "min-height: 200px; max-width:800px;";
+                        
                     $scope.modalPreviewImage.show();
                     $('#preview_view #board img').remove();
                     $('#preview_download button').remove();
-                    $('#preview_view #board').append("<img width='100%' src='" + url + "'>");
+                    $('#preview_view #board').append("<img src='" + url + "' " + style + ">");
                     $('#preview_view').css('height', window.screen.height - 44); // header height: 44px
                     // Add Button and bind to download_image
                     $('#preview_download').append("<button class='button'>ダウンロード</button>");
                     $('#preview_download button').on('click', function(){
-                        download_image(url);
+                        download_image(org_url);
                     });
                 });
 
@@ -1440,7 +1465,8 @@ angular.module('app.chatroom', [])
         $scope.goto_link = function(mission_id, chat_id) {
             $scope.chat_id = chat_id;
             if ($scope.mission_id == mission_id) {
-                $scope.scrollToMessage(chat_id);
+                if (chat_id != undefined)
+                    $scope.scrollToMessage(chat_id);
             }
             else {
                 $stateParams.mission_id = mission_id;

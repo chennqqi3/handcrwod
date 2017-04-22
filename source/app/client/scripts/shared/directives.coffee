@@ -245,7 +245,7 @@ angular.module('app.directives', [])
             return str.replace(/\[file id=(\d+) url=\'([^\]]*)\'\]([^\]]*)\[\/file\]/g, (item, id, url, name) ->                
                 rep_str = "<div class='attach-name'>"
                 if (hideThumb != true && isImage(name))
-                    rep_str += "<a href='javascript:;' class='preview-image' preview-image='" + CONFIG.BASE + url + "'><img src='" + CONFIG.BASE + url + "/150' style='max-width:150px'></a><br/>"
+                    rep_str += getImageThumb(url, name)
                 rep_str += "<i class='icon-paper-clip'></i>&nbsp;"
                 if (hideThumb != true && isVideo(name))
                     rep_str += "<a href='javascript:;' class='preview-video' preview-video='" + CONFIG.BASE + url + "'>" + name + "</a>"
@@ -255,6 +255,25 @@ angular.module('app.directives', [])
 
                 return rep_str
             )
+
+        getImageThumb = (url, name) ->
+            found = name.match(/^\((\d+)x(\d+)\)/)
+            w = 0
+            h = 0
+            if found != null
+                w = found[1]
+                h = found[2]
+
+            str = "<a href='javascript:;' class='preview-image' preview-image='" + CONFIG.BASE + url + "' " + (if w>0 then ('w=' + w)) + " " + (if h>0 then ('h=' + h)) + ">"
+            if w > 0 && h > 0
+                if w > 300
+                    h = parseInt(h * 300 / w, 10)
+                    w = 300
+                str += "<img src='" + CONFIG.BASE + url + "/300' style='width:" + w + "px;height:" + h + "px"
+            else 
+                str += "<img src='" + CONFIG.BASE + url + "/300' style='max-width:300px"
+            str += "'></a><br/>"
+            return str
 
         getLinkString = (str) ->
             if $api.is_empty(str)
@@ -394,6 +413,7 @@ angular.module('app.directives', [])
             .replace(/&amp;&amp;&lt;\;\;/g, '<')
             .replace(/&amp;&amp;&gt;\;\;/g, '>')
             .replace(/\n/g, '<br/>')
+            .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
         t = text.replace(/(https?:\/\/)([\d\w\.-]+)\.([\d\w\.]{2,6})([\:][\d]+)?([\(\)\/\w \?\=\&\;\#\%\.\+\@\,\!\:-]*)*\/?/g, (url) ->
             return '<a href="' + url + '" target="_blank">' + url + '</a>'
         )

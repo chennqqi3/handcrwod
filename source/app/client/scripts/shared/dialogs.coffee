@@ -250,7 +250,7 @@ angular.module('app.dialogs', [])
                 controller: 'modalAlertsCtrl'
             )
 
-        this.previewImage = (url, title) ->
+        this.previewImage = (url, title, width, height) ->
             modalInstance = $modal.open(
                 templateUrl: 'views/dialogs/mdl_preview.html' + $rootScope.ver
                 controller: 'modalPreviewImageCtrl'
@@ -260,6 +260,10 @@ angular.module('app.dialogs', [])
                         return url
                     title: ->
                         return title
+                    width: ->
+                        return width
+                    height: -> 
+                        return height
             )
 
         this.previewVideo = (url) ->
@@ -737,18 +741,27 @@ angular.module('app.dialogs', [])
 )
 
 .controller('modalPreviewImageCtrl', 
-    ($scope, $rootScope, $modalInstance, $api, logger, url, title) ->
+    ($scope, $rootScope, $modalInstance, $api, logger, url, title, width, height) ->
         if url
             len = url.length
             if url.substring(len-3) == 'gif'
                 $scope.url = url
             else
                 $scope.url = url + '/1000'
+            $scope.org_url = url
 
         if $api.is_empty(title)
             $scope.title = "プレビュー"
         else
             $scope.title = title
+
+        if width > 0 && height > 0
+            if width > 800
+                height = parseInt(height * 800 / width, 10)
+                width = 800
+            $scope.style = "height: " + height + "px; width: " + width + "px;"
+        else 
+            $scope.style = "min-height: 200px; max-width:800px;"
 
         $scope.close = ->
             $modalInstance.dismiss('close')

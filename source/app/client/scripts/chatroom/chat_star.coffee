@@ -81,7 +81,9 @@ angular.module('app.chat.star', [])
                 $('.preview-image').off('click')
                 $('.preview-image').on('click', ->
                     url = $(this).attr('preview-image')
-                    $dialogs.previewImage(url)
+                    width = $(this).attr('w')
+                    height = $(this).attr('h')
+                    $dialogs.previewImage(url, null, width, height)
                 )
             , 2000)
 

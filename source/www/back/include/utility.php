@@ -632,21 +632,28 @@
 			$exif = exif_read_data($dest_path);
 			if ($exif !== FALSE) {
 				$orientation = $exif['Orientation'];
-				switch ($orientation) {
-				   	case 3:
-				   		$source = imagecreatefromjpeg($dest_path);
-				    	$rotated = imagerotate($source, 180, 0);
-				      	break;
-				   	case 6:
-				   		$source = imagecreatefromjpeg($dest_path);
-				    	$rotated = imagerotate($source, -90, 0);
-				      	break;
-				   	case 8:
-				   		$source = imagecreatefromjpeg($dest_path);
-				    	$rotated = imagerotate($source, 90, 0);
-				      	break;
+				try {
+					switch ($orientation) {
+					   	case 3:
+					   		$source = @imagecreatefromjpeg($dest_path);
+					   		$rotated = @imagerotate($source, 180, 0);
+							@imagejpeg($rotated, $dest_path, 100);
+					      	break;
+					   	case 6:
+					   		$source = @imagecreatefromjpeg($dest_path);
+					   		$rotated = @imagerotate($source, -90, 0);
+							@imagejpeg($rotated, $dest_path, 100);
+					      	break;
+					   	case 8:
+					   		$source = @imagecreatefromjpeg($dest_path);
+					   		$rotated = @imagerotate($source, 90, 0);
+							@imagejpeg($rotated, $dest_path, 100);
+					      	break;
+					}
 				}
-				imagejpeg($rotated, $dest_path, 100);
+				catch(Exception $e) {
+
+				}
 			}
 		}
 
@@ -829,7 +836,9 @@
 			$oh = $image->getImageHeight();
 
 			if ($ow < $maxw && $oh < $maxh)
-				return;
+			{
+				return array("org_width" => $ow, "org_height" => $oh, "width" => $ow, "height" => $oh);
+			}
 			
 			$w = $maxw;
 			$h = intval($oh * $maxw / $ow);
@@ -864,7 +873,9 @@
 			$oh = imagesy($src_img);
 
 			if ($ow < $maxw && $oh < $maxh)
-				return;
+			{
+				return array("org_width" => $ow, "org_height" => $oh, "width" => $ow, "height" => $oh);
+			}
 			
 			$w = $maxw;
 			$h = intval($oh * $maxw / $ow);
@@ -885,6 +896,8 @@
 			imagedestroy($src_img);
 			imagedestroy($dst_img);
 		}
+
+		return array("org_width" => $ow, "org_height" => $oh, "width" => $w, "height" => $h);
 	}
 
 	function _resize_thumb($path, $source_ext, $maxw=PHOTO_MAX_WIDTH, $maxh=PHOTO_MAX_HEIGHT){

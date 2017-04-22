@@ -847,9 +847,12 @@
 			$err = $mission->upload_attach('file');
 
 			if ($err == ERR_OK) {
-				$this->finish(array("mission_attach_id" => $mission->new_attach->mission_attach_id, 
-									"mission_attach_url"=>$mission->new_attach->attach_name, 
-									"create_time"=>date("Y-m-d H:i:s")), ERR_OK);
+				$this->finish(array(
+					"mission_attach_id" => $mission->new_attach->mission_attach_id, 
+					"mission_attach_url" => $mission->new_attach->attach_name, 
+					"width" => $mission->image_width,
+					"height" => $mission->image_height,
+					"create_time"=>date("Y-m-d H:i:s")), ERR_OK);
 			}
 			else {
 				$this->checkError($err);

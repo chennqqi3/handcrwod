@@ -1,11 +1,11 @@
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" ng-click="close()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
-    <h4 class="modal-title" id="myModalLabel">プレビュー</h4>
+    <h4 class="modal-title" id="myModalLabel">{{title}}</h4>
 </div>
 <div class="modal-body">
     <div class="form-group">
-        <div class="col-md-12 text-center">
-            <a ng-href="{{url}}" target="_blank"><image ng-src="{{url}}/1000" style="min-height: 200px; max-width:800px;"></a>
+        <div class="col-md-12 text-center" style="min-height: 200px">
+            <a ng-href="{{org_url}}" target="_blank"><image ng-src="{{url}}" style="{{style}}"></a>
             <div class="divider"></div>
         </div>
     </div>

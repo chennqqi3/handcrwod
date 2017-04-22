@@ -1,7 +1,7 @@
 angular.module('app.chat.star', [])
 
 .controller('chatStarCtrl', 
-    function($scope, $api, chatStorage, $rootScope, logger, $session, $state, $timeout, $ionicActionSheet, $ionicScrollDelegate) {
+    function($scope, $api, chatStorage, $rootScope, logger, $session, $state, $timeout, $ionicActionSheet, $ionicScrollDelegate, $ionicModal) {
         var viewScroll = $ionicScrollDelegate.$getByHandle('chat_star_scroll');
 
         $scope.sync = function() {
@@ -60,15 +60,53 @@ angular.module('app.chat.star', [])
             }
         };
         $scope.sync();
+
+        $ionicModal.fromTemplateUrl('templates/chatroom/preview_image.html', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function(modal) {
+            $scope.modalPreviewImage = modal;
+        });
+
         $scope.initPreviewLink = function() {
             return $timeout(function() {
-                $('.preview-image').off('click');
-                return $('.preview-image').on('click', function() {
-                    var url;
+                $('.preview-image').off('click').on('click', function() {
                     url = $(this).attr('preview-image');
-                    return $dialogs.previewImage(url);
+                    org_url = url;
+                    width = $(this).attr('w');
+                    height = $(this).attr('h');
+                    if (url) {
+                        len = url.length;
+                        if (url.substring(len-3) != 'gif')
+                            url = url + '/1000';
+                    }
+
+                    if (width > 0 && height > 0) {
+                        if (width > 800) {
+                            height = parseInt(height * 800 / width, 10);
+                            width = 800;
+                        }
+                        style = "height: " + height + "px; width: " + width + "px;";
+                    }
+                    else 
+                        style = "min-height: 200px; max-width:800px;";
+                        
+                    $scope.modalPreviewImage.show();
+                    $('#preview_view #board img').remove();
+                    $('#preview_download button').remove();
+                    $('#preview_view #board').append("<img src='" + url + "' " + style + ">");
+                    $('#preview_view').css('height', window.screen.height - 44); // header height: 44px
+                    // Add Button and bind to download_image
+                    $('#preview_download').append("<button class='button'>ダウンロード</button>");
+                    $('#preview_download button').on('click', function(){
+                        download_image(org_url);
+                    });
                 });
             }, 2000);
+        };
+
+        $scope.closePreview = function() {
+            $scope.modalPreviewImage.hide();
         };
         $scope.startScrollTimer = function(cmsg_id, type) {
             if ($scope.scrollTimer !== null) {
@@ -181,6 +219,10 @@ angular.module('app.chat.star', [])
         $scope.goMessage = function(message) {
             $state.transitionTo("tab.star.chatroom", {mission_id: message.mission_id, chat_id: message.cmsg_id});
         };
+
+        $scope.$on('$destroy', function() {
+            $scope.modalPreviewImage.remove();
+        });
 
     }
 );

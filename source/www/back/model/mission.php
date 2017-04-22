@@ -399,21 +399,9 @@
 			}
 			else if ($ext == "jpg" || $ext == "jpeg" || $ext == "png" || $ext == "bmp" || $ext == "gif") {
 				// thumnail
-				$thmb_size = 150;
-				$thmb_file_name = $save_file_name . "_" . $thmb_size . ".jpg";
-				$thmb_dir = DATA_PATH . THUMB_URL . $sub_dir;
-				$thmb_path = $thmb_dir . $thmb_file_name;
-
-				if (!file_exists($thmb_dir))
-					_mkdir($thmb_dir);
-
-				if (!file_exists($thmb_path))
-				{
-					if (copy($path, $thmb_path))
-					{
-						_resize_photo($thmb_path, "jpg", $thmb_size, $thmb_size);
-					}
-				}
+				$this->create_thumb(150, $path, $save_file_name, $sub_dir);
+				$this->create_thumb(300, $path, $save_file_name, $sub_dir);
+				$this->create_thumb(1000, $path, $save_file_name, $sub_dir);
 			}
 
 			// download url
@@ -424,6 +412,27 @@
 			$this->new_attach = $mission_attach;
 
 			return $err;
+		}
+
+		public function create_thumb($thmb_size, $path, $save_file_name, $sub_dir)
+		{
+			$thmb_file_name = $save_file_name . "_" . $thmb_size . ".jpg";
+			$thmb_dir = DATA_PATH . THUMB_URL . $sub_dir;
+			$thmb_path = $thmb_dir . $thmb_file_name;
+
+			if (!file_exists($thmb_dir))
+				_mkdir($thmb_dir);
+
+			if (!file_exists($thmb_path))
+			{
+				if (copy($path, $thmb_path))
+				{
+					$ret = _resize_photo($thmb_path, "jpg", $thmb_size, $thmb_size);
+
+					$this->image_width = $ret["org_width"];
+					$this->image_height = $ret["org_height"];
+				}
+			}
 		}
 
 		public function delete_attach($mission_attach_id)
