@@ -14,7 +14,8 @@
                 "cmsg_star_id",
                 array(
                     "cmsg_id",
-                    "user_id"),
+                    "user_id",
+                    "hidden"),
                 array("auto_inc" => true));
         }
     }

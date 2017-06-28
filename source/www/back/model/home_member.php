@@ -34,16 +34,17 @@
             $where = '';
             if ($mine->priv == HPRIV_GUEST) {
                 // 参加しているルームのメンバーとのみ
-                $where = "AND hm.user_id IN (
+                $where = "AND (hm.user_id IN (
                         SELECT DISTINCT mm.user_id FROM t_mission_member mm
                         WHERE mm.mission_id IN (
                             SELECT DISTINCT mm.mission_id FROM t_mission_member mm
                             LEFT JOIN t_mission m ON mm.mission_id=m.mission_id
-                            WHERE mm.del_flag=0 AND m.home_id=" . _sql($home_id) . " 
+                            WHERE mm.del_flag=0 AND m.del_flag=0 AND m.complete_flag!=1 
+                                AND m.home_id=" . _sql($home_id) . " 
                                 AND mm.user_id=" . _sql($my_id) . " 
-                                AND m.private_flag IN (" . CHAT_PUBLIC . "," . CHAT_PRIVATE . ")
+                                AND m.private_flag=" . CHAT_PRIVATE . "
                                 )
-                        )";
+                        ) OR hm.user_id=" . _sql($my_id) . ") ";
             }
 
             $sql = "SELECT hm.home_id, hm.user_id, u.user_name, u.email, u.login_id, hm.priv, hm.accepted
