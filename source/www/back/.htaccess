@@ -15,6 +15,7 @@ Options FollowSymLinks
 
 	RewriteRule ^avartar/(.+)$ data/avartar/$1 [QSA,NC,L]
 	RewriteRule ^data/avartar/$ img/unknown.png [QSA,NC,L]
+	RewriteRule ^emoticon/(.+)$ data/emoticon/$1 [QSA,NC,L]
 	RewriteCond %{REQUEST_FILENAME} !-s
 	RewriteRule ^data/avartar/(.*).jpg$ common/down_gravatar/$1 [QSA,NC,L]
 
@@ -22,15 +23,11 @@ Options FollowSymLinks
 	RewriteCond %{REQUEST_FILENAME} !-s
 	RewriteRule ^data/homelogo/(.*)$ img/no_logo.png [QSA,NC,L]
 
+	RewriteRule mattach/(.+)/(.+)/(.+)/(.+).mp4$ data/mattach/$1/$2/$3?$4.mp4 [QSA,NC,L,T=video/mp4]
 	RewriteRule mattach/(.+)/(.+)/(.+)/(.+)/(.+)$ data/thumb/$1/$2/$3_$5.jpg [QSA,NC,L]
 	RewriteCond %{REQUEST_FILENAME} !-s
 	RewriteRule ^data/thumb/(.+)/(.+)/(.+)$ common/down_thumb_mattach/$1/$2/$3 [QSA,NC,L]
-
-	RewriteRule mattach/(.+)/(.+)/(.+)/(.+).mp4$ data/mattach/$1/$2/$3?$4.mp4 [QSA,NC,L,T=video/mp4]
-	RewriteRule mattach/(.+)/(.+)/(.+)/(.+)$ data/mattach/$1/$2/$3 [QSA,NC,L]
-	RewriteRule ^data/mattach/$ img/back.png [QSA,NC,L]
-	RewriteCond %{REQUEST_FILENAME} !-s
-	RewriteRule ^data/mattach/(.*)$ img/back.png [QSA,NC,L]
+	RewriteRule mattach/(.+)/(.+)/(.+)/(.+)$ common/down_mattach/$1$2/$3/$4 [QSA,NC,L]
 
 	RewriteRule ^$ index.php [QSA,NC,L]
 
