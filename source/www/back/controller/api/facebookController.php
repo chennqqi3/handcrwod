@@ -30,9 +30,6 @@
               'secret' => FACEBOOK_APP_SECRET
             ));
 
-            _session("facebook_redirect_url", $params->base . "#/" . $params->redirect_url);
-            _session("facebook_signup_url", $params->base . "#/" . $params->signup_url);
-
             if (!FACEBOOK_ENABLE) {
                 print "Facebookと連携することができません。";
                 exit;
@@ -57,8 +54,8 @@
             $this->setApiParams($param_names);
             $params = $this->api_params;
 
-            $redirect_url = _session("facebook_redirect_url");
-            $signup_url = _session("facebook_signup_url");
+            $redirect_url = _app_url("#/signin"); 
+            $signup_url = _app_url("#/signup_facebook");
 
             if ($this->code != null) {
                 $user_info = $this->get_facebook_info();
@@ -110,9 +107,9 @@
 
         public function register()
         {
-            $param_names = array("token", "email");
+            $param_names = array("token", "login_id", "user_name");
             $this->setApiParams($param_names);
-            $this->checkRequired($param_names);
+            $this->checkRequired("token", "user_name");
             $params = $this->api_params;
 
             @session_write_close();
@@ -134,8 +131,8 @@
                     $this->checkError(ERR_ALREADY_USING_EMAIL);
 
                 $user = new user;
-                $user->user_name = $user_info->name;
-                $user->email = $params->email;
+                $user->login_id = $params->login_id;
+                $user->user_name = $params->user_name;
                 $user->facebook_id = $user_info->id;
                 $user->user_type = UTYPE_USER;
                 $user->language = DEFAULT_LANGUAGE;
@@ -149,31 +146,12 @@
                 $this->checkError($err);
             }
 
-            if ($err == ERR_OK) {
-                // login
-                user::init_session_data($user);
-            }
+            // login
+            user::init_session_data($user);
 
-            $planconfig = new planconfig($user->plan_type);
-
-            $last_home = home::last_home();
-            
-            $this->finish(array(
-                "session_id" => session_id(),
-                "user_id" => $user->user_id, 
-                "user_name" => $user->user_name,
-                "email" => $user->email,
-                "avartar" => _avartar_full_url($user->user_id),
-                "language" => $user->language,
-                "time_zone" => $user->time_zone,
-                "priority_tasks" => task_user::getPriorityTasks($user->user_id),
-                "inbox_tasks" => task::getInboxTasks($user->user_id),
-                "plan" => $planconfig->props,
-                "plan_end_date" => $user->plan_end_date,
-                "cur_home" => $last_home,
-                "alerts" => user::get_alerts($user->user_id),
-                "chat_uri" => _chat_uri()
-            ), $err);   
+            // post login success
+            $ret = $user->post_login();
+            $this->finish($ret, ERR_OK);
         }
 
         public function signin()
@@ -201,27 +179,10 @@
                 _session();
                 $this->checkError($err);
             }
-
-            $planconfig = new planconfig($user->plan_type);
-
-            $last_home = home::last_home();
-
-            $this->finish(array(
-                "session_id" => session_id(),
-                "user_id" => $user->user_id, 
-                "user_name" => $user->user_name,
-                "email" => $user->email,
-                "avartar" => _avartar_full_url($user->user_id),
-                "language" => $user->language,
-                "time_zone" => $user->time_zone,
-                "priority_tasks" => task_user::getPriorityTasks($user->user_id),
-                "inbox_tasks" => task::getInboxTasks($user->user_id),
-                "plan" => $planconfig->props,
-                "plan_end_date" => $user->plan_end_date,
-                "cur_home" => $last_home,
-                "alerts" => user::get_alerts($my_id),
-                "chat_uri" => _chat_uri()
-            ), $err);  
+            
+            // post login success
+            $ret = $user->post_login();
+            $this->finish($ret, ERR_OK);
         }
 
         private function get_facebook_info()
