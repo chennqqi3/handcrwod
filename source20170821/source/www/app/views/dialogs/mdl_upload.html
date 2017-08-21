@@ -1,0 +1,15 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="close()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+    <h4 class="modal-title" id="myModalLabel">ファイルアップロード</h4>
+</div>
+<div class="modal-body">
+    <form action="#" class="dropzone" upload-form>
+        <input type="hidden" name="mission_id" value="{{object_id}}">
+        <input type="hidden" name="task_id" value="{{object_id}}">
+        <input type="hidden" name="TOKEN" value="{{TOKEN}}">
+    </form>
+    <div class="clear"></div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="close()">閉じる</button>
+</div>

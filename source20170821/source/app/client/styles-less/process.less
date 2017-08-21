@@ -1,0 +1,168 @@
+.panel-process {
+    background: white;
+    margin-bottom: 0px;
+
+    #critical_label {
+        display: inline-block;
+        padding: 3px;
+        background: #FF4081;
+        color: white;
+        font-size: 60%;
+        border-radius: 3px;
+        vertical-align: 10px;
+    }
+
+    .page-process{
+        position: absolute;
+        top: 50px;
+        right: 0;
+        bottom: 0px;
+        width: 100%;
+        left: 0;
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: -blackberry-touch;
+        -moz-transition: none;
+        -webkit-transition: none;
+        -o-transition: none;
+        transition: none;
+        margin: 0;
+        padding: 0px;
+
+        -moz-user-select: none;
+        -webkit-user-select: none; 
+        -ms-user-select:none; 
+        -o-user-select:none;
+        user-select:none;
+
+        div{
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+
+        #board{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+
+            &.default-back {
+                background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAAHpk4xqAAAAElBMVEX6+vrs7Ozr6+vu7u7v7+/t7e3EXgZMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHRJREFUKM/VzrERA0EQAsGdAfJPWRG8c55wuyi4xt3CDuCW9pCDnvOYl9HEq8bkMojcwHLYwpnUXjTrKZoLLd4a7KVtG0U9ZYWFkQM0aZd5mQoKyYFqNsAbbcMo7AKbykbuX5In4pv2TT618tTi6Uaf6HvrB6gQAgdgFALaAAAAAElFTkSuQmCC);
+            }
+
+            #lines {
+                position: relative;
+            }
+            #selrect {
+                position: absolute;
+                left: 0px;
+                top: 0px;
+            }
+        }
+        #back {
+            z-index: 1;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .task-item {
+            cursor: move;
+            width: 250px;
+            position: absolute;
+            background: #ffffff;
+            padding: 0px;
+            box-shadow: 1px 1px 2px #999;
+
+            .complete-handle {
+                position: absolute;
+                top: 5px;
+                left: 5px;
+
+                .avartar {
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                }
+            }
+
+            .progress {
+                position: absolute;
+                background: #FFF9C4;
+                width: 0%;
+                height: 100%;
+                opacity: 0.6;
+                filter: alpha(opacity=60);
+                border-radius: 0px;
+
+                &.completed {
+                    background: none;
+                }
+            }
+
+            .view {
+                position: relative;
+                padding: 8px;
+                min-height: 40px;
+            }
+
+            .task-name {
+                padding-left: 35px;
+            }
+
+            &.completed {
+                background: #ccc !important;
+            }
+
+            &.processed {
+                background: lighten(@brand-primary, 50%);
+            }
+
+            &.ui-state-active {
+                background: lighten(@brand-primary, 40%) !important;
+            }
+            &.ui-state-hover {
+                background: @brand-primary !important;
+                color: white;
+            }
+
+            &.selected {
+                background: lighten(@brand-primary, 10%) !important;
+
+                .task-name,
+                .label {
+                    color: black;
+                }
+            }
+
+            .task-label {
+                float: right;
+                padding-top: 0px;
+
+                .label-warning {
+                    color: white;
+                    background: @brand-warning;
+                }
+
+                .label {
+                    padding-bottom: 2px;
+                }
+            }
+
+        }
+    }
+}
+
+.connector {
+    display: block;
+    width: 30px;
+    height: 30px;
+    opacity: .65;
+}
+
+.connector .fa {
+    font-size: 30px;
+    color: @brand-warning;
+}

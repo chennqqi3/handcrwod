@@ -1,0 +1,27 @@
+<div class="panel-member-mission">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+        <h4 class="modal-title">メンバー</h4>
+    </div>
+    <div class="modal-body">
+        <ul class="dialog-list">
+            <li data-ng-repeat="member in mission.members" class="list-group-item">
+                <span class="view">
+                    <div class="pull-right">
+                        <span class="badge badge-success" ng-class="{'show-priv': member.priv!=RPRIV.MEMBER, 'hide-priv': member.priv==RPRIV.MEMBER}" ng-click="selPriv(member)" ng-if="canEditMissionMember()">{{member.priv | room_member_label}}</span>
+                        <button type="button" class="btn btn-circle btn-xs btn-inverse" data-ng-show="canRemoveUser(member)" ng-click="removeUser(member)"><i class="icon-trash"></i></button>
+                    </div>
+                    <a href="javascript:;" ng-click="showUserProfile(member.user_id)"><img ng-src="{{member.avartar}}" class="avartar img30_30"></a>
+                    {{member.user_name}} <small>{{member.login_id}}</small>
+                </span>
+            </li>
+        </ul>
+    </div>
+    <div class="modal-footer">
+        <div class="input-group pull-left" ng-show="canInvite()">
+            <button type="submit" class="btn btn-default" ng-click="addMissionMember(mission, search_string)"><i class="icon-user-follow"></i> ルームの共有</button>
+        </div>
+        <button type="button" class="btn btn-default" ng-click="cancel()">閉じる</button>
+    </div>
+</div>
+<!-- end Share mission panel -->

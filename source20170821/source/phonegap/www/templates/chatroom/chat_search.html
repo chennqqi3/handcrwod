@@ -1,0 +1,31 @@
+<ion-modal-view>
+    <ion-header-bar class="bar bar-header bar-positive">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" ng-model="search.text" placeholder="検索..." ng-change="search_chat(true)">
+        </label>
+        <button class="button button-icon icon ion-ios-close-outline" ng-click="close()"></button>
+    </ion-header-bar>
+
+    <ion-content id="chat_view" delegate-handle="userMessageScroll" on-scroll-complete="onMessageScrollComplete()">
+        <div ng-repeat="message in messages" class="message-wrapper" on-hold="onMessageHold($event, $index, message)">
+            <div id="s_chat_{{message.cmsg_id}}">
+                <img ng-click="viewProfile(message)" class="profile-pic avartar left" ng-src="{{message.avartar}}"/>
+
+                <div class="chat-message left border-top">
+                    <div class="message-detail">
+                        <span ng-click="viewProfile(message)" class="bold">
+                            {{message.user_name}}
+                        </span>
+                        <span class="misc"><span class="mission-name">{{message.mission_name}}</span> <span class="time">{{message.date_label}}</span></span>
+                    </div>
+                    
+                    <div class="message" ng-bind-html="message.content | chatize" autolinker>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clear"></div>
+        </div>            
+    </ion-content>
+</ion-modal-view>

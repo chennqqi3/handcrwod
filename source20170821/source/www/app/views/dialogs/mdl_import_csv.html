@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="close()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+    <h4 class="modal-title" id="myModalLabel">CSV取込</h4>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <div class="col-md-12">
+            CSV取り込み用のフォーマットは、<a class="btn btn-xs btn-info" href="data/handcrowd_sample.csv"><i class="icon-cloud-download"></i>こちら</a> からダウンロードしてください。<br/>
+            フォーマットをダウンロード後に必要な情報を入力し、CSV取り込みをクリックしてください
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+<div class="modal-footer">
+    <a class="btn btn-primary btn-default" href="javascript:;" ng-file-select="importCSV($files)"><i class="icon-cloud-upload"></i> CSV取込</a>
+    <button type="button" class="btn btn-default" ng-click="close()">閉じる</button>
+</div>

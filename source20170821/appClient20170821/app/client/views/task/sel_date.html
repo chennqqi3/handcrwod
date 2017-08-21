@@ -1,0 +1,61 @@
+<!-- Date panel -->
+<div id="panel-sel-date" class="panel panel-default panel-sel-date"
+	data-ng-controller="selDateCtrl">
+	<header class="panel-header">
+		<div class="pull-right">
+			<div class="btn-group">
+				<button type="button" class="btn btn-default btn-circle" ng-click="closePanel()"><i class="ln-icon-cross2"></i></button>
+			</div>
+		</div>
+		<h4>日時選択</h4>
+	</header>
+	<!-- end panel-header -->
+	<div class="page">
+		<div class="calendar">
+		</div>
+		<ul class="list-group">
+			<li class="list-group-item" ng-show="timeMode != true">
+				<span class="view">
+					<button type="button" class="edit-popup edit-block edit-popup-empty" ng-click="setTime()">時間選択</button>
+				</span>
+			</li>
+			<li class="list-group-item" ng-show="timeMode">
+				<span class="view">
+					<div class="row">
+						<div class="col-xs-5">
+							<select ng-model="curtime.hour" class="form-control">
+								<option data-ng-repeat="hour in hours">{{hour}}</option>
+							</select>
+						</div>
+						<label class="col-xs-1 time-label">時</label>
+						<div class="col-xs-5">
+							<select ng-model="curtime.minute" class="form-control">
+								<option data-ng-repeat="minute in minutes">{{minute}}</option>
+							</select>
+						</div>
+						<label class="col-xs-1 time-label">分</label>
+					</div>
+				</span>
+			</li>
+			<li class="list-group-item" ng-show="timeMode">
+				<span class="view">
+					<button type="button" class="edit-popup edit-block edit-popup-empty" ng-click="clearTime()">時間削除</button>
+				</span>
+			</li>
+			<li class="list-group-item">
+				<span class="view">
+					<div class="row">
+						<div class="col-xs-6">
+							<button type="button" class="btn btn-block" ng-click="clearDate()">クリア</button>
+						</div>
+						<div class="col-xs-6">
+							<button type="button" class="btn btn-primary btn-block" ng-click="setDate()">保存</button>
+						</div>
+					</div>
+				</span>
+			</li>
+		</ul>
+	</div>
+	<!-- end page -->
+</div>
+<!-- end Date panel -->

@@ -1,0 +1,49 @@
+<div class="panel panel-default panel-process" data-ng-controller="processCtrl">
+	<header class="title-bar">
+		<div class="title-wrapper">
+			<h2>プロセス</h2>
+			<span ng-show="cur_mission.private_flag==1">
+				<label>金額</label> {{ cur_mission.total_budget | number: 0 }}円
+				<label>工数</label> {{ cur_mission.total_hours | hours_label}}
+			</span>
+			<span id="critical_label" ng-show="showCritical">クリティカルパス</span>
+		</div>
+		<ul class="button-group-right">
+			<li>
+				<button id="btnRemoveProcLink" type="button" class="btn btn-default btn-circle" ng-click="removeProclink()" ng-show="canEditTask() && removableProclink"><i class="icon-trash"></i></button>
+			</li>
+			<li>
+				<button id="btnEditTask" type="button" class="btn btn-default btn-circle" ng-click="editTask()" ng-show="canEdit()"><i class="icon-pencil"></i></button>
+			</li>
+			<li>
+				<button id="btnAddTask" type="button" class="btn btn-default btn-circle" ng-click="addTask()" ng-show="canEditTask() && cur_mission != null"><i class="ln-icon-plus"></i></button>
+			</li>
+			<li>
+				<button type="button" class="btn btn-default btn-circle" sel-template><i class="icon-tag"></i></button>
+			</li>
+		</ul>
+	</header>
+	<div class="page page-process">
+		<div id="board" class="default-back">
+			<canvas id="lines" ng-mousedown="mousedownCanvas($event)" task-links ng-model="links"></canvas>
+			<div class="task-item ui-draggable" task-draggable data-ng-repeat="task in ptasks | filter:searchFilter track by task.task_id" ng-model="task" data-task-id="{{task.task_id}}" data-ng-class="{inited: initItem(task), processed: task.processed == 1, completed: task.progress==100, 'default-cursor': !canEditTask()}" ng-mousedown="selectTask(task)" ng-dblclick="editTask()">
+				<div class="progress" ng-class="{completed: task.progress==100}" ng-model="task.progress" progress-back></div>
+				<div class="view">
+					<div class="complete-handle" ng-model="task">
+						<img alt="" ng-src="{{task.avartar}}" class="avartar img30_30" data-ng-class="{'avartar-border-success': task.complete_flag == true}">
+					</div>
+					<div class="task-label">
+						<span class="label label-success">{{ task.plan_hours | times_label }}</span>
+						<span class="label" data-ng-class="{ 'label-warning':is_past(task), 'label-default': !is_past(task)}">{{ (task.complete_flag == true ? task.complete_time : task.plan_end_date) | min_date_label }}</span>
+					</div>
+					<div class="task-name">
+					{{task.task_name}}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<section data-ng-include=" 'views/process/sel_template.html' + ver "></section>
+<section data-ng-include=" 'views/task/task_edit.html' + ver "></section>

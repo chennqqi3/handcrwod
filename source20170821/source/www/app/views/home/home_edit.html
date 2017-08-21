@@ -1,0 +1,71 @@
+<div class="panel-edit-mission">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+        
+        <h4 class="modal-title">グループ情報</h4>
+    </div>
+    <div class="modal-body">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <div class="row form-group">
+                    <label class="col-sm-2">タイトル</label>
+                    <form class="col-sm-10" data-ng-submit="changeHomeName(home)">
+                        <input type="text" class="edit form-control" data-ng-trim="false" ng-model="home.home_name" data-ng-blur="changeHomeName(home)" ng-show="canEditHome()">
+                    </form>
+                    <span class="col-sm-10 col-detail" ng-show="!canEditHome()">{{home.home_name}}</span>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="row form-group">
+                    <label class="col-sm-2">ロゴ</label>
+                    <div class="col-sm-6 text-center">
+                        <div class="logo-container-80">
+                            <span ng-if="home.logo_url == null">{{home.home_name | abbr}}</span>
+                            <img alt="" ng-src="{{home.logo_url}}" class="logo" ng-if="home.logo_url != null">
+                        </div>
+                    </div>
+                    <div class="col-sm-4" ng-show="canEditHome()">
+                        <div class="button btn btn-sm btn-gap-v btn-default" ng-file-select="onUploadLogo($files)">アップロード</div>
+                        <br/>
+                        <button type="button" class="btn btn-sm btn-gap-v btn-default" ng-click="onRemoveLogo($files)">削除</button>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="row form-group">
+                    <label class="col-sm-2">概要</label>
+                    <div class="col-sm-10 summary-item" ng-show="!editSummaryMode">
+                        <a href="javascript:;" id="summary" ng-model="home.summary" class="edit-popup edit-block edit-popup-empty" ng-click="editSummary(home)" data-ng-show="(home.summary==null || home.summary=='' ) && canEditHome()">概要の入力</a>
+                        <a href="javascript:;" class="edit-popup" ng-bind-html="home.summary | noHTML | htmlfy" data-ng-show="home.summary!=null && home.summary!=''" ng-click="editSummary(home)"></a>
+                    </div>
+                    <form name="form_summary" class="col-sm-10 form-validation comment-form" data-ng-submit="submitSaveSummary(home)" ng-show="editSummaryMode">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <textarea class="form-control" ng-model="home.summary" placeholder="概要を入力してください。" rows=10 auto-focus="editSummaryMode == true"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <button type="submit" class="edit-popup edit-block edit-popup-empty"><i class="ln-icon-floppy-disk"></i> 保存</button>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <button type="button" class="edit-popup edit-block edit-popup-empty" ng-click="exitEditSummary()"><i class="ln-icon-cross2"></i> 取消</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="cancel()">閉じる</button>
+    </div>
+</div>
+<!-- end Edit home panel -->

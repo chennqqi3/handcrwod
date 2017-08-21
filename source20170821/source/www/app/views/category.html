@@ -1,0 +1,72 @@
+<!-- Category panel -->
+<div class="panel panel-default side-panel panel-category shadow-right"
+	data-ng-controller="categoryCtrl">
+	<header class="panel-header with-icon-right">
+		<input type="text" class="form-control" required data-ng-model="search_string" placeholder="キーワードを入力">
+		<i class="fa fa-search"></i>
+	</header>
+	<!-- end panel-header -->
+	<div class="user-category-add-bar" id="user-category-add">
+		<form name="form_user_category_add" class="form-horizontal form-validation" data-ng-submit="submitForm()" ng-controller="userCategoryAddCtrl">
+			<div class="col-md-12">
+				<div class="form-group">
+					<span class="icon-left fa fa-plus"></span>
+					<input type="text" class="form-control" required data-ng-model="category_name" placeholder="カテゴリー名を入力">
+					<a href="javascript:;" ng-click="closePanel()"><span class="icon-right fa fa-times"></span></a>
+				</div>
+			</div>
+		</form>
+		<div class="clear"></div>
+	</div>
+	<div class="page page-categories">
+		<ul class="list-user-category">
+			<li class="list-user-category-item" data-user-category-id="{{category.user_category_id}}" data-ng-repeat="category in categories" data-ng-class="{editing: category == editedCategory}">
+				<div category-droppable data-ng-model="category.user_category_id">
+					<div class="view user-category" data-ng-class="{editmode: editmode}">
+						<input type="checkbox" data-ng-model="category.checked">
+						<label data-ng-dblclick="editCategory(category)">
+							<i class="fa fa-folder-o"></i> &nbsp; {{category.category_name}}
+						</label>
+					</div>
+					<div class="list-mission-item-empty"></div>
+				</div>
+				<form data-ng-submit="doneEditing(category, $index)">
+					<input type="text"
+						   class="edit form-control"
+						   data-ng-trim="false"
+						   data-ng-model="category.category_name"
+						   data-ng-blur="doneEditing(category, $index)"
+						   data-mission-focus="category == editedCategory">
+				</form>
+				<ul class="list-mission" category-mission-sortable>
+					<li class="list-mission-item" data-mission-id="{{mission.mission_id}}" data-ng-repeat="mission in catMissions | filter:{mission_name:search_string} | categoryFilter:category.user_category_id " data-ng-class="{selected: mission.mission_id == cur_mission.mission_id}" ng-click="selectMission(mission)" >
+						<div class="view">
+							<div>
+								<span class="mission-name">{{mission.mission_name}}</span>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<footer class="panel-footer">
+		<ul class="nav-left list-unstyled">
+			<li data-ng-show="!editmode">
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="startEditMode()" title="編集"><i class="glyphicon glyphicon-pencil"></i></button>
+			</li>
+			<li data-ng-show="editmode">
+				<button type="button" class="btn btn-gap-v btn-white-primary" data-ng-disabled="!canRemove()" ng-click="removeCategories()" title="削除"><i class="glyphicon glyphicon-trash"></i></button>
+			</li>
+		</ul> 
+		<ul class="nav-right pull-right list-unstyled">
+			<li data-ng-show="editmode">
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="exitEditMode()" title="取消"><i class="fa fa-times"></i></button>
+			</li>
+			<li data-ng-show="!editmode">
+				<button type="button" class="btn btn-gap-v btn-white-primary" ng-click="showCategoryAdd()"><i class="fa fa-plus"></i> カテゴリー</button>
+			</li>
+		</ul>
+	</footer>
+</div>
+<!-- end Category panel -->

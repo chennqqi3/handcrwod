@@ -1,0 +1,61 @@
+<div class="page-signup">
+    <div class="main-body">
+        <div class="container">
+            <div class="form-container">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="text-center">
+							<h1><img src="images/logo.png"/> ユーザー登録</h1>
+						</div>
+
+						<section>
+							<form name="form_signup" class="form-horizontal form-validation" data-ng-controller="signupCtrl">
+								<div class="form-group form-group-large">
+									<span class="icon-left glyphicon glyphicon-user"></span>
+									<input type="text" class="form-control" required name="user_name" ng-model="user.user_name" placeholder="名前">
+		    						<div class="err-msg" ng-show="(show_error || form_signup.user_name.$dirty) && form_signup.user_name.$invalid">
+		                                <small class="error" ng-show="form_signup.user_name.$error.required">名前を入力してください。</small>
+		                            </div>
+								</div>
+								<div class="form-group form-group-large">
+									<span class="icon-left glyphicon glyphicon-envelope"></span>
+									<input type="email" class="form-control" required name="email" ng-model="user.email" placeholder="メールアドレス" ng-readonly="email_readonly">
+		    						<div class="err-msg" ng-show="(show_error || form_signup.email.$dirty) && form_signup.email.$invalid">
+		                                <small class="error" ng-show="form_signup.email.$error.required">メールアドレスを入力してください。</small>
+		                            </div>
+								</div>
+								<div class="form-group form-group-large">
+									<span class="icon-left glyphicon glyphicon-lock"></span>
+									<input type="password" class="form-control" required name="password" ng-model="user.password" placeholder="パスワード">
+		    						<div class="err-msg" ng-show="(show_error || form_signup.password.$dirty) && form_signup.password.$invalid">
+		                                <small class="error" ng-show="form_signup.password.$error.required">パスワードを入力してください。</small>
+		                            </div>
+								</div>
+								<div class="form-group form-group-large">
+									<span class="icon-left glyphicon glyphicon-refresh"></span>
+									<input type="password" class="form-control" required name="password_retyped" ng-model="user.password_retyped" placeholder="パスワード(確認)" data-equals="{{user.password}}">
+			                        <div class="err-msg" ng-show="form_signup.password_retyped.$dirty && form_signup.password_retyped.$invalid">
+			                            <small class="error" ng-show="form_signup.password_retyped.$error.required">{{err_no_equal_password}}</small>
+			                            <small class="error" ng-show="form_signup.password_retyped.$error.equals">{{err_no_equal_password}}</small>
+			                        </div>
+								</div>
+								<div class="form-group">
+									<i class="fa fa-check"></i> <a href="javascript:;" ng-click="showContract()">利用契約</a>と<a href="javascript:;" ng-click="showPrivacy()">プライバシーポリシー</a>に同意します。
+									<div class="alert" ng-class="{'alert-danger': err_code!=0, 'alert-info': err_code==0}" data-ng-show="showMessage">{{message}}</div>
+								</div>
+								<div class="form-group">
+									<button type="submit" class="btn btn-primary btn-lg btn-block" ng-show="!registered" ng-click="submitForm()">同意して登録</button>
+									<button type="submit" class="btn btn-primary btn-lg btn-block" ng-show="registered" ng-click="submitForm()">確認メール再発送</button>
+								</div>
+							</form>
+						</section>
+
+						<section>
+							<p class="text-center">アカウントを持っていますか？ <a href="#/signin" >ログイン</a></p>
+						</section>
+					</div>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>

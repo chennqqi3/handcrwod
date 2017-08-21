@@ -1,0 +1,175 @@
+.home-main {
+    overflow: hidden;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+
+    .title-wrapper {
+        margin: 0px 0px 0px 0px;
+    }
+
+    h3 {
+        font-size: 18px;
+        padding-left: 10px;
+    }
+
+    .page {
+        position: absolute;
+        top: 50px;
+        right: 0;
+        bottom: 0px;
+        left: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: -blackberry-touch;
+        -moz-transition: none;
+        -webkit-transition: none;
+        -o-transition: none;
+        transition: none;
+        padding: 10px;
+
+        .sub-right-button {
+            float: right;
+            color: #666;
+            margin-top: 15px;
+            margin-left: 5px;
+
+            &.btn-warning {
+                color: white;
+            }
+        }
+
+        .home-summary {
+            padding: 0px 40px;
+        }
+    }
+}
+
+.panel-open-home {
+    .modal-body {
+        overflow-y: auto;
+        max-height: 350px;
+    }
+
+    .list-group {
+        .avartar {
+            margin-right: 10px;
+        }
+    }
+
+    .list-group-item {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border: none;
+
+        &.selected {
+            background: @brand-success;
+            color: white;
+            font-weight: bold;
+        }
+
+        .view {
+            position: relative;
+            padding: 0;
+
+            img.avartar {
+                display: inline-block;
+                padding: 0px;
+                margin-right: 10px;
+                width: 20px;
+                height: 20px;
+                border-width: 0px;
+                vertical-align: -4px;
+            }
+
+            .icon {
+                font-size: 20px;
+                margin-right: 10px;
+                vertical-align: -4px;
+            }
+        }
+    }
+
+    .list-group-item:first-child {
+        border-top: 0px;
+    }
+}
+
+.chatroom-box {
+    .view {
+        display: block;
+        position: relative;
+        padding: 15px;
+        margin-bottom: 20px;
+        background: #f9f9f9;
+        height: 110px;
+        text-align: center;
+
+        .info {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            top: 5px;
+            text-align: left;
+        }
+
+        .icon {
+            display: block;
+            font-size: 40px;
+            margin: 0 auto;
+            margin-top: 15px;
+            opacity: 0.5;
+        }
+
+        img {
+            display: block;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            margin-top: 15px;
+            border-width: 0px;
+        }
+
+        .title {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            text-align: center;
+            max-height: 40px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .show-priv {
+            cursor: pointer;
+        }
+        
+        .hide-priv {
+            cursor: pointer;
+            opacity: 0.5;
+
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+    }
+}
+
+.bot-list {
+    padding-left: 10px;
+    padding-right: 10px;
+    list-style: none;
+
+    li {
+        padding: 5px;
+    }
+
+    .avartar {
+        margin-right: 10px;
+    }
+}

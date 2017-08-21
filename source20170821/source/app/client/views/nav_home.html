@@ -1,0 +1,12 @@
+<div id="nav-home-wrapper">
+    <ul id="navHome" ng-controller="NavHomeCtrl" data-slim-scroll>
+        <li ng-repeat="home in homes | orderBy:'order'" ng-class="{'active': cur_home.home_id==home.home_id }" title="{{home.home_name}}" ng-click="open(home)">
+            <span ng-if="home.logo_url == null">{{home.home_name | abbr}}</span>
+            <img ng-src="{{home.logo_url}}" class="img30_30 logo" ng-if="home.logo_url != null">
+            <i class="badge badge-danger" ng-show="home.unreads > 0">{{home.unreads}}</i>
+        </li>
+        <li title="グループ新規作成" ng-click="addHome()">
+            <span><i class="icon-plus"></i></span>
+        </li>
+    </ul>
+</div>

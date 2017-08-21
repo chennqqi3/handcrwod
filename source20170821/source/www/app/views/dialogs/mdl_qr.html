@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="close()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+    <h4 class="modal-title" id="myModalLabel">{{title}}</h4>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a ng-href="{{qr_url}}" target="_blank"><image ng-src="{{qr_url}}" style="min-height: 200px; max-width:800px;"></a>
+            <div class="divider"></div>
+        </div>
+        <div class="col-md-12 text-center">
+            {{url}} <button type="button" class="btn btn-primary btn-sm" copy-url="{{url}}">招待リンクをコピー</button>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="close()">閉じる</button>
+</div>

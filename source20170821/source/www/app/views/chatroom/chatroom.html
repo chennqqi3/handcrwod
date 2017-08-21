@@ -1,0 +1,201 @@
+<div id="chat_main" class="chat-main" data-ng-controller="chatroomCtrl" ng-class="{'show-side-panel': show_tasks || show_process || show_attach}">
+	<header class="title-bar">
+        <ul class="button-group-left" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">
+            <li dropdown>
+                <button id="btn_room_setting" type="button" class="btn btn-default btn-circle" dropdown-toggle><i class="icon-list"></i></button>
+                <ul class="dropdown-menu" aria-labelledby="simple-dropdown">
+                    <li>
+                        <a href ng-click="editMission()"><i class="icon-info"></i> チャットルーム情報</a>
+                    </li>
+                    <li ng-show="cur_mission.private_flag == 1 && canEditMissionMember()">
+                        <a href ng-click="inviteMission()"><i class="icon-user-follow"></i> ルームの共有</a>
+                    </li>
+                    <li ng-show="canComplete()">
+                        <a href ng-click="completeMissionConfirm()"><i class="icon-flag"></i> アーカイブする</a>
+                    </li>
+                    <li ng-show="canUncomplete()">
+                        <a href ng-click="uncompleteMissionConfirm()"><i class="icon-flag"></i> アーカイブしない</a>
+                    </li>
+                    <li ng-show="canBreak()">
+                        <a href ng-click="breakMissionConfirm()"><i class="icon-logout"></i> 退室</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        
+		<div class="title-wrapper">
+            <h2 ng-class="{'with-info': cur_mission.private_flag==1 || cur_mission.private_flag==0}">{{cur_mission.mission_name}} <a href="javascript:;" ng-click="showInviteQR()" ng-if="canInviteChat()" title="QRコード"><img class="qr-code" ng-src="images/qr.png"></a></h2>
+            <div class="chat-info">
+                <span class="badge badge-danger" ng-if="cur_mission.end_date != null">期限:{{cur_mission.end_date | date_label}}</span> 
+                <span class="badge badge-primary" ng-if="cur_mission.private_flag!=2 && cur_mission.private_flag!=3">メンバー:{{cur_mission.members.length}}人</span> 
+            </div>
+		</div>
+
+		<ul class="button-group-right">
+            <li class="search-wrapper" ng-class="{'searching':searching}">
+                <form id="search_bar" ng-submit="search()" novalidate>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-info" ng-click="search()"><i class="icon-magnifier"></i></button>
+                        </div>
+                        <input type="text" class="search-input form-control" required ng-model="search_string" maxlength="50" placeholder="検索..." enter-submit="search()" esc="exitSearch()" ng-focus="startSearch()">
+                        <div class="input-group-btn" ng-show="searching">
+                            <button type="button" class="btn btn-default" ng-click="exitSearch()"><i class="icon-close"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </li>
+            <li ng-show="cur_mission.private_flag==1">
+                <span data-ng-repeat="member in cur_mission.members | limitTo:5">
+                    <img ng-src="{{member.avartar}}" class="avartar clickable img30_30" title="{{member.user_name}}" ng-click="showUserProfile(member.user_id)">
+                </span>
+            </li>
+            <li ng-show="cur_mission.private_flag==1">
+                <button type="button" class="btn btn-default btn-circle" title="メンバーの招待と削除" ng-click="memberMission()"><i class="icon-people"></i></button>
+            </li>
+			<li>
+				<button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_process, 'btn-default': !show_process}" title="プロセス" ng-click="showProcess()"><i class="ln-icon-site-map"></i></button>
+			</li>
+			<li>
+				<button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_attach, 'btn-default': !show_attach}" title="ファイル" ng-click="showFiles()"><i class="icon-paper-clip"></i></button>
+			</li>
+            <li>
+                <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_star, 'btn-default': !show_star}" title="スター付き" ng-click="showStar()"><i class="icon-star"></i></button>
+            </li>
+            <li>
+                <button type="button" class="btn btn-default btn-circle" ng-class="{'btn-primary': show_summary, 'btn-default': !show_summary}" title="概要" ng-click="showSummary()"><i class="icon-info"></i></button>
+            </li>
+		</ul>
+	</header>
+    <div class="chat-panel">
+        <div id="loader">
+            <div>
+                <div class="hc-loader">Loading...</div>
+            </div>
+        </div>
+    	<div id="chat_view" class="chat-view page chat-container transparent" scroll-top="prev()" scroll-bottom="next()" scroll="onScroll()">
+            <div id="messages"></div>
+            <div id="scroll_bottom"></div>
+    	</div>
+        <div class="chat-send-files" id="file_bar">
+            <div class="chat-send-file" ng-repeat="file in files">
+                <div class="file-info">
+                    {{file.name}}({{file.fileSize}}M)
+                </div>
+                <span class="pull-right">
+                    {{file.progress}}% 
+                    <button class="btn btn-xs btn-default btn-circle" ng-click="onCancelUpload(file)"><i class="icon-close"></i></button>                    
+                </span>
+                <div class="pbar">            
+                    <progressbar class="progressbar-sm progress-striped active" value="file.progress"></progressbar>
+                </div>                
+            </div>
+        </div>
+        <form id="input_bar" class="bar bar-footer item-input-inset" novalidate>
+            <div class="footer-btn-wrap">
+                <button class="btn btn-default btn-circle btn-smile"><i class="icon-emotsmile"></i></button>
+            </div>
+            <div class="footer-btn-wrap">
+                <button class="btn btn-default btn-circle btn-file" multiple ng-file-select="onUploadFiles($files)" id="btn_upload"><i class="icon-paper-clip"></i></button>
+            </div>
+            <div class="footer-btn-wrap">
+                <button class="btn btn-default btn-circle btn-to" >TO</button>
+            </div>
+            <label class="item-input-wrapper">
+                <textarea ng-model="cmsg.content" value="" placeholder="メッセージを入力してください。(SHIFT + ENTERで送信)" required minlength="1" maxlength="21000" id="chat_ta" chat-input enter-submit="sendMessage()" esc="exitEdit()" ng-change="on_change_message()" ng-trim="false" rows='1' ng-keypress="on_keypress($event)"></textarea>
+            </label>
+            <div class="footer-btn-wrap">
+                <button id="btn_send_message" class="btn btn-default btn-circle" type="submit" ng-disabled="!cmsg.content || cmsg.content === ''" ng-click="sendMessage()">
+                    <i class="ln-icon-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="right-panel">
+        <section data-ng-include=" 'views/task/tasks.html' + ver " ng-if="show_tasks"></section>
+        <section data-ng-include=" 'views/process/process.html' + ver " ng-if="show_process"></section>
+        <section data-ng-include=" 'views/mission/mission_attach.html' + ver " ng-if="show_attach"></section>
+        <section data-ng-include=" 'views/chatroom/chat_star.html' + ver " ng-if="show_star"></section>
+        <section data-ng-include=" 'views/mission/mission_summary.html' + ver " ng-if="show_summary"></section>
+    </div>
+
+    <div class="resize-handle-h" ng-dblclick="maxRightPanel()"><i class="fa fa-bars fa-rotate-90"></i></div>
+
+    <div id="emoticon_gallery" class="popover chatpop fade top in">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <input type="text" class="search-input form-control" required ng-model="search_emoticon" maxlength="50" placeholder="検索...">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                    </div>
+                </div>
+            </div>
+            <ul class="emoticon-list clearfix">
+                <li ng-repeat="em in emoticons | filter:emoticonFilter" class="emoticon" title="{{em.title}} {{em.alt}}" ng-click="emoticon_message(em.alt)" style="background-image: url({{em.image}})"></li>
+                <li class="emoticon icon-plus" ng-click="manage_emoticon()"></li>
+            </ul>
+        </h3>
+    </div>
+
+    <div id="alternative_emoticons" class="popover chatpop fade top in">
+        <h3 class="popover-title">
+            <ul class="emoticon-list-with-alt clearfix">
+                <li ng-repeat="em in filtered_emoticon = (emoticons | filter:alternative_emoticonFilter)" class="emoticon_with_alt" title="{{em.title}} {{em.alt}}" ng-click="emoticon_message_with_alt(em.alt)" style="background-image: url({{em.image}})" alt="{{em.alt}}">{{em.alt}}</li>
+            </ul>
+        </h3>
+    </div>
+
+    <div id="react_emoticons" class="popover chatpop fade in">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <input type="text" class="search-input form-control" required ng-model="search_emoticon" maxlength="50" placeholder="検索...">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                    </div>
+                </div>
+            </div>
+            <ul class="emoticon-list clearfix">
+                <li ng-repeat="em in emoticons | filter:{title:search_emoticon}" class="emoticon" title="{{em.title}} {{em.alt}}" ng-click="react(cmsg_id, em.emoticon_id)" style="background-image: url({{em.image}})"></li>
+                <li class="emoticon icon-plus" ng-click="manage_emoticon()"></li>
+            </ul>
+        </h3>
+    </div>
+    <div id="file_drop" class="popover chatpop top">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <div class="drop-box"><strong>このエリアにドロップしてください</strong><br/>（複数ファイル送信可能）</div>
+        </h3>
+    </div>
+    <div id="to_users" class="popover chatpop fade top in">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <div class="search-wrapper">
+                <div class="input-group">
+                    <input type="text" class="search-input form-control" required ng-model="search_user" maxlength="50" placeholder="検索...">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                    </div>
+                </div>
+            </div>
+            <ul class="user-list">
+                <li data-ng-repeat="member in cur_mission.members | filter:{user_name:search_user}" ng-click="to_message(member)" ng-if="member.user_id!=session.user_id">
+                    <img ng-src="{{member.avartar}}" class="avartar img30_30">
+                    {{member.user_name}}
+                </li>
+                <li ng-click="to_message()" ng-if="cur_mission.private_flag!=2"><img ng-src="{{all_avartar}}" class="avartar img30_30"> 全員</li>
+            </ul>
+        </h3>
+    </div>
+    <div id="selection_menu" class="popover chatpop fade bottom in">
+        <div class="arrow"></div>
+        <h3 class="popover-title">
+            <button type="button" class="btn btn-default btn-sm" ng-click="quote()"><i class="fa fa-fw fa-quote-left"></i>　引用</button>
+            <button type="button" class="btn btn-default btn-sm" ng-click="addTask()" ng-if="canEditTask()"><i class="icon-fa fa fa-check-square-o"></i>　タスク登録</button>
+        </h3>
+    </div>
+</div>

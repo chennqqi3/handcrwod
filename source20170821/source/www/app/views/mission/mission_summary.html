@@ -1,0 +1,35 @@
+<div class="panel panel-default panel-chat-star" data-ng-controller="missionSummaryCtrl">  
+    <header class="title-bar">
+        <div class="title-wrapper">
+            <h2>概要 
+            	<span class="badge badge-danger" ng-if="cur_mission.total_budget>0">合計金額:{{(cur_mission.total_budget | number: 0) + ' 円'}}</span> 
+                <span class="badge badge-primary" ng-if="cur_mission.total_hours>0">合計工数:{{cur_mission.total_hours | times_label}}</span>
+            </h2>
+        </div>
+		<ul class="button-group-right" ng-show="canEditMission()">
+			<li>
+				<buttontype="button" class="btn btn-default btn-circle" ng-click="edit()" ng-show="!editMode"><i class="icon-pencil"></i></button>
+			</li>
+		</ul>
+    </header>
+    <div class="page chat-container">
+        <div ng-bind-html="cur_mission.summary | noHTML | htmlfy" ng-show="!editMode"></div>
+
+        <form name="form_summary" class="form-horizontal form-validation" ng-show="editMode">
+			<div class="form-group">
+				<div class="col-sm-12">
+					<textarea class="form-control" ng-model="cur_mission.summary" placeholder="概要を入力してください。" rows=20 auto-focus="editMode == true"></textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-6">
+					<button type="submit" class="edit-popup edit-block edit-popup-empty" ng-click="save()"><i class="ln-icon-floppy-disk"></i> 保存</button>
+				</div>
+				<div class="col-sm-6">
+					<button type="button" class="edit-popup edit-block edit-popup-empty" ng-click="cancel()"><i class="ln-icon-cross2"></i> 取消</button>
+				</div>
+			</div>
+
+		</form>
+    </div>
+</div>

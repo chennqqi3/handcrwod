@@ -1,0 +1,39 @@
+<!-- Skills panel -->
+<div id="panel-sel-skill" class="panel panel-default panel-sel-skill"
+	data-ng-controller="selSkillCtrl">
+	<header class="panel-header">
+		<div class="pull-right">
+			<button type="button" class="btn btn-default" ng-click="clickOk()"><i class="ln-icon-check"></i> OK</button>
+			<button type="button" class="btn btn-default" ng-click="closePanel()"><i class="ln-icon-cross2"></i> キャンセル</button>
+		</div>
+		<h4>スキル選択</h4>
+		<div class="input-group">
+			<input type="text" class="form-control" required ng-model="search_string" placeholder="キーワードを入力">
+			<div class="input-group-btn">
+				<button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+				<button type="button" class="btn btn-default" ng-click="addSkill()" data-ng-disabled="!canAddSkill()"><i class="ln-icon-plus"></i></button>
+			</div>
+		</div>
+	</header>
+	<!-- end panel-header -->
+	<div class="page" data-slim-scroll>
+		<ul class="list-group">
+			<li data-ng-repeat="skill in all_skills | filter:{selected:true}" class="list-group-item" data-ng-class="">
+				<span class="view">
+					<label ng-click="selectSkill(skill)">
+						<i class="fa fa-fw fa-check"></i> {{skill.skill_name}}
+					</label>
+				</span>
+			</li>
+			<li data-ng-repeat="skill in all_skills | filter:search_string | filter:{selected:false}" class="list-group-item" data-ng-class="">
+				<span class="view">
+					<label ng-click="selectSkill(skill)">
+						{{skill.skill_name}}
+					</label>
+				</span>
+			</li>
+		</ul>
+	</div>
+	<!-- end page -->
+</div>
+<!-- end Skills panel -->

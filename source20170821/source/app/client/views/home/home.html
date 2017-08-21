@@ -1,0 +1,118 @@
+<div class="home-main" data-ng-controller="homeCtrl">
+    <header class="title-bar" ng-if="cur_home!=null">
+        <ul class="button-group-left">
+            <li dropdown>
+                <button type="button" class="btn btn-default btn-circle" dropdown-toggle><i class="icon-settings"></i></button>
+                <ul class="dropdown-menu" aria-labelledby="simple-dropdown">
+                    <li><a href ng-click="editHome()"><i class="icon-info"></i> グループ情報</a></li>
+                    <li><a href ng-click="importCSV()" ng-if="canEditHome()"><i class="icon-cloud-upload"></i> CSV取込</a></li>
+                    <li><a href ng-click="breakHome()" ng-if="canBreakHome()"><i class="icon-logout"></i> グループ退会</a></li>
+                    <li><a href ng-click="removeHome()" ng-if="canEditHome()"><i class="icon-trash"></i> 削除</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="title-wrapper">
+            <h2>{{cur_home.home_name | home_label}} <a href="javascript:;" ng-click="showInviteQR()" title="QRコード" ng-if="canEditHomeMember()"><img class="qr-code" ng-src="images/qr.png"></a></h2>
+        </div>
+        <ul class="button-group-right">
+            <li class="search-wrapper">
+                <form id="search_bar" ng-submit="search()" novalidate>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-info" ng-click="search()"><i class="icon-magnifier"></i></button>
+                        </div>
+                        <input type="text" class="search-input form-control" maxlength="50" placeholder="キーワードを入力" ng-model="query.search_string">
+                    </div>
+                </form>
+            </li>
+        </ul>
+    </header>
+    <header class="title-bar" ng-if="cur_home==null">
+        <div class="title-wrapper">
+            <h2>ホーム</h2>
+        </div>
+    </header>
+    <div class="page">
+        <div class="row" ng-if="cur_home==null" ng-cloak>
+            <div class="col-sm-12">
+                <img src="images/welcome.svg">
+                <div class="alert alert-info">
+                    <i class="fa fa-warning"></i>
+                    グループが存在しません。<a href="javascript:;" class="btn btn-danger btn-sm" ng-click="addHome()">こちら</a> からマイグループを作成するか、他のグループから招待してもらってください。
+                </div>
+            </div>
+        </div>
+        <div ng-if="cur_home!=null">
+            <div class="row">
+                <div class="col-sm-12 home-summary" ng-bind-html="cur_home.summary | noHTML | htmlfy"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <a href="javascript:;" class="btn btn-default btn-sm sub-right-button" title="全メンバー用新規作成" ng-click="addMission()" ng-if="cur_home.priv == HPRIV.HMANAGER"><i class="icon-plus"></i> 新規作成</a>
+                    <a href="javascript:;" class="btn btn-default btn-sm sub-right-button" ng-class="{'btn-warning': cur_home.include_completed}" ng-click="toggleCompleted(0)"><i class="icon-flag"></i> アーカイブ<span ng-show="cur_home.include_completed">非</span>表示</a>
+                    <h3>全メンバー用 <span class="badge badge-primary">{{filteredPublics.length}}件</span></h3>
+                </div>
+            </div>
+            <div class="row">
+                <div data-ng-repeat="mission in filteredPublics = (missions | filter:publicFilter | filter:{mission_name:query.search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
+                    <div class="view">
+                        <div class="info">
+                            <span class="badge badge-danger" ng-if="mission.unreads>0">未読:{{mission.unreads}}</span>
+                            <small>{{mission.last_date | date_time_label}}</small>
+                            <button type="button" class="btn btn-default btn-xs btn-circle pull-right" title="削除" ng-click="removeMission(mission)" ng-if="cur_home.priv == HPRIV.HMANAGER"><i class="icon-trash"></i></button>
+                        </div>
+                        <a href="#/chats/{{mission.mission_id}}">
+                            <i class="icon icon-bubbles"></i>
+                            <div class="title" title="{{::mission.mission_name}}">
+                                <i class="icon-flag text-danger" title="アーカイブ" ng-show="mission.complete_flag"></i> {{::mission.mission_name}}
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-if="filteredPrivates.length > 0">
+                <div class="col-sm-12">
+                    <h3>特定メンバー用 <span class="badge badge-primary">{{filteredPrivates.length}}件</span></h3>
+                </div>
+            </div>
+            <div class="row">
+                <div data-ng-repeat="mission in filteredPrivates = (missions | filter:privateFilter | filter:{mission_name:query.search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
+                    <div class="view">
+                        <div class="info">
+                            <span class="badge badge-danger" ng-if="mission.unreads>0">未読:{{mission.unreads}}</span>
+                            <small>{{mission.last_date | date_time_label}}</small>
+                            <button type="button" class="btn btn-default btn-xs btn-circle pull-right" title="削除" ng-click="removeMission(mission)" ng-if="cur_home.priv == HPRIV.HMANAGER || cur_home.priv == HPRIV.RMANAGER"><i class="icon-trash"></i></button>
+                        </div>
+                        <a href="#/chats/{{mission.mission_id}}">
+                            <i class="icon icon-bubbles"></i>
+                            <div class="title" title="{{::mission.mission_name}}">
+                                <i class="icon-flag text-danger" title="アーカイブ" ng-show="mission.complete_flag"></i> {{::mission.mission_name}}
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <a href="javascript:;" class="btn btn-default btn-sm sub-right-button" title="グループへの招待" ng-click="inviteMember()" ng-if="canEditHomeMember()"><i class="icon-user-follow"></i> グループへの招待</a>
+                    <h3>メンバー <span class="badge badge-primary">{{filteredMembers.length}}人</span></h3>
+                <div>
+                <div data-ng-repeat="member in filteredMembers = (missions | filter:memberFilter | filter:{user_name:query.search_string})" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 chatroom-box">
+                    <div class="view">
+                        <div class="info" ng-if="canEditHomeMember()">
+                            <span class="badge badge-success" ng-class="{'show-priv': member.priv!=HPRIV.GUEST, 'hide-priv': member.priv==HPRIV.GUEST}" ng-click="selPriv(member)">{{member.priv | priv_label}}</span>
+                            <button type="button" class="btn btn-default btn-xs btn-circle pull-right" title="削除" ng-click="removeMember(member)"><i class="icon-trash"></i></button>
+                        </div>
+                        <div class="clickable" ng-click="open_member(member)">
+                            <img ng-src="{{member.avartar}}" class="avartar">
+                            <div class="title" title="{{::member.user_name}}">
+                                {{::member.user_name}}
+                                <span class="badge badge-danger" ng-show="member.accepted == 0">承認待ち</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

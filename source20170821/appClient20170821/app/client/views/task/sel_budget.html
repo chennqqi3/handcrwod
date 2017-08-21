@@ -1,0 +1,28 @@
+<!-- Date panel -->
+<div id="panel-sel-budget" class="panel panel-default panel-sel-budget panel-popup"
+	data-ng-controller="selBudgetCtrl">
+	<header class="panel-header">
+		<div class="pull-right">
+			<div class="btn-group">
+				<button type="button" class="btn btn-default btn-circle" ng-click="closePanel()"><i class="ln-icon-cross2"></i></button>
+			</div>
+		</div>
+		<h4>予算</h4>
+	</header>
+	<!-- end panel-header -->
+	<div class="page">
+		<form name="form_sel_budget" class="form-validation list-group">
+			<div class="list-group-item col-md-12">
+				<div class="input-group">
+					<input type="text" class="form-control text-right" id="txt_budget" ng-model="budget" placeholder="単価を入力してください。" ng-change="changeBudget()">
+					<span class="input-group-addon">円</span>
+				</div>
+			</div>
+			<div class="list-group-item col-md-12">
+				<button type="submit" class="btn btn-block btn-primary" data-ng-disabled="!canSubmit()" ng-click="clickOk()"><i class="fa fa-check"></i> 確認</button>
+			</div>
+		</form>
+	</div>
+	<!-- end page -->
+</div>
+<!-- end Date panel -->

@@ -1,0 +1,52 @@
+<div class="panel panel-default panel-attach" data-ng-controller="missionAttachCtrl">  
+    <header class="title-bar">
+        <div class="title-wrapper">
+            <h2>添付ファイル</h2>
+        </div>
+        <ul class="button-group-right">
+            <li>
+                <button id="btnAddAttach" type="button" class="btn btn-default btn-circle" multiple ng-file-select="onUploadFiles($files)" ng-show="cur_mission != null"><i class="ln-icon-plus"></i></button>
+            </li>
+        </ul>
+    </header>
+    <div class="page">
+        <div class="row">
+            <div class="col-md-12">
+                <section class="attach-container">
+                    <section data-ng-cloak>
+                        <ul class="attach-list list-unstyled">
+                            <li class="attach-item ui-state-default" data-ng-repeat="attach in attaches track by attach.mission_attach_id">
+                                <span class="view">
+                                    <div class="attach-remove">
+                                        <button type="button" class="btn btn-default btn-xs btn-circle" title="削除" ng-click="remove(attach)"><i class="icon-trash"></i></button>
+                                    </div>
+                                    <div class="attach-label">
+                                        <span class="label hidden-xs label-default">{{ attach.create_time | date_time_label }}</span>
+                                    </div>
+                                    <div class="attach-name">
+                                        <i class="icon-paper-clip"></i> <a target="_blank" ng-href="{{attach.attach_url}}">{{attach.file_name}}</a><small>({{attach.file_size}}M)</small>
+                                    </div>
+                                    <div style="clear: both;"></div>
+                                </span>
+                            </li>
+                        </ul>
+                    </section>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="mission-send-files">
+        <div class="mission-send-file" ng-repeat="file in files">
+            <div class="file-info">
+                {{file.name}}({{file.file_size}}M)
+            </div>
+            <span class="pull-right">
+                {{file.progress}}% 
+                <button class="btn btn-xs btn-default btn-circle" ng-click="onCancelUpload(file)"><i class="icon-close"></i></button>                    
+            </span>
+            <div class="pbar">            
+                <progressbar class="progressbar-sm progress-striped active" value="file.progress"></progressbar>
+            </div>                
+        </div>
+    </div>    
+</div>

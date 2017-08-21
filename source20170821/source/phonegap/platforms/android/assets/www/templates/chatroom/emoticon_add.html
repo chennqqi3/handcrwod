@@ -1,0 +1,24 @@
+<ion-view view-title="絵文字管理" cache-view="false">
+    <ion-content>
+        <form name="form_emoticon" novalidate>
+            <div class="list">
+                <label class="item item-input">
+                    <span class="input-label">入力文字</span>
+                    <input type="text" required="" ng-model="emoticon.alt" placeholder="英数字でキーワード" ng-blur="change_alt()">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">説明</span>
+                    <input type="text" required="" ng-model="emoticon.title">
+                </label>
+                <div class="item text-center">
+                    <div class="emoticon" style="background-image: url({{emoticon.image}})"></div>
+                    <br/>
+                    <div class="button button-small button-assertive" ng-file-select="onUpload($files)">写真や動画Gifをアップロード</div>
+                </div>
+                <div class="item text-center">
+                    <div class="button button-block button-positive" ng-disabled="form_emoticon.$invalid || emoticon.image==''"  ng-click="add()">保存</div>
+                </div>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

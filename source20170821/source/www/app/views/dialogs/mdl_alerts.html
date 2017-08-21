@@ -1,0 +1,25 @@
+<div class="panel-alert">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+        <h4 class="modal-title">アラート</h4>
+    </div>
+    <div class="modal-body">
+        <ul class="dialog-list">
+            <li data-ng-repeat="alert in alerts" class="list-group-item">
+                <span class="view">
+                    <i class="icon icon-info text-warning"></i>
+                    {{alert.msg}}
+
+                    <div class="text-right">
+                        <button type="button" class="btn btn-sm btn-warning" ng-click="accept(alert, 1)" ng-disabled="posting">承認</button>
+                        <button type="button" class="btn btn-sm" ng-click="accept(alert, 0)" ng-disabled="posting">キャンセル</button>
+                    </div>
+                </span>
+                <div class="clear"></div>
+            </li>
+        </ul>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="cancel()">閉じる</button>
+    </div>
+</div>

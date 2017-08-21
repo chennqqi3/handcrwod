@@ -1,0 +1,28 @@
+<div class="home-main" data-ng-controller="botCtrl">
+    <header class="title-bar">
+        <ul class="button-group-left">
+            <li>
+                <button type="button" class="btn btn-default btn-circle"><i class="icon-emotsmile"></i></button>
+            </li>
+        </ul>
+        <div class="title-wrapper">
+            <h2>アシスタント <small class="badge badge-primary">{{bot_tasks0.length}}件</small></h2>
+        </div>
+        <ul class="button-group-right">
+            <li>
+                <label class="check-large-circle check-large-circle-info"><input id="bot_params.self_only" type="checkbox" ng-model="bot_params.self_only"><i></i> <span>自分のタスクだけ</span></label>
+            </li>
+        </ul>
+    </header>
+    <div class="page">
+        <ul class="bot-list">
+            <li data-ng-repeat="task in bot_tasks0 = (bot_tasks | filter:customFilter)" class="list-group-item">
+                <span class="view">
+                    <img alt="" ng-src="{{task.avartar}}" class="avartar img30_30" title="{{task.performer_name}}">
+                    <i class="icon-bubbles"></i> <a ng-href="#/chats/{{task.mission_id}}" class="text-primary">{{task.mission_name}}</a> / <i class="fa fa-check-square-o"></i> <span class="text-primary">{{task.task_name}}</span><span ng-if="task.task_end_expire">の期限<span class="badge badge-danger">{{task.plan_end_date|date_label}}</span>が切れました。</span><span ng-if="!task.task_end_expire && task.task_start_expire">の開始日<span class="badge badge-warning">{{task.plan_start_date|date_label}}</span>が切れました。</span>
+                </span>
+                <div class="clear"></div>
+            </li>
+        </ul>
+    </div>
+</div>

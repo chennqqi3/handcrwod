@@ -1,0 +1,137 @@
+<header class="title-bar">
+    <ul class="button-group-left">
+        <li dropdown ng-if="cur_mission.private_flag!=2">
+            <button type="button" class="btn btn-default btn-circle"><i class="icon-settings"></i></button>
+        </li>
+    </ul>
+    <div class="title-wrapper">
+        <h2>設定</h2>
+    </div>
+</header>
+
+<div class="page page-settings" data-ng-controller="settingsCtrl" data-ng-cloak>
+    <div class="row">
+        <div class="col-md-2 col-sm-12 text-center">
+			<img alt="" ng-src="{{user.avartar}}" class="img80_80 avartar">
+			<br/>
+			<br/>
+
+			<div class="button btn btn-gap-v btn-default" ng-file-select="onUploadAvartar($files)">写真アップロード</div>
+		</div>
+        <div class="col-md-5 col-sm-12">
+            <form name="form_update_profile" class="form-horizontal form-validation" data-ng-submit="updateProfile()">
+				<h3><i class="icon-user"></i> プロファイル</h3>
+                <div class="form-group">
+                    <label for="user_name" class="col-md-4">名前</label>
+                    <div class="col-md-8">
+                        <input type="text"　id="user_name" class="form-control" required ng-model="user.user_name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="login_id" class="col-md-4">ユーザーID</label>
+                    <div class="col-md-8">
+                        <input type="text"　id="login_id" class="form-control" required ng-model="user.login_id">
+                    </div>
+                    <div class="col-md-8 col-md-offset-4">
+                        ユーザーIDはハンドクラウドでユニックする必要があります。
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="col-md-4">メールアドレス</label>
+                    <div class="col-md-8">
+                        <input type="email" id="email" class="form-control" required ng-model="user.email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="skills" class="col-md-4">スキル</label>
+                    <div class="col-md-8">
+						<span class="skills" id="skills" sel-skill="1" ng-model="user.skills"><a href="javascript:;" class="edit-popup edit-popup-empty" ng-show="user.skills.length==0"> スキル選択</a><a href="javascript:;" class="edit-popup" data-ng-repeat="skill_name in user.skills">{{skill_name}}</a></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="hourly_amount" class="col-md-4">時給（円）</label>
+                    <div class="col-md-5">
+                        <input type="text" id="hourly_amount" class="form-control text-right" ng-model="user.hourly_amount" ng-change="changeHourlyAmount()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="time_zone" class="col-md-4">時間帯</label>
+                    <div class="col-md-5">
+						<select class="form-control" id="time_zone" ng-model="user.time_zone">
+							<option data-ng-repeat="time_zone in time_zones">{{time_zone}}</option>
+						</select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">メール通知</label>
+                    <div class="col-md-8">
+                        <label class="check-large-circle check-large-circle-primary"><input id="alarm_mail_flag" type="checkbox" ng-model="user.alarm_mail_flag"><i></i> <span>メール通知にチェックを入れておくと、以下の設定時間にタスク一覧と更新ログが自動でメール通知されます。</span></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="alarm_time" class="col-md-4">メール通知時間</label>
+                    <div class="col-md-5">
+                        <select class="form-control" id="alarm_time" ng-model="user.alarm_time"  ng-options="alarm_time as alarm_time + ':00' for alarm_time in alarm_times">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">ユーザープラン</label>
+                    <div class="col-md-8">
+                        <span class="badge badge-success">{{user.plan.plan_type_string}}</span>
+                    </div>
+                    <div class="col-md-8 col-md-offset-4">
+                        ユーザープランの変更は<a href="http://reflux.jp/handcrowd/#contact" target="_blank">こちらから</a>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4">プラン終了日付</label>
+                    <div class="col-md-8">
+                        <span>{{user.plan_end_date | date_label}}</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <button type="button" class="btn btn-gap-v btn-danger pull-left" ng-click="breakHandcrowd()">退会</button>
+				    <button type="submit" class="btn btn-gap-v btn-primary pull-right" data-ng-disabled="!canUpdateProfile()">保存</button>
+                </div>
+			</form>
+        </div>
+        <div class="col-md-5 col-sm-12">
+			<form name="form_update_password" class="form-horizontal form-validation" data-ng-submit="updatePassword()">
+				<h3><i class="icon-key"></i> パスワード変更</h3>
+                <div class="form-group">
+                    <label for="password" class="col-md-5">現在のパスワード</label>
+                    <div class="col-md-7">
+                        <input type="password" id="password" class="form-control" ng-model="user.old_password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="new_password" class="col-md-5">新パスワード</label>
+                    <div class="col-md-7">
+                        <input type="password" id="new_password" class="form-control" required ng-model="user.new_password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="new_password_retyped" class="col-md-5">パスワード(確認)</label>
+                    <div class="col-md-7">
+                        <input type="password" id="new_password_retyped" class="form-control" required ng-model="user.new_password_retyped" data-equals="{{user.new_password}}">
+                    </div>
+                </div>
+                <hr>
+				<button type="submit" class="btn btn-gap-v btn-default pull-right" data-ng-disabled="!canUpdatePassword()">パスワード変更</button>
+			</form>
+            <div class="clear"></div>
+			<form name="form_sync_google" class="form-horizontal form-validation">
+				<h3><i class="fa fa-google"></i> Googleカレンダー連携</h3>
+				<p ng-show="google_auth_url != '' ">Googleカレンダーとハンドクラウドを連携するには、以下のボタンを押下して、Googleアカウントへ接続してください。</p>
+                <hr>
+				<a href="{{google_auth_url}}" class="btn btn-gap-v btn-default pull-right" ng-show="google_auth_url != '' ">Googleアカウントへの接続</a>
+				<p ng-show="google_auth_url == '' ">Googleカレンダーとハンドクラウドは連携しています。</p>
+				<button type="button pull-right" class="btn btn-gap-v btn-warning" ng-click="disconnectGoogle()" ng-show="google_auth_url == '' ">Googleカレンダーとの連携解除</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<section data-ng-include=" 'views/task/sel_skill.html' + ver "></section>

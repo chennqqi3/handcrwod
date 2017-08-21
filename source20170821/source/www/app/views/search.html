@@ -1,0 +1,32 @@
+<!-- Search panel -->
+<div class="panel panel-default side-panel panel-search shadow-right"
+	data-ng-controller="searchCtrl" data-ng-cloak>
+	<header class="panel-header with-icon-right">
+		<input type="text" class="form-control" required data-ng-model="search_string" placeholder="キーワードを入力" ng-change="refreshSearch(search_string)" ng-blur="saveHistory(search_string)">
+		<i class="fa fa-search"></i>
+	</header>
+	<!-- end panel-header -->
+	<div class="page">
+		<h3>検索履歴</h3>
+		<ul class="list-group">
+			<li data-ng-repeat="history in histories track by $index" class="list-group-item" data-ng-class="{selected: history.search_string == search_string}">
+				<span class="view">
+					<label ng-click="selectSearch(history.search_string)">
+						<i class="fa fa-search"></i>
+						{{history.search_string}}
+					</label>
+				</span>
+			</li>
+		</ul>
+	</div>
+	<!-- end page -->
+	<footer class="panel-footer">
+		<ul class="nav-left list-unstyled">
+			<li>
+				<button type="button" class="btn btn-gap-v btn-white-primary" data-ng-disabled="!canRemove()" ng-click="removeHistory()" title="削除"><i class="glyphicon glyphicon-trash"></i></button>
+			</li>
+		</ul> 
+	</footer>
+	<!-- end panel-footer -->
+</div>
+<!-- end Search panel -->

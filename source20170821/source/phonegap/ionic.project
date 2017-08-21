@@ -1,0 +1,13 @@
+{
+  "name": "handcrowd",
+  "app_id": "6e4e04e5",
+  "gulpStartupTasks": [
+    "sass",
+    "vendor-js",
+    "watch"
+  ],
+  "watchPatterns": [
+    "www/**/*",
+    "!www/lib/**/*"
+  ]
+}

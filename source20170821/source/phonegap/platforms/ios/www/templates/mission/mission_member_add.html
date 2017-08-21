@@ -1,0 +1,32 @@
+<ion-view view-title="チャットルームへの招待">
+    <ion-header class="bar bar-header item-input-inset" ng-show="show_search_member">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" ng-model="search_home.text" placeholder="検索...">
+        </label>
+        <button class="button button-clear" ng-click="close_search_member()">キャンセル</button>
+    </ion-header>
+    <ion-nav-buttons side="right">
+        <button menu-toggle="right" class="button button-icon icon ion-ios-search" ng-click="open_search_member()"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <ion-list>
+            <ion-item data-ng-repeat="member in members | filter:search_home.text" class="item item-avatar item-button-right">
+                <img ng-src="{{member.avartar}}" class="avatar">
+                <h2>{{member.user_name}}</h2>
+                <button class="button button-clear button-positive" ng-click="invite(member.email, content)">招待</button>
+            </ion-item>            
+            <ion-item class="item">
+                <button class="button button-block button-positive" ng-click="addMemberFromEmail()">
+                    メールアドレス/ユーザIDから招待
+                </button>
+            </ion-item>
+            <ion-item class="item">
+                <span class="input-label"><strong>招待QRコード</strong></span>
+            </ion-item>
+            <ion-item class="item">
+                <image ng-src="{{qr_image_url}}" style="width:100%;">
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

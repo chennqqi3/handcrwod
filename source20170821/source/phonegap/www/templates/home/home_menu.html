@@ -1,0 +1,37 @@
+<ion-side-menu side="left" ng-controller="homeMenuCtrl">
+    <ion-header-bar class="bar bar-header bar-positive">
+        <div class="buttons">
+            <button class="button button-icon icon ion-ios-search" ng-click="open_search_home()"></button>
+        </div>
+        <h1 class="title">グループ</h1>
+        <div class="buttons">
+            <button class="button button-icon icon ion-ios-plus-empty" ng-click="addHome()"></button>
+        </div>
+    </ion-header-bar>
+    <ion-header class="bar bar-header item-input-inset" ng-show="show_search_home">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" ng-model="search_home.text" placeholder="検索...">
+        </label>
+        <button class="button button-clear" ng-click="close_search_home()">キャンセル</button>
+    </ion-header>
+    <ion-content has-header="true">
+        <ion-list>
+            <ion-item ng-click="open(home)" class="item item-logo-left" ng-repeat="home in homes | filter:{home_name:search_home.text}" ng-class="{'item-calm': cur_home.home_id==home.home_id}">
+                <div class="logo-container">
+                    <span ng-if="home.logo_url == null">{{home.home_name | abbr}}</span>
+                    <img ng-src="{{home.logo_url}}" class="logo" ng-if="home.logo_url != null">
+                </div>
+                {{home.home_name}}
+                <i class="badge badge-danger" ng-show="home.unreads > 0">{{home.unreads}}</i>
+                <ion-option-button ng-if="canEditHome(home)" class="button-assertive" ng-click="removeHome(home)"><i class="icon ion-ios-trash-outline"></i></ion-option-button>
+                <ion-option-button ng-if="canEditHome(home)" class="button-stable" ng-click="edit(home)"><i class="icon ion-ios-more-outline"></i></ion-option-button>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+    <ion-footer-bar class="bar bar-footer bar-light">
+        <div class="buttons">
+            <a ui-sref="signout" class="button button-icon ion-log-out" ng-click="logout()"> ログアウト</a>
+        </div>
+    </ion-footer-bar>
+</ion-side-menu>

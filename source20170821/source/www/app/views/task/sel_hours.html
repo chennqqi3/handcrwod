@@ -1,0 +1,33 @@
+<!-- Date panel -->
+<div id="panel-sel-hours" class="panel panel-default panel-sel-hours"
+	data-ng-controller="selHoursCtrl">
+	<header class="panel-header">
+		<div class="pull-right">
+			<div class="btn-group">
+				<button type="button" class="btn btn-default btn-circle" ng-click="closePanel()"><i class="ln-icon-cross2"></i></button>
+			</div>
+		</div>
+		<h4>工数選択</h4>
+	</header>
+	<!-- end panel-header -->
+	<div class="page">
+		<form name="form_sel_hours" class="form-validation list-group">
+			<div class="list-group-item col-sm-6">
+				<div class="input-group">
+					<input type="text" class="form-control text-right" ng-model="hours.day" placeholder="人日を入力" pattern="[0-9]+" ng-blur="changeDay()">
+					<span class="input-group-addon">人日</span>
+				</div>
+			</div><div class="list-group-item col-sm-6">
+				<div class="input-group">
+					<input type="text" class="form-control text-right" ng-model="hours.hour" placeholder="時間を入力" pattern="[0-9]+([\.][0-9]{0,2})?" ng-blur="changeHour()">
+					<span class="input-group-addon">時間</span>
+				</div>
+			</div>
+			<div class="list-group-item col-sm-12">
+				<button type="submit" class="btn btn-block btn-primary" data-ng-disabled="!canSubmit()" ng-click="clickOk()"><i class="fa fa-check"></i> 確認</button>
+			</div>
+		</form>
+	</div>
+	<!-- end page -->
+</div>
+<!-- end Date panel -->

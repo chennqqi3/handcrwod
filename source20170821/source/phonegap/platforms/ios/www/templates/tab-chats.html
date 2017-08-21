@@ -1,0 +1,14 @@
+<ion-view view-title="チャット">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button menu-toggle="right" class="button button-icon icon ion-qr-scanner" ng-click="scan_qr()"></button>
+        <button menu-toggle="right" class="button button-icon icon ion-ios-search" ng-click="open_search_chat()"></button>
+    </ion-nav-buttons>
+    <ion-content delegate-handle="missionScroll">
+        <ion-list class="chat-list">
+            <chat-rooms ng-if="loaded"></chat-rooms>
+        </ion-list>
+    </ion-content>
+</ion-view>

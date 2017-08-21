@@ -1,0 +1,31 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+    <h4 class="modal-title" id="myModalLabel">担当者選択</h4>
+</div>
+<div class="modal-body">
+  	<ul class="dialog-list">
+		<li data-ng-repeat="user in users | filter:{user_name:search_string}">
+			<a href="javascript:;" ng-click="selectPerformer(user)">
+				<img alt="" ng-src="{{user.avartar}}" class="avartar avartar-primary img30_30">
+				<span tooltip-placement="right" tooltip="依頼金額累計：{{user.deliver_amount}}円" tooltip-append-to-body="true">{{user.user_name}}</span>
+			</a>
+			<div class="pull-right">
+                <span ng-show="user.ongoing_tasks>0"> 進行中:{{user.ongoing_tasks}}件</span>
+			</div>
+			<div class="skills" ng-show="user.type!=1">{{user.skills}}</div>
+		</li>
+	</ul>
+</div>
+<div class="modal-footer">
+    <form id="search_form" novalidate>
+        <div class="input-group pull-left" style="max-width:350px">
+            <input type="text" class="form-control" required ng-model="search_string" placeholder="キーワードを入力" maxlength="50" auto-focus=true>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default"><i class="icon-magnifier"></i> 検索</button>
+            </div>
+        </div>
+    </form>
+    <button type="button" class="btn btn-primary" ng-show="!task.complete_flag" ng-click="complete()">完了</button>
+    <button type="button" class="btn btn-primary" ng-show="task.complete_flag" ng-click="uncomplete()">未完了</button>
+    <button type="button" class="btn btn-default" ng-click="cancel()">閉じる</button>
+</div>

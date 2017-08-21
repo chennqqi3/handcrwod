@@ -1,0 +1,58 @@
+<div class="page-signin">
+    <div class="main-body" data-ng-controller="signinCtrl" ng-show="showSignin">
+        <div class="container">
+            <div class="form-container">
+				<div class="row">
+					<div class="col-xs-12">
+						<header class="logo">
+							<img src="images/logo_banner.svg?v=1.1.3"/>
+						</header>
+						<form name="form_signin" class="form-horizontal form-validation" data-ng-submit="submitForm()">
+							<fieldset>
+								<div class="form-group form-group-large">
+									<span class="icon-left icon-envelope"></span>
+									<input type="text" class="form-control" required ng-model="user.login_id" placeholder="メールアドレス／ユーザーID">
+								</div>
+								<div class="form-group form-group-large">
+									<span class="icon-left icon-key"></span>
+									<input type="password" class="form-control" required ng-model="user.password" placeholder="パスワード">
+								</div>
+								<div class="form-group" data-ng-show="showExpireError || showSigninError">
+									<div class="alert alert-danger" data-ng-show="showExpireError">有償プランの期限が切れました。<a href="http://reflux.jp/handcrowd/#contact" target="_blank">こちらから</a>お支払いただくかサポートセンターへご連絡ください。</div>
+									<div class="alert alert-danger" data-ng-show="showSigninError">メールアドレスまたはパスワードが正しくありません。パスワードを忘れてしまった方は、<a href="#/forgotpwd">こちらからパスワードをリセット</a>してください。</div>
+								</div>
+								<div class="form-group">
+									<button type="submit" class="btn btn-primary btn-lg btn-block" data-ng-disabled="!canSubmit()">ログイン</button>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+				<div class="social-login">
+					<div class="row">
+						<div class="col-sm-6 col-xs-12">
+							<a ng-href="{{api_url}}facebook/login?base={{base_url}}&redirect_url={{facebook_redirect_url}}&signup_url={{facebook_signup_url}}" class="btn btn-info btn-lg btn-block"><i class="fa fa-facebook-square"></i> Facebookログイン</a>
+						</div>
+						<div class="col-sm-6 col-xs-12">
+							<a ng-href="{{api_url}}google/login?base={{base_url}}&redirect_url={{google_redirect_url}}&signup_url={{google_signup_url}}" class="btn btn-danger btn-lg btn-block"><i class="fa fa-google"></i> Googleログイン</a>
+						</div>
+					</div>
+				</div>
+				<hr>
+				<section>
+					<div class="row">
+						<p class="col-sm-6 col-xs-12 text-center">
+							<a href="#/signup" class="btn btn-circle btn-info-alt btn-default"><i class="icon-user-follow"></i></a>
+							<a href="#/signup">アカウントを新規登録する</a>
+						</p>
+						<p class="col-sm-6 col-xs-12 text-center">
+							<a href="#/forgotpwd" class="btn btn-circle btn-info-alt btn-default"><i class="icon-key"></i></a> 
+							<a href="#/forgotpwd">パスワードをリセットする</a>
+						</p>
+					</div>
+				</section>
+            </div>
+        </div>
+    </div>
+
+</div>

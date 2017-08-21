@@ -1,0 +1,19 @@
+<!-- Calendar panel -->
+<div class="panel panel-default side-panel panel-calendar shadow-right"
+	data-ng-controller="calendarCtrl">
+	<header class="panel-header">
+		<h3>カレンダー</h3>
+	</header>
+	<ul class="list-group">
+		<li class="list-group-item text-center">
+			<button type="button" class="btn btn-primary btn-block" ng-click="selectThisWeek()" data-ng-class="{ 'selected': search_this_week==true }">今週</button>
+		</li>
+		<li class="list-group-item text-center">
+			<div id="sel-calendar">
+			</div>
+		<li class="list-group-item text-center">
+			<button type="button" class="btn btn-primary btn-block" ng-click="clearDate()">クリア</button>
+		</li>
+	</ul>
+</div>
+<!-- end Calendar panel -->

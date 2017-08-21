@@ -1,0 +1,446 @@
+@-moz-keyframes 'good_job_animate' {
+    0%{
+        width:100px;
+        height:130px;
+        opacity: 1;
+    }
+    100% {
+        width: 300px;
+        height: 390px;
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes 'good_job_animate' {
+    0%{
+        width:100px;
+        height:130px;
+        opacity: 1;
+    }
+    100% {
+        width: 300px;
+        height: 390px;
+        opacity: 0;
+    }
+}    
+
+.good_job {
+    position: absolute;
+    left: 0%;
+    top: 30%;
+    text-align: center;
+    width: 100%;
+    z-index: 1000;
+    display: none;
+}
+
+.good_job img {
+    width: 300px;
+    height: 390px;
+    opacity: 0;
+}
+
+.good_job_show img {
+    -moz-animation: 'good_job_animate' 0.6s ease-out;
+    -webkit-animation: 'good_job_animate' 0.6s ease-out;
+}
+
+.panel-task {
+    overflow: hidden;
+    background: white;
+    margin-bottom: 0px;
+
+    .title-wrapper {
+        margin: 0px 0px 0px 0px;
+    }
+
+    .page {
+        position: absolute;
+        top: 50px !important;
+        right: 0;
+        bottom: 0px !important;
+        width: 100%;
+        left: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: -blackberry-touch;
+        -moz-transition: none;
+        -webkit-transition: none;
+        -o-transition: none;
+        transition: none;
+        padding: 10px;
+
+        // essential
+        .task-list {
+            margin-bottom: 0px;
+            .view {
+                display: block;
+            }
+        }
+
+        label {
+            font-weight: normal;
+        }
+
+        .task-list {
+            > li {
+                background: rgba(255, 255, 255, 0.8);
+                border-bottom: solid 1px @gray-lighter;
+                position: relative;
+
+                .progress {
+                    position: absolute;
+                    background: #FFF9C4;
+                    width: 0%;
+                    height: 100%;
+                }
+            }
+
+            // when init
+            .view {
+                position: relative;
+                padding: 0 12px 0 40px;
+                background-color: none;
+
+                .complete-handle {
+                    position: absolute;
+                    top: 6px;
+                    left: 8px;
+
+                    .check-large-circle {
+                        display: inline-block;
+                        position: absolute;
+                        top: 0px;
+                        left: 0px;
+                    }
+
+                    .avartar {
+                        position: absolute;
+                        top: 0px;
+                        left: 0px;
+                    }
+                }
+
+                .task-name {
+                    line-height: 20px;
+                    margin: 0;
+                    width: 100%;
+                    padding: 12px 0 12px 5px;
+                    font-weight: normal;
+
+                    .fa-sitemap {
+                        color: @gray-light;
+                    }
+                }
+
+                a {
+                    text-decoration: none;
+                }
+
+                .task-label {
+                    float: right;
+                    padding-top: 10px;
+
+                    .label-warning {
+                        color: white;
+                        background: @brand-warning;
+                    }
+
+                    .label {
+                        padding-bottom: 2px;
+                    }
+                }
+
+                .check-edit {
+                    display: none;
+                }
+
+                .progress-label {
+                    color: #999;
+                }
+
+                &.editmode {
+                    .check-edit {
+                        position: absolute;
+                        top: 10px;
+                        left: 16px;
+                        display: block;
+                    }
+
+                    .complete-handle {
+                        left: 35px;
+                    }
+
+                    .task-name {
+                        line-height: 20px;
+                        margin: 0;
+                        width: 100%;
+                        padding: 12px 0 12px 30px;
+                        font-weight: normal;
+                    }
+                }
+            }
+
+            .completed .view {
+                background: #f9f9f9;
+
+                .check-star {
+                    i {
+                        color: @gray-lighter !important;
+                        border-color: @gray-lighter !important;
+                    }
+                }
+
+                .label-danger {
+                    opacity: .5;
+                }
+            }
+
+            li.selected {
+                border-left: solid 5px @brand-primary;
+            }
+        }
+
+        @media (max-width:@screen-xs) {
+            .task-list {
+                .view {
+                    padding: 0 5px 0 40px;
+
+                    .check-large-circle {
+                        left: 8px;
+                    }
+                }
+            }
+        }
+
+        .complete-bar {
+            margin-top: 10px;
+        }
+    }
+}
+
+.panel-task-edit {
+    position: absolute;
+    top: 0px;
+    right: 0;
+    bottom: 0px;
+    width: 400px;
+    padding: 0;
+    margin: 0;
+    background: white;
+    border: none;
+    display: none;
+    border-left: solid 1px #f0f0f0 !important;
+
+    .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+        cursor: default;
+        border-color: rgba(0, 0, 0, 0);
+        background-color: rgba(0, 0, 0, 0);
+
+        &:hover, &:focus, &:active {
+            border-color: rgba(0, 0, 0, 0);
+            background-color: rgba(0, 0, 0, 0);
+        }
+    }
+
+    .panel-header {
+        .check-priority {
+            position: absolute;
+            left: 10px;
+            top: 13px;
+        }
+
+        .title-wrapper {
+            margin: 0px 0px 0px 40px;
+        }
+    }
+
+    .task-detail {
+        position: absolute;
+        top: 50px;
+        left: 0px;
+        right: 0px;
+        bottom: 40px;
+        width: 400px;
+        padding: 0;
+        margin: 0;
+        background: white;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    > .list-group {
+        .list-group-item {
+            padding-top: 2px;
+            padding-bottom: 2px;
+            border: none;
+
+            &.tabs-item {
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            
+            .row {
+                > div {
+                    min-height: 20px;
+                    padding-top: 5px;
+                }
+            }
+
+            .fa {
+                margin-right: 10px;
+                font-size: 18px;
+            }
+
+            .ui-rating {
+                display: inline-block;
+                line-height: 20px;
+                padding: 4px 0;
+                margin-bottom: 8px;
+                .fa {
+                    margin-right: 5px;
+                }
+
+                &:focus {
+                    outline: none;
+                }
+            }
+        }
+    }
+
+    .skills {
+        min-height: 36px;
+    }
+
+    .comment {
+        padding: 8px 10px;
+        border-bottom: solid 1px @list-group-border;
+        min-height: 50px;
+        .commentor {
+            float: left;
+            padding-right: 10px;
+        }
+        h4 {
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0px;
+        }
+        p {
+            margin-left: 50px;
+        }
+        .date-time-label {
+            font-size: 12px;
+            text-align: right;
+            min-width: 80px;
+        }
+    }
+
+    .comment-form {
+        .form-group {
+            margin-bottom: 10px;
+        }
+    }
+
+    .comment:last-child {
+        border-bottom: none;
+    }
+
+    @media (max-width: @screen-xs-max) {
+        width: 100%;    
+        .task-detail {
+            width: 100%;
+        }
+    }
+
+    .edit-range {
+        height: 43px;
+
+        label {
+            position: absolute;
+            width: 40px;
+            right: 15px;
+            display: block;
+            text-align: right;
+            padding-top: 5px;
+        }
+        span {
+            position: absolute;
+            left: 50px;
+            right: 55px;
+            display: block;
+
+            input {
+                display: inline-block;
+                overflow: hidden;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                padding-right: 2px;
+                padding-left: 1px;
+                height: 27px;
+                outline: none;
+                background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ccc), color-stop(100%, #ccc));
+                background: linear-gradient(to right, #ccc 0%, #ccc 100%);
+                background-position: center;
+                background-size: 99% 2px;
+                background-repeat: no-repeat;
+                -webkit-appearance: none; 
+            }
+            input::-webkit-slider-thumb {
+                position: relative;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background-color: #fff;
+                box-shadow: 0 0 2px rgba(0, 0, 0, 0.3), 0 3px 5px rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+                -webkit-appearance: none;
+                border: 0; 
+            }
+            input::-webkit-slider-thumb:before {
+                /* what creates the colorful line on the left side of the slider */
+                position: absolute;
+                top: 8px;
+                left: -2001px;
+                width: 2000px;
+                height: 2px;
+                background: @brand-primary;
+                content: ' '; 
+            }
+            input::-webkit-slider-thumb:after {
+                /* create a larger (but hidden) hit area */
+                position: absolute;
+                top: -15px;
+                left: -15px;
+                padding: 30px;
+                content: ' '; 
+            }
+            input::-ms-track {
+                background: transparent;
+                border-color: transparent;
+                border-width: 11px 0 16px;
+                color: transparent;
+                margin-top: 20px; 
+            }
+            input::-ms-thumb {
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background-color: #fff;
+                border-color: #fff;
+                box-shadow: 0 0 2px rgba(0, 0, 0, 0.3), 0 3px 5px rgba(0, 0, 0, 0.2);
+                margin-left: 1px;
+                margin-right: 1px;
+                outline: none; 
+            }
+            input::-ms-fill-lower {
+                height: 2px;
+                background: @brand-primary; 
+            }
+            input::-ms-fill-upper {
+                height: 2px;
+                background: #ccc; 
+            }
+        }
+    }
+}

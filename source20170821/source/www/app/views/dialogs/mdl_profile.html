@@ -1,0 +1,32 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="close()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+    <h4 class="modal-title" id="myModalLabel">{{user.user_name}}</h4>
+</div>
+<div class="modal-body modal-user-profile">
+    <div class="row">
+        <div class="col-sm-3">
+            <img ng-src="{{user.avartar}}" class="avartar img120_120" title="{{user.user_name}}">
+        </div>
+        <div class="col-sm-9">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <div class="row form-group">
+                        <label class="col-sm-4">ユーザーID</label>
+                        <span class="col-sm-8 col-detail">{{user.login_id}}</span>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row form-group">
+                        <label class="col-sm-4">スキル</label>
+                        <span class="col-sm-8 col-detail">
+                            <span data-ng-repeat="skill_name in user.skills">{{skill_name}} </span>
+                        </span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="close()">閉じる</button>
+</div>

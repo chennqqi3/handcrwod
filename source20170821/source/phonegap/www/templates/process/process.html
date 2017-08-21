@@ -1,0 +1,24 @@
+<ion-view view-title="プロセス">
+    <ion-content>
+        <ion-scroll id="process_view" zooming="true" direction="xy" delegate-handle="zoom-pane" class="zoom-pane" scrollbar-x="false" scrollbar-y="false">   
+            <div id="board" class="default-back">
+                <canvas id="lines" task-links ng-model="links"></canvas>
+                <div class="task-item" data-ng-repeat="task in ptasks | filter:searchFilter track by task.task_id" ng-model="task" data-task-id="{{task.task_id}}" data-ng-class="{inited: initItem(task), processed: task.processed == 1, completed: task.progress == 100}" ng-mousedown="selectTask(task)" ng-dblclick="editTask()">
+                    <div class="progress" ng-class="{completed: task.progress==100}" ng-model="task.progress" progress-back></div>
+                    <div class="view">
+                        <div class="complete-handle" ng-model="task">
+                            <img alt="" ng-src="{{task.avartar}}" class="avartar img30_30" data-ng-class="{'avartar-border-success': task.complete_flag == true}">
+                        </div>
+                        <div class="task-label">
+                            <span class="label label-success">{{ task.plan_hours | times_label }}</span>
+                            <span class="label" data-ng-class="{ 'label-warning':is_past(task), 'label-default': !is_past(task)}">{{ (task.complete_flag == true ? task.complete_time : task.plan_end_date) | min_date_label }}</span>
+                        </div>
+                        <div class="task-name">
+                        {{task.task_name}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ion-scroll>
+    </ion-content>
+</ion-view>

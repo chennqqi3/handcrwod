@@ -1,0 +1,23 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">閉じる</span></button>
+  <h4 class="modal-title" id="myModalLabel">サポートチームにお見積依頼</h4>
+</div>
+<div class="modal-body">
+	<form name="form_req_ent" id="form_req_ent" class="form-horizontal form-validation" data-ng-submit="submitForm()" ng-controller="frmReqEntrCtrl">
+		<div class="col-md-12">
+			<div class="form-group">
+				<input type="text" class="form-control" required ng-model="req.title" placeholder="メールタイトルを入力">
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<textarea class="form-control" ng-model="req.content" placeholder="依頼内容を入力してください。" rows=10></textarea>
+			</div>
+		</div>
+	</form>
+	<div class="clear"></div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" ng-click="cancel()">取消</button>
+  <button type="button" class="btn btn-primary" ng-click="ok()">依頼</button>
+</div>

@@ -1,0 +1,101 @@
+<ion-view view-title="設定">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <ion-list>
+            <div class="item text-center">
+                <img alt="" ng-src="{{user.avartar}}" class="img80_80 avartar">
+                <br/>
+                <div class="button button-small button-assertive" ng-file-select="onUploadAvartar($files)">写真アップロード</div>
+            </div>
+            <label class="item item-divider">
+                プロファイル
+            </label>
+            <form novalidate name="form_profile">
+                <label class="item item-input">
+                    <span class="input-label">名前</span>
+                    <input type="text" placeholder="名前を入力してください。" required ng-model="user.user_name">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">ユーザーID</span>
+                    <input type="text" placeholder="ユーザーIDはハンドクラウドでユニックです。" required ng-model="user.login_id">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">メールアドレス</span>
+                    <input type="text" placeholder="メールアドレスを入力してください。" required ng-model="user.email">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">スキル</span>
+                    <p class="skills"><span data-ng-repeat="skill_name in user.skills">{{skill_name}}</span></p>
+                    <button class="button button-clear button-large button-positive" ng-click="open_skill()"><i class="icon-graduation"></i></button>
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">時給（円）</span>
+                    <input type="number" placeholder="時給を入力してください。" ng-model="user.hourly_amount">
+                </label>
+                <label class="item item-input item-select">
+                    <span class="input-label">時間帯</span>
+                    <select ng-model="user.time_zone">
+                        <option data-ng-repeat="time_zone in time_zones">{{time_zone}}</option>
+                    </select>
+                </label>
+                <ion-toggle ng-model="user.alarm_mail_flag">
+                    メール通知にチェックを入れておくと、<br/>以下の設定時間にタスク一覧と更新<br/>ログが自動でメール通知されます。
+                </ion-toggle>
+                <label class="item item-input item-select">
+                    <span class="input-label">メール通知時間</span>
+                    <select ng-model="user.alarm_time">
+                        <option data-ng-repeat="alarm_time in alarm_times" value="{{alarm_time}}">{{alarm_time}}:00</option>
+                    </select>
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">ユーザープラン</span>
+                    <span class="badge badge-assertive">{{user.plan.plan_type_string}}</span>
+                </label>
+                <div class="item item-input">
+                    <span class="item-note">ユーザープランの変更は<a href="#" onclick="window.open('http://reflux.jp/handcrowd/#contact', '_system', 'location=no'); return false;">こちらから</a></span>
+                </div>
+                <label class="item item-input">
+                    <span class="input-label">プラン終了日付</span>
+                    {{user.plan_end_date | date_label}}
+                </label>
+                <div class="item text-center">
+                    <div class="button button-block button-positive" ng-disabled="form_profile.$invalid"  ng-click="updateProfile()">保存</div>
+                </div>
+            </form>
+            <label class="item item-divider">
+                パスワード変更
+            </label>
+            <form novalidate name="form_password">
+                <label class="item item-input">
+                    <span class="input-label">現在のパスワード</span>
+                    <input type="password" required placeholder="現在のパスワードを入力してください。" ng-model="user.old_password">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">パスワード</span>
+                    <input type="password" required placeholder="新しいパスワードを入力してください。" ng-model="user.new_password">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">パスワード(確認)</span>
+                    <input type="password" required placeholder="パスワードを再度入力してください。" ng-model="user.new_password_retyped" data-equals="{{user.new_password}}">
+                </label>
+                <div class="item text-center">
+                    <div class="button button-block button-positive" ng-disabled="form_password.$invalid" ng-click="updatePassword()">保存</div>
+                </div>
+            </form>
+            <label class="item item-divider">
+                アプリ情報
+            </label>
+            <form novalidate>
+                <label class="item item-input">
+                    <span class="input-label">バージョン</span>
+                    v<span app-version></span>
+                </label>
+            </form>
+            <div class="item text-center">
+                <div class="button button-block button-assertive" ng-click="breakHandcrowd()">退会</div>
+            </div>
+        </ion-list>
+    </ion-content>
+</ion-view>

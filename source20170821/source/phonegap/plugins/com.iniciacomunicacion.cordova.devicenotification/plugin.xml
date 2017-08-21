@@ -1,0 +1,38 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.iniciacomunicacion.cordova.devicenotification"
+    version="0.3.7">
+
+    <name>DeviceNotification</name>
+    <description>Cordova Notification Plugin</description>
+    <license>GPL 2.0</license>
+    <keywords>cordova,notification</keywords>
+    <repo>https://github.com/katzer/cordova-plugin-local-notifications.git</repo>
+
+    <author>Inigo Gonzalez - inigo@iniciacomunicacion.com</author>
+
+    <js-module src="www/deviceNotification.js" name="deviceNotification">
+        <merges target="deviceNotification" />
+    </js-module>
+
+    
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="DeviceNotification">
+                <param name="android-package" value="com.iniciacomunicacion.devicenotification.DeviceNotification"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/DeviceNotification.java" target-dir="src/com/iniciacomunicacion/devicenotification/" />
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            
+        </config-file>
+    </platform>
+
+    
+</plugin>
